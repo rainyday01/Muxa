@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Muxa · R5 #14 Dual-Tone Shell (白壳 + 珊瑚芯). Production source. -->
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 108 108" width="1024" height="1024">
+  <defs>
+    <linearGradient id="plate" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#FFFCF9"/>
+      <stop offset="100%" stop-color="#EDE8E1"/>
+    </linearGradient>
+    <linearGradient id="shell" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#FFFFFF"/>
+      <stop offset="100%" stop-color="#F4F0EA"/>
+    </linearGradient>
+    <linearGradient id="core" x1="0.3" y1="0" x2="0.7" y2="1">
+      <stop offset="0%" stop-color="#FF8A80"/>
+      <stop offset="100%" stop-color="#D4534A"/>
+    </linearGradient>
+    <filter id="soft" x="-25%" y="-25%" width="150%" height="150%">
+      <feDropShadow dx="0" dy="3.5" stdDeviation="2.8" flood-color="#37352F" flood-opacity="0.12"/>
+    </filter>
+  </defs>
+  <rect width="108" height="108" fill="url(#plate)"/>
+  <g transform="translate(54,53) scale(0.60) translate(-54,-54)" filter="url(#soft)">
+    <polygon points="54,10 92,32 92,76 54,98 16,76 16,32"
+             fill="url(#shell)" stroke="#E4DFD7" stroke-width="1" stroke-linejoin="round"/>
+    <polygon points="54,26 78,40 78,68 54,82 30,68 30,40" fill="url(#core)"/>
+    <polygon points="54,28 74,40 74,66 54,78 34,66 34,40" fill="#FFFFFF" fill-opacity="0.12"/>
+    <path d="M42 49 L50 57 L42 65" stroke="#FFFFFF" stroke-width="3.6" fill="none"
+          stroke-linecap="round" stroke-linejoin="round"/>
+    <line x1="53" y1="65" x2="64" y2="65" stroke="#FFFFFF" stroke-width="3.6" stroke-linecap="round"/>
+  </g>
+</svg>

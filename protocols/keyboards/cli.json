@@ -1,0 +1,30 @@
+{
+  "id": "cli",
+  "name": "CLI Tools",
+  "version": 3,
+  "barKeys": [
+    { "id": "up", "label": "↑", "action": { "type": "key", "keyCode": "ArrowUp" } },
+    { "id": "down", "label": "↓", "action": { "type": "key", "keyCode": "ArrowDown" } },
+    { "id": "ctrl", "label": "Ctrl", "action": { "type": "modifier_latch", "modifier": "ctrl" } },
+    { "id": "shift", "label": "Shift", "action": { "type": "modifier_latch", "modifier": "shift" } },
+    { "id": "tab", "label": "Tab", "action": { "type": "key", "keyCode": "Tab" } }
+  ],
+  "expandedKeys": [
+    { "id": "esc", "label": "Esc", "action": { "type": "key", "keyCode": "Escape" } },
+    { "id": "ctrl_c", "label": "Ctrl-C", "action": { "type": "chord", "keys": ["Control", "c"] } },
+    { "id": "ctrl_x", "label": "Ctrl-X", "action": { "type": "chord", "keys": ["Control", "x"] } },
+    { "id": "stab", "label": "⇧Tab 模式", "action": { "type": "chord", "keys": ["Shift", "Tab"] } },
+    { "id": "ctrl_j", "label": "Ctrl-J 换行", "action": { "type": "chord", "keys": ["Control", "j"] } },
+    { "id": "ctrl_l", "label": "Ctrl-L", "action": { "type": "chord", "keys": ["Control", "l"] } },
+    { "id": "ctrl_r", "label": "Ctrl-R", "action": { "type": "chord", "keys": ["Control", "r"] } },
+    { "id": "enter2", "label": "Enter", "action": { "type": "key", "keyCode": "Enter" } },
+    { "id": "left", "label": "←", "action": { "type": "key", "keyCode": "ArrowLeft" } },
+    { "id": "right", "label": "→", "action": { "type": "key", "keyCode": "ArrowRight" } },
+    { "id": "home", "label": "Home", "action": { "type": "key", "keyCode": "Home" } },
+    { "id": "end", "label": "End", "action": { "type": "key", "keyCode": "End" } },
+    { "id": "pgup", "label": "Pg Up", "action": { "type": "key", "keyCode": "PageUp" } },
+    { "id": "pgdn", "label": "Pg Dn", "action": { "type": "key", "keyCode": "PageDown" } },
+    { "id": "paste", "label": "Paste", "action": { "type": "text", "text": "" } },
+    { "id": "hide", "label": "Hide", "action": { "type": "text", "text": "" } }
+  ]
+}

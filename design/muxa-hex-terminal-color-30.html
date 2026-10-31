@@ -1,0 +1,247 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1"/>
+<title>Muxa · Hex Terminal · 30 彩色方案 + 比例说明</title>
+<style>
+  :root {
+    --page: #0e1118;
+    --ink: #eef2ff;
+    --muted: #9aa3b8;
+    --card: #161b26;
+    --line: rgba(160, 180, 220, 0.12);
+  }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0;
+    font-family: "SF Pro Text", "Segoe UI", system-ui, sans-serif;
+    background:
+      radial-gradient(900px 480px at 10% -5%, #1e2a4a 0%, transparent 55%),
+      radial-gradient(800px 420px at 90% 0%, #2a1840 0%, transparent 50%),
+      var(--page);
+    color: var(--ink);
+    line-height: 1.45;
+    padding: 28px 18px 72px;
+  }
+  header, section, footer { max-width: 1200px; margin: 0 auto 32px; }
+  h1 { font-size: 1.5rem; font-weight: 650; letter-spacing: -0.02em; margin: 0 0 8px; }
+  h2 { font-size: 1.08rem; font-weight: 600; margin: 0 0 8px; display: flex; gap: 10px; align-items: center; flex-wrap: wrap; }
+  .tag {
+    font-size: 0.7rem; font-weight: 700; letter-spacing: 0.05em; text-transform: uppercase;
+    padding: 3px 9px; border-radius: 999px; background: #5b7cfa; color: #fff;
+  }
+  .tag.warn { background: #e07a4a; }
+  .tag.ok { background: #2db87a; }
+  .sub { color: var(--muted); font-size: 0.93rem; max-width: 78ch; margin: 0 0 12px; }
+  .sub code, .note code, .hexes code {
+    font-family: ui-monospace, Menlo, monospace;
+    font-size: 0.84em;
+    background: rgba(120,150,220,.12);
+    color: #c5d4ff;
+    padding: 1px 5px;
+    border-radius: 4px;
+  }
+  .note { color: var(--muted); font-size: 0.88rem; margin: 0 0 14px; }
+  .callout {
+    border: 1px solid var(--line);
+    background: rgba(255,255,255,.03);
+    border-radius: 14px;
+    padding: 14px 16px;
+    font-size: 0.9rem;
+    color: var(--muted);
+    margin-bottom: 16px;
+  }
+  .callout strong { color: #dce6ff; }
+  .callout ul { margin: 8px 0 0; padding-left: 1.2em; }
+  .callout li { margin: 4px 0; }
+  .grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+    gap: 14px;
+  }
+  .grid.cmp {
+    grid-template-columns: repeat(auto-fill, minmax(168px, 1fr));
+  }
+  .card {
+    background: var(--card);
+    border: 1px solid var(--line);
+    border-radius: 16px;
+    padding: 12px 10px 14px;
+    text-align: center;
+  }
+  .card.hi { border-color: rgba(91,124,250,.55); box-shadow: 0 0 0 1px rgba(91,124,250,.2); }
+  .preview {
+    width: 108px; height: 108px; margin: 0 auto 10px;
+    border-radius: 24px; overflow: hidden;
+    box-shadow: 0 1px 0 rgba(255,255,255,.06) inset, 0 12px 28px rgba(0,0,0,.35);
+  }
+  .preview.round { border-radius: 50%; }
+  .preview svg { display: block; width: 108px; height: 108px; }
+  .num { font-size: 0.68rem; color: var(--muted); letter-spacing: 0.05em; text-transform: uppercase; }
+  .name { font-size: 0.88rem; font-weight: 600; margin-top: 2px; }
+  .hexes { font-size: 0.64rem; color: var(--muted); margin-top: 6px; font-family: ui-monospace, Menlo, monospace; line-height: 1.35; word-break: break-all; }
+  .chips { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 8px; justify-content: center; }
+  .chip { width: 14px; height: 14px; border-radius: 4px; border: 1px solid rgba(255,255,255,.15); }
+  footer { color: var(--muted); font-size: 0.8rem; }
+</style>
+</head>
+<body>
+<header>
+  <h1>Muxa · Hex Terminal · 30 彩色方案</h1>
+  <p class="sub">
+    造型仍是 <strong>#08 双六边形 + <code>&gt;_</code></strong>，不改结构。
+    本轮<strong>刻意避开纯黑底 + 全棕系</strong>，参考市面高下载 App 常见色相：蓝 / 靛 / 紫 / 青绿 / 粉 / 珊瑚 / 薄荷 / 浅色底等。
+  </p>
+</header>
+
+<section>
+  <h2><span class="tag warn">比例</span> 为什么 HTML 里的六边形比手机上的小</h2>
+  <div class="callout">
+    <strong>原因不是「两套画法」，而是三层缩放叠在一起：</strong>
+    <ul>
+      <li><strong>HTML 原图 SVG</strong>（design 文件）：六边形几乎铺满 108 画布（无额外缩小）→ 看起来最大。</li>
+      <li><strong>APK 矢量</strong>：整组 <code>scale(0.72)</code> 居中，给自适应图标留安全边 → 比原图小。</li>
+      <li><strong>桌面启动器</strong>：多数机型会对 Adaptive Icon <strong>再放大并圆形/圆角裁剪</strong>（约 10%–25%），安全边被吃掉 → 肉眼上六边形又变「大」、贴边。</li>
+    </ul>
+    上一份 HTML 的 A 组 = APK 矢量比例（0.72），所以比你手机桌面上的观感更「收」。  
+    <strong>本页目标比例</strong>：以 A 组 / HTML 展示为准的呼吸感；APK 将改为 <code>scale(0.62)</code>，抵消桌面二次放大后，接近本页「目标」预览。
+  </div>
+  <div class="grid cmp" id="proportion"></div>
+</section>
+
+<section>
+  <h2><span class="tag ok">C · Color ×30</span> 彩色方案（目标比例 scale 0.62）</h2>
+  <p class="note">每张都是：圆角 24 的 108 画布 + 目标缩放六边形。点名编号即可（如 <code>C12 Aurora Teal</code>）。</p>
+  <div class="grid" id="series-c"></div>
+</section>
+
+<footer>
+  构图：Hex Terminal #08 · 比例目标 scale 0.62 @ 108 · 选型后写入 ic_launcher_foreground / background
+</footer>
+
+<script>
+/** @typedef {{id:string,name:string,bg:string,outer:string,outerStroke:string,inner:string,innerStroke:string,prompt:string,note?:string}} Palette */
+
+const GEOM = {
+  outer: "54,12 90,32 90,76 54,96 18,76 18,32",
+  inner: "54,22 82,38 82,70 54,86 26,70 26,38",
+};
+
+/** Classic cold black — for proportion compare only */
+const CLASSIC = {
+  id: "classic", name: "Classic cold (ref)",
+  bg: "#101014", outer: "#1c1c22", outerStroke: "#aeaeb2",
+  inner: "#0a0a0c", innerStroke: "#636366", prompt: "#ff6363",
+};
+
+/**
+ * 30 market-popular, non-black, not-all-brown palettes.
+ * BGs: navy / indigo / purple / teal / soft light / pastel — no #101014 black.
+ */
+const COLORS = [
+  // Blues (Telegram / Chrome / many tools)
+  { id: "C01", name: "Sky Blue", bg: "#1B6BFF", outer: "#E8F1FF", outerStroke: "#FFFFFF", inner: "#0E4AD4", innerStroke: "#B8D4FF", prompt: "#FFFFFF" },
+  { id: "C02", name: "Ocean Tool", bg: "#0B5CAD", outer: "#D9ECFF", outerStroke: "#F2F8FF", inner: "#084A8C", innerStroke: "#8FC4F0", prompt: "#7DFFB3" },
+  { id: "C03", name: "Ice Blue Soft", bg: "#E8F3FF", outer: "#FFFFFF", outerStroke: "#5B9FE8", inner: "#D4E9FF", innerStroke: "#3D7FCB", prompt: "#1B6BFF" },
+  { id: "C04", name: "Cobalt Night", bg: "#123A7A", outer: "#2A5FBF", outerStroke: "#9EC0FF", inner: "#0C2A5C", innerStroke: "#6A95E0", prompt: "#FFD36A" },
+  // Indigo / violet (AI / creative apps)
+  { id: "C05", name: "Indigo AI", bg: "#4F46E5", outer: "#EEF0FF", outerStroke: "#FFFFFF", inner: "#3730C3", innerStroke: "#C7CBFF", prompt: "#FDE68A" },
+  { id: "C06", name: "Violet Pop", bg: "#7C3AED", outer: "#F3E8FF", outerStroke: "#FFFFFF", inner: "#5B21B6", innerStroke: "#D8B4FE", prompt: "#FB7185" },
+  { id: "C07", name: "Grape Soft", bg: "#F3E8FF", outer: "#FFFFFF", outerStroke: "#A78BFA", inner: "#E9D5FF", innerStroke: "#7C3AED", prompt: "#7C3AED" },
+  { id: "C08", name: "Deep Iris", bg: "#312E81", outer: "#4C47B8", outerStroke: "#C4B5FD", inner: "#1E1B5A", innerStroke: "#818CF8", prompt: "#F472B6" },
+  // Teal / cyan (dev / fintech)
+  { id: "C09", name: "Teal Pro", bg: "#0F766E", outer: "#CCFBF1", outerStroke: "#FFFFFF", inner: "#0B5C56", innerStroke: "#5EEAD4", prompt: "#FDE047" },
+  { id: "C10", name: "Cyan Electric", bg: "#0891B2", outer: "#E0F7FA", outerStroke: "#FFFFFF", inner: "#0E7490", innerStroke: "#67E8F9", prompt: "#FFFFFF" },
+  { id: "C11", name: "Mint Cream", bg: "#ECFDF5", outer: "#FFFFFF", outerStroke: "#34D399", inner: "#D1FAE5", innerStroke: "#059669", prompt: "#059669" },
+  { id: "C12", name: "Aurora Teal", bg: "#134E4A", outer: "#2DD4BF", outerStroke: "#99F6E4", inner: "#0F3D3A", innerStroke: "#5EEAD4", prompt: "#FBBF24" },
+  // Greens
+  { id: "C13", name: "WhatsApp-ish", bg: "#128C7E", outer: "#DCF8C6", outerStroke: "#FFFFFF", inner: "#075E54", innerStroke: "#86EFAC", prompt: "#FFFFFF" },
+  { id: "C14", name: "Forest Fresh", bg: "#166534", outer: "#DCFCE7", outerStroke: "#BBF7D0", inner: "#14532D", innerStroke: "#4ADE80", prompt: "#FDE047" },
+  { id: "C15", name: "Lime Pop", bg: "#365314", outer: "#ECFCCB", outerStroke: "#D9F99D", inner: "#1A2E05", innerStroke: "#A3E635", prompt: "#A3E635" },
+  // Pink / coral / magenta (consumer social)
+  { id: "C16", name: "Coral Fresh", bg: "#F97316", outer: "#FFF7ED", outerStroke: "#FFFFFF", inner: "#EA580C", innerStroke: "#FDBA74", prompt: "#FFFFFF" },
+  { id: "C17", name: "Soft Coral", bg: "#FFF1E8", outer: "#FFFFFF", outerStroke: "#FB923C", inner: "#FFEDD5", innerStroke: "#EA580C", prompt: "#EA580C" },
+  { id: "C18", name: "Hot Pink", bg: "#DB2777", outer: "#FCE7F3", outerStroke: "#FFFFFF", inner: "#9D174D", innerStroke: "#F9A8D4", prompt: "#FDE047" },
+  { id: "C19", name: "Rose Soft", bg: "#FFF1F2", outer: "#FFFFFF", outerStroke: "#FB7185", inner: "#FFE4E6", innerStroke: "#E11D48", prompt: "#E11D48" },
+  { id: "C20", name: "Magenta Night", bg: "#86198F", outer: "#FAE8FF", outerStroke: "#F5D0FE", inner: "#701A75", innerStroke: "#E879F9", prompt: "#FDE68A" },
+  // Multi-hue / high-contrast popular combos
+  { id: "C21", name: "Duotone Blue-Pink", bg: "#2563EB", outer: "#DBEAFE", outerStroke: "#FFFFFF", inner: "#1D4ED8", innerStroke: "#93C5FD", prompt: "#FB7185" },
+  { id: "C22", name: "Duotone Purple-Cyan", bg: "#6D28D9", outer: "#EDE9FE", outerStroke: "#FFFFFF", inner: "#5B21B6", innerStroke: "#C4B5FD", prompt: "#22D3EE" },
+  { id: "C23", name: "Sunset Blue", bg: "#1E3A8A", outer: "#FFEDD5", outerStroke: "#FDBA74", inner: "#172554", innerStroke: "#93C5FD", prompt: "#FB923C" },
+  { id: "C24", name: "Nord Frost", bg: "#5E81AC", outer: "#ECEFF4", outerStroke: "#E5E9F0", inner: "#4C566A", innerStroke: "#88C0D0", prompt: "#EBCB8B" },
+  { id: "C25", name: "Notion-ish Light", bg: "#F7F6F3", outer: "#FFFFFF", outerStroke: "#37352F", inner: "#EFEDE9", innerStroke: "#787774", prompt: "#E16259" },
+  { id: "C26", name: "Slack-ish Aubergine", bg: "#4A154B", outer: "#E8D5E9", outerStroke: "#FFFFFF", inner: "#350D36", innerStroke: "#C77BB0", prompt: "#ECB22E" },
+  { id: "C27", name: "Stripe Blurple", bg: "#635BFF", outer: "#EEF0FF", outerStroke: "#FFFFFF", inner: "#4B44DB", innerStroke: "#C7C4FF", prompt: "#00D4FF" },
+  { id: "C28", name: "Linear Violet", bg: "#5E6AD2", outer: "#EEF0FF", outerStroke: "#FFFFFF", inner: "#4752C4", innerStroke: "#B4B9F0", prompt: "#F2C94C" },
+  { id: "C29", name: "Figma Purple", bg: "#A259FF", outer: "#F3E8FF", outerStroke: "#FFFFFF", inner: "#7C3AED", innerStroke: "#D8B4FE", prompt: "#1ABCFE" },
+  { id: "C30", name: "Spotify Green", bg: "#1DB954", outer: "#D1FAE5", outerStroke: "#FFFFFF", inner: "#169C46", innerStroke: "#6EE7B7", prompt: "#FFFFFF" },
+];
+
+/**
+ * @param {Palette} p
+ * @param {number} scale
+ * @param {string} uid
+ * @param {{safe?:boolean, round?:boolean}} opt
+ */
+function iconSvg(p, scale, uid, opt = {}) {
+  const s = scale;
+  const swO = (2 / s).toFixed(2);
+  const swI = (1 / s).toFixed(2);
+  const swP = (3.5 / s).toFixed(2);
+  const safe = opt.safe
+    ? `<circle cx="54" cy="54" r="36" fill="none" stroke="rgba(255,80,80,.45)" stroke-width="0.9" stroke-dasharray="2.5 2"/>`
+    : "";
+  return `
+<svg viewBox="0 0 108 108" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="${p.name}">
+  <defs><clipPath id="c-${uid}"><rect width="108" height="108" rx="24"/></clipPath></defs>
+  <g clip-path="url(#c-${uid})">
+    <rect width="108" height="108" fill="${p.bg}"/>
+    <g transform="translate(54,54) scale(${s}) translate(-54,-54)">
+      <polygon points="${GEOM.outer}" fill="${p.outer}" stroke="${p.outerStroke}" stroke-width="${swO}" stroke-linejoin="round"/>
+      <polygon points="${GEOM.inner}" fill="${p.inner}" stroke="${p.innerStroke}" stroke-width="${swI}" stroke-linejoin="round"/>
+      <path d="M40 48 L50 58 L40 68" fill="none" stroke="${p.prompt}" stroke-width="${swP}" stroke-linecap="round" stroke-linejoin="round"/>
+      <line x1="52" y1="68" x2="68" y2="68" stroke="${p.prompt}" stroke-width="${swP}" stroke-linecap="round"/>
+    </g>
+    ${safe}
+  </g>
+</svg>`;
+}
+
+function card(title, sub, p, scale, uid, cls = "", round = false) {
+  return `
+  <article class="card ${cls}">
+    <div class="preview ${round ? "round" : ""}">${iconSvg(p, scale, uid, { safe: cls.includes("hi") })}</div>
+    <div class="num">${title}</div>
+    <div class="name">${sub}</div>
+    <div class="hexes">scale ${scale.toFixed(2)}</div>
+  </article>`;
+}
+
+function colorCard(p, scale) {
+  const chips = [p.bg, p.outer, p.inner, p.prompt]
+    .map((c) => `<span class="chip" style="background:${c}" title="${c}"></span>`)
+    .join("");
+  return `
+  <article class="card">
+    <div class="preview">${iconSvg(p, scale, p.id)}</div>
+    <div class="num">${p.id}</div>
+    <div class="name">${p.name}</div>
+    <div class="chips">${chips}</div>
+    <div class="hexes">${p.bg} · prompt ${p.prompt}</div>
+  </article>`;
+}
+
+// Proportion comparison — same classic colors, different scales
+const prop = document.getElementById("proportion");
+prop.innerHTML = [
+  card("1 · HTML 原图", "design SVG 满铺", CLASSIC, 1.0, "p1"),
+  card("2 · 旧 APK 矢量", "foreground scale 0.72", CLASSIC, 0.72, "p2"),
+  card("3 · 桌面观感模拟", "0.72 × 启动器≈1.2 放大", CLASSIC, 0.72 * 1.2, "p3", "", true),
+  card("4 · 目标（本页/下版）", "scale 0.62 抵消放大", CLASSIC, 0.62, "p4", "hi"),
+].join("");
+
+document.getElementById("series-c").innerHTML = COLORS.map((p) => colorCard(p, 0.62)).join("");
+</script>
+</body>
+</html>

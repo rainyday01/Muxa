@@ -1,0 +1,966 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1"/>
+<title>m-tmux · 图标第 2 轮 + 30 产品名</title>
+<style>
+  :root {
+    --bg: #09090b; --panel: #121214; --border: #27272a;
+    --text: #fafafa; --muted: #a1a1aa; --accent: #38bdf8;
+  }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0; font-family: "SF Pro Text", system-ui, "PingFang SC", "Noto Sans SC", sans-serif;
+    background: var(--bg); color: var(--text); line-height: 1.45;
+  }
+  .wrap { max-width: 1180px; margin: 0 auto; padding: 28px 18px 80px; }
+  header { border-bottom: 1px solid var(--border); padding-bottom: 18px; margin-bottom: 22px; }
+  h1 { font-size: 24px; margin: 0 0 8px; letter-spacing: -0.02em; }
+  .lead { color: var(--muted); font-size: 14px; max-width: 72ch; margin: 0 0 10px; }
+  .chips { display: flex; flex-wrap: wrap; gap: 8px; }
+  .chip { font-size: 11px; padding: 4px 10px; border-radius: 999px; background: #18181b; border: 1px solid var(--border); color: var(--muted); }
+  .chip strong { color: var(--text); }
+  h2 { font-size: 18px; margin: 28px 0 12px; }
+  .sub { color: var(--muted); font-size: 13px; margin: -6px 0 14px; }
+  .toolbar {
+    display: flex; flex-wrap: wrap; gap: 10px; align-items: center; margin-bottom: 16px;
+    position: sticky; top: 0; z-index: 5; background: rgba(9,9,11,.92); backdrop-filter: blur(10px);
+    padding: 10px 0; border-bottom: 1px solid var(--border);
+  }
+  .toolbar label { font-size: 12px; color: var(--muted); }
+  .toolbar select, .toolbar input {
+    background: #18181b; border: 1px solid var(--border); color: var(--text);
+    border-radius: 8px; padding: 6px 10px; font-size: 13px;
+  }
+  .grid {
+    display: grid; grid-template-columns: repeat(auto-fill, minmax(190px, 1fr)); gap: 16px;
+  }
+  .card {
+    background: var(--panel); border: 1px solid var(--border); border-radius: 16px; padding: 14px;
+    transition: .15s border-color, .15s transform; cursor: pointer;
+  }
+  .card:hover { border-color: #52525b; transform: translateY(-2px); }
+  .card.picked { border-color: var(--accent); box-shadow: 0 0 0 1px var(--accent); }
+  .icon-frame {
+    aspect-ratio: 1; border-radius: 18px; margin-bottom: 10px; padding: 12px; display: grid; place-items: center;
+    background:
+      linear-gradient(45deg,#18181b 25%,transparent 25%),
+      linear-gradient(-45deg,#18181b 25%,transparent 25%),
+      linear-gradient(45deg,transparent 75%,#18181b 75%),
+      linear-gradient(-45deg,transparent 75%,#18181b 75%);
+    background-size: 14px 14px; background-position: 0 0,0 7px,7px -7px,-7px 0; background-color: #0a0a0c;
+  }
+  .icon-frame svg { width: 108px; height: 108px; border-radius: 24px; box-shadow: 0 10px 24px rgba(0,0,0,.45); }
+  .num { font-size: 11px; color: var(--accent); font-weight: 700; }
+  .meta h3 { margin: 4px 0; font-size: 14px; }
+  .angle { margin: 0; font-size: 12px; color: var(--muted); }
+  .tags { margin: 4px 0 0; font-size: 11px; color: #71717a; }
+  table.names {
+    width: 100%; border-collapse: collapse; font-size: 13px;
+    background: var(--panel); border-radius: 12px; overflow: hidden; border: 1px solid var(--border);
+  }
+  table.names th, table.names td { padding: 10px 12px; text-align: left; border-bottom: 1px solid var(--border); }
+  table.names th { background: #18181b; color: var(--muted); font-weight: 600; font-size: 11px; letter-spacing: .04em; text-transform: uppercase; }
+  table.names tr:last-child td { border-bottom: 0; }
+  table.names tr:hover td { background: #18181b; }
+  table.names tr.picked td { background: #0c1a24; }
+  .idx { width: 40px; color: var(--accent); font-weight: 700; font-variant-numeric: tabular-nums; }
+  .nm { font-weight: 650; font-size: 15px; white-space: nowrap; }
+  .why { color: var(--muted); }
+  .rec {
+    margin-top: 14px; padding: 12px 14px; border-radius: 12px; background: #0c1a24; border: 1px solid #164e63;
+    font-size: 13px; color: #bae6fd;
+  }
+  footer { margin-top: 36px; padding-top: 14px; border-top: 1px solid var(--border); font-size: 12px; color: var(--muted); }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <h1>第 2 轮 · 30 图标 + 30 产品名候选</h1>
+    <p class="lead">
+      相对第 1 轮全部换了视觉隐喻（线缆坞、会话标签栈、隧道、工牌、折叠分栏、等距盒等），避免再出「单字母 M」。
+      下方另附 <strong>30 个应用名</strong>，按远程终端 / attach / 主机 / 弱网会话定位命名。点击图标或名称行可 shortlist。
+    </p>
+    <div class="chips">
+      <span class="chip"><strong>图标</strong> Round 2 · 30</span>
+      <span class="chip"><strong>命名</strong> 30 candidates</span>
+      <span class="chip"><strong>现状</strong> m-tmux 待替换</span>
+      <span class="chip"><strong>日期</strong> 2026-07-26</span>
+    </div>
+  </header>
+
+  <h2>一、应用名称 × 30</h2>
+  <p class="sub">点击行可标记；命名需自行做商标 / 商店重名检索。当前不推荐继续强化 “m-tmux” 字母堆叠。</p>
+  <div class="rec">
+    <strong>个人短名单建议（可改）：</strong>
+    Remux · Attach · Pane · Tether · Muxa · Shellport · Drift · Quay
+  </div>
+  <table class="names" id="nameTable" style="margin-top:12px">
+    <thead><tr><th>#</th><th>名称</th><th>理由 / 语感</th></tr></thead>
+    <tbody>
+      
+    <tr>
+      <td class="idx">01</td>
+      <td class="nm">Remux</td>
+      <td class="why">Remote + tmux 的自然缩合；好念、可注册感强</td>
+    </tr>
+    <tr>
+      <td class="idx">02</td>
+      <td class="nm">Pane</td>
+      <td class="why">窗格即核心隐喻；极短好记</td>
+    </tr>
+    <tr>
+      <td class="idx">03</td>
+      <td class="nm">Attach</td>
+      <td class="why">tmux attach 动作本身；开发者一秒懂</td>
+    </tr>
+    <tr>
+      <td class="idx">04</td>
+      <td class="nm">Latch</td>
+      <td class="why">挂住远程会话；短、有力</td>
+    </tr>
+    <tr>
+      <td class="idx">05</td>
+      <td class="nm">Muxly</td>
+      <td class="why">multiplex + -ly；轻品牌感</td>
+    </tr>
+    <tr>
+      <td class="idx">06</td>
+      <td class="nm">Shellport</td>
+      <td class="why">shell 的港口；远程落点</td>
+    </tr>
+    <tr>
+      <td class="idx">07</td>
+      <td class="nm">Termdock</td>
+      <td class="why">终端停靠站；偏产品工具</td>
+    </tr>
+    <tr>
+      <td class="idx">08</td>
+      <td class="nm">Hostly</td>
+      <td class="why">以主机为中心的工作台</td>
+    </tr>
+    <tr>
+      <td class="idx">09</td>
+      <td class="nm">Relay</td>
+      <td class="why">中继 / 接力；移动侧入口</td>
+    </tr>
+    <tr>
+      <td class="idx">10</td>
+      <td class="nm">Socket</td>
+      <td class="why">Unix socket / 连接感；偏极客</td>
+    </tr>
+    <tr>
+      <td class="idx">11</td>
+      <td class="nm">Tether</td>
+      <td class="why">拴住远程会话；不断线意象</td>
+    </tr>
+    <tr>
+      <td class="idx">12</td>
+      <td class="nm">Clasp</td>
+      <td class="why">扣住 / 附着；短品牌名</td>
+    </tr>
+    <tr>
+      <td class="idx">13</td>
+      <td class="nm">Rivet</td>
+      <td class="why">铆钉；牢固连接</td>
+    </tr>
+    <tr>
+      <td class="idx">14</td>
+      <td class="nm">Aft</td>
+      <td class="why">after / 后台会话；极短</td>
+    </tr>
+    <tr>
+      <td class="idx">15</td>
+      <td class="nm">Nook</td>
+      <td class="why">角落里的远程终端；亲切</td>
+    </tr>
+    <tr>
+      <td class="idx">16</td>
+      <td class="nm">Harbor</td>
+      <td class="why">港湾；会话停泊</td>
+    </tr>
+    <tr>
+      <td class="idx">17</td>
+      <td class="nm">Warpane</td>
+      <td class="why">warp + pane；速度+窗格</td>
+    </tr>
+    <tr>
+      <td class="idx">18</td>
+      <td class="nm">Moshell</td>
+      <td class="why">mosh + shell；强调弱网</td>
+    </tr>
+    <tr>
+      <td class="idx">19</td>
+      <td class="nm">Pylot</td>
+      <td class="why">pilot 谐音；驾驶远程机</td>
+    </tr>
+    <tr>
+      <td class="idx">20</td>
+      <td class="nm">Consolea</td>
+      <td class="why">console 品牌化</td>
+    </tr>
+    <tr>
+      <td class="idx">21</td>
+      <td class="nm">Sessn</td>
+      <td class="why">session 压缩拼写；现代 app 风</td>
+    </tr>
+    <tr>
+      <td class="idx">22</td>
+      <td class="nm">Tabby Remote</td>
+      <td class="why">若避开冲突可用；标签会话</td>
+    </tr>
+    <tr>
+      <td class="idx">23</td>
+      <td class="nm">Forge Term</td>
+      <td class="why">锻造终端；工程师向</td>
+    </tr>
+    <tr>
+      <td class="idx">24</td>
+      <td class="nm">Drift</td>
+      <td class="why">会话可漂移（mosh）；诗意</td>
+    </tr>
+    <tr>
+      <td class="idx">25</td>
+      <td class="nm">Quay</td>
+      <td class="why">码头；短、冷淡高级</td>
+    </tr>
+    <tr>
+      <td class="idx">26</td>
+      <td class="nm">Boltsh</td>
+      <td class="why">bolt + sh；快连 shell</td>
+    </tr>
+    <tr>
+      <td class="idx">27</td>
+      <td class="nm">Muxa</td>
+      <td class="why">mux 品牌后缀；两音节</td>
+    </tr>
+    <tr>
+      <td class="idx">28</td>
+      <td class="nm">Portico</td>
+      <td class="why">门廊；进入远程的前厅</td>
+    </tr>
+    <tr>
+      <td class="idx">29</td>
+      <td class="nm">Keylane</td>
+      <td class="why">密钥通道；安全连接</td>
+    </tr>
+    <tr>
+      <td class="idx">30</td>
+      <td class="nm">Lumen Shell</td>
+      <td class="why">光感 shell；偏精致工具</td>
+    </tr>
+    </tbody>
+  </table>
+
+  <h2>二、图标 Round 2 × 30</h2>
+  <p class="sub">与第 1 轮不重复叙事。SVG 矢量，可导出 1024²。</p>
+  <div class="toolbar">
+    <label>底色</label>
+    <select id="bgPrev">
+      <option value="check">棋盘</option>
+      <option value="black">黑</option>
+      <option value="white">白</option>
+      <option value="blue">蓝灰</option>
+    </select>
+    <label>筛选</label>
+    <input id="filter" type="search" placeholder="图标名 / 标签…"/>
+  </div>
+  <div class="grid" id="grid">
+    <article class="card" data-id="1">
+      <div class="icon-frame">
+        <svg viewBox="0 0 108 108" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Cable Dock">
+          <clipPath id="sq1"><rect x="4" y="4" width="100" height="100" rx="24"/></clipPath>
+          <g clip-path="url(#sq1)">
+  <rect width="108" height="108" fill="#0c0f14"/>
+  <rect x="34" y="14" width="40" height="28" rx="6" fill="#1a2030" stroke="#64748b" stroke-width="1.5"/>
+  <rect x="40" y="20" width="28" height="14" rx="2" fill="#0ea5e9" opacity="0.35"/>
+  <path d="M54 42 V58" stroke="#94a3b8" stroke-width="4" stroke-linecap="round"/>
+  <path d="M40 58 H68" stroke="#94a3b8" stroke-width="4" stroke-linecap="round"/>
+  <path d="M40 58 V78 M68 58 V78" stroke="#94a3b8" stroke-width="3" stroke-linecap="round"/>
+  <rect x="28" y="76" width="52" height="18" rx="5" fill="#111827" stroke="#38bdf8" stroke-width="1.5"/>
+  <path d="M38 85 L44 89 L38 93" stroke="#38bdf8" stroke-width="2" fill="none" stroke-linecap="round"/>
+  <line x1="50" y1="93" x2="66" y2="93" stroke="#38bdf8" stroke-width="2" stroke-linecap="round" opacity="0.7"/>
+</g>
+        </svg>
+      </div>
+      <div class="meta">
+        <div class="num">R2 · #01</div>
+        <h3>Cable Dock</h3>
+        <p class="angle">Type-C / 线缆接入终端</p>
+        <p class="tags">hardware</p>
+      </div>
+    </article>
+    <article class="card" data-id="2">
+      <div class="icon-frame">
+        <svg viewBox="0 0 108 108" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Session Stack">
+          <clipPath id="sq2"><rect x="4" y="4" width="100" height="100" rx="24"/></clipPath>
+          <g clip-path="url(#sq2)">
+  <rect width="108" height="108" fill="#121018"/>
+  <rect x="20" y="24" width="68" height="16" rx="5" fill="#2a2438"/>
+  <rect x="20" y="42" width="68" height="16" rx="5" fill="#352f4a"/>
+  <rect x="20" y="60" width="68" height="28" rx="6" fill="#1a1528" stroke="#c4b5fd" stroke-width="1.5"/>
+  <circle cx="30" cy="32" r="2.5" fill="#f87171"/><circle cx="38" cy="32" r="2.5" fill="#fbbf24"/><circle cx="46" cy="32" r="2.5" fill="#4ade80"/>
+  <text x="30" y="78" font-family="ui-monospace,monospace" font-size="10" fill="#e9d5ff">grok · live</text>
+</g>
+        </svg>
+      </div>
+      <div class="meta">
+        <div class="num">R2 · #02</div>
+        <h3>Session Stack</h3>
+        <p class="angle">层叠会话标签</p>
+        <p class="tags">tabs</p>
+      </div>
+    </article>
+    <article class="card" data-id="3">
+      <div class="icon-frame">
+        <svg viewBox="0 0 108 108" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Tunnel Arch">
+          <clipPath id="sq3"><rect x="4" y="4" width="100" height="100" rx="24"/></clipPath>
+          <g clip-path="url(#sq3)">
+  <rect width="108" height="108" fill="#0a0e12"/>
+  <path d="M18 78 Q18 28 54 28 Q90 28 90 78" fill="none" stroke="#475569" stroke-width="8" stroke-linecap="round"/>
+  <path d="M30 78 Q30 42 54 42 Q78 42 78 78" fill="#0f172a" stroke="#38bdf8" stroke-width="2.5"/>
+  <circle cx="54" cy="60" r="8" fill="#0ea5e9" opacity="0.4"/>
+  <path d="M48 60 L52 64 L62 52" stroke="#7dd3fc" stroke-width="2.2" fill="none" stroke-linecap="round"/>
+</g>
+        </svg>
+      </div>
+      <div class="meta">
+        <div class="num">R2 · #03</div>
+        <h3>Tunnel Arch</h3>
+        <p class="angle">隧道 / 跳板</p>
+        <p class="tags">jump host</p>
+      </div>
+    </article>
+    <article class="card" data-id="4">
+      <div class="icon-frame">
+        <svg viewBox="0 0 108 108" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Prompt Beam">
+          <clipPath id="sq4"><rect x="4" y="4" width="100" height="100" rx="24"/></clipPath>
+          <g clip-path="url(#sq4)">
+  <rect width="108" height="108" fill="#050508"/>
+  <defs>
+    <linearGradient id="beam" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0%" stop-color="#22d3ee" stop-opacity="0"/>
+      <stop offset="40%" stop-color="#22d3ee"/>
+      <stop offset="100%" stop-color="#a78bfa" stop-opacity="0.2"/>
+    </linearGradient>
+  </defs>
+  <path d="M22 54 L46 36 L46 48 L92 48 L92 60 L46 60 L46 72 Z" fill="url(#beam)"/>
+  <circle cx="34" cy="54" r="10" fill="#0c1220" stroke="#67e8f9" stroke-width="2"/>
+  <path d="M30 54 L34 58 L40 50" stroke="#67e8f9" stroke-width="2" fill="none" stroke-linecap="round"/>
+</g>
+        </svg>
+      </div>
+      <div class="meta">
+        <div class="num">R2 · #04</div>
+        <h3>Prompt Beam</h3>
+        <p class="angle">光束提示符</p>
+        <p class="tags">light, brand</p>
+      </div>
+    </article>
+    <article class="card" data-id="5">
+      <div class="icon-frame">
+        <svg viewBox="0 0 108 108" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Pane Mosaic">
+          <clipPath id="sq5"><rect x="4" y="4" width="100" height="100" rx="24"/></clipPath>
+          <g clip-path="url(#sq5)">
+  <rect width="108" height="108" fill="#0f0f12"/>
+  <rect x="14" y="14" width="44" height="50" rx="8" fill="#1c1c24" stroke="#818cf8" stroke-width="1.5"/>
+  <rect x="64" y="14" width="30" height="28" rx="6" fill="#1c1c24" stroke="#34d399" stroke-width="1.5"/>
+  <rect x="64" y="48" width="30" height="46" rx="6" fill="#1c1c24" stroke="#fbbf24" stroke-width="1.5"/>
+  <rect x="14" y="70" width="44" height="24" rx="6" fill="#1c1c24" stroke="#f472b6" stroke-width="1.5"/>
+  <path d="M24 32 h20 M24 40 h14" stroke="#818cf8" stroke-width="2" stroke-linecap="round"/>
+  <circle cx="79" cy="28" r="3" fill="#34d399"/>
+  <path d="M72 64 h14 M72 72 h10" stroke="#fbbf24" stroke-width="2" stroke-linecap="round"/>
+</g>
+        </svg>
+      </div>
+      <div class="meta">
+        <div class="num">R2 · #05</div>
+        <h3>Pane Mosaic</h3>
+        <p class="angle">不规则拼窗</p>
+        <p class="tags">mosaic</p>
+      </div>
+    </article>
+    <article class="card" data-id="6">
+      <div class="icon-frame">
+        <svg viewBox="0 0 108 108" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Handshake Keys">
+          <clipPath id="sq6"><rect x="4" y="4" width="100" height="100" rx="24"/></clipPath>
+          <g clip-path="url(#sq6)">
+  <rect width="108" height="108" fill="#111113"/>
+  <path d="M30 48 h20 a12 12 0 1 1 0 12 H30 a10 10 0 0 1 0-12z" fill="none" stroke="#fbbf24" stroke-width="3"/>
+  <circle cx="62" cy="54" r="8" fill="none" stroke="#fbbf24" stroke-width="3"/>
+  <path d="M70 54 h16 M80 54 v10 M86 54 v6" stroke="#fbbf24" stroke-width="3" stroke-linecap="round"/>
+  <path d="M22 70 C34 82 48 82 54 70" stroke="#a1a1aa" stroke-width="2" fill="none"/>
+  <path d="M54 70 C60 82 74 82 86 70" stroke="#a1a1aa" stroke-width="2" fill="none"/>
+</g>
+        </svg>
+      </div>
+      <div class="meta">
+        <div class="num">R2 · #06</div>
+        <h3>Handshake Keys</h3>
+        <p class="angle">握手密钥</p>
+        <p class="tags">auth, ssh</p>
+      </div>
+    </article>
+    <article class="card" data-id="7">
+      <div class="icon-frame">
+        <svg viewBox="0 0 108 108" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Pulse Ring">
+          <clipPath id="sq7"><rect x="4" y="4" width="100" height="100" rx="24"/></clipPath>
+          <g clip-path="url(#sq7)">
+  <rect width="108" height="108" fill="#0a0f0c"/>
+  <circle cx="54" cy="54" r="36" fill="none" stroke="#14532d" stroke-width="3"/>
+  <circle cx="54" cy="54" r="26" fill="none" stroke="#22c55e" stroke-width="2.5" opacity="0.7"/>
+  <path d="M28 54 L40 54 L46 40 L54 68 L62 48 L68 54 L80 54" stroke="#4ade80" stroke-width="3" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
+</g>
+        </svg>
+      </div>
+      <div class="meta">
+        <div class="num">R2 · #07</div>
+        <h3>Pulse Ring</h3>
+        <p class="angle">心跳存活环</p>
+        <p class="tags">alive, mosh</p>
+      </div>
+    </article>
+    <article class="card" data-id="8">
+      <div class="icon-frame">
+        <svg viewBox="0 0 108 108" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Console Knobs">
+          <clipPath id="sq8"><rect x="4" y="4" width="100" height="100" rx="24"/></clipPath>
+          <g clip-path="url(#sq8)">
+  <rect width="108" height="108" fill="#1c1917"/>
+  <rect x="16" y="22" width="76" height="64" rx="10" fill="#292524" stroke="#78716c" stroke-width="1.5"/>
+  <rect x="24" y="30" width="40" height="28" rx="4" fill="#0c0a09"/>
+  <path d="M32 40 L38 44 L32 48" stroke="#fafaf9" stroke-width="2" fill="none" stroke-linecap="round"/>
+  <line x1="42" y1="48" x2="54" y2="48" stroke="#a8a29e" stroke-width="2" stroke-linecap="round"/>
+  <circle cx="78" cy="40" r="10" fill="#44403c" stroke="#a8a29e" stroke-width="2"/>
+  <line x1="78" y1="40" x2="78" y2="32" stroke="#fbbf24" stroke-width="2.5" stroke-linecap="round"/>
+  <circle cx="32" cy="72" r="4" fill="#22c55e"/><circle cx="46" cy="72" r="4" fill="#ef4444" opacity="0.5"/>
+  <circle cx="60" cy="72" r="4" fill="#3b82f6" opacity="0.6"/>
+</g>
+        </svg>
+      </div>
+      <div class="meta">
+        <div class="num">R2 · #08</div>
+        <h3>Console Knobs</h3>
+        <p class="angle">机架旋钮台</p>
+        <p class="tags">hardware pro</p>
+      </div>
+    </article>
+    <article class="card" data-id="9">
+      <div class="icon-frame">
+        <svg viewBox="0 0 108 108" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Cloud Anchor">
+          <clipPath id="sq9"><rect x="4" y="4" width="100" height="100" rx="24"/></clipPath>
+          <g clip-path="url(#sq9)">
+  <rect width="108" height="108" fill="#0c1222"/>
+  <path d="M36 48 h-4 a14 14 0 0 1 2-28 a18 18 0 0 1 34-4 a14 14 0 0 1 8 26 h-6" fill="#1e3a5f" stroke="#7dd3fc" stroke-width="1.5"/>
+  <path d="M54 52 V72" stroke="#38bdf8" stroke-width="3" stroke-linecap="round"/>
+  <rect x="38" y="70" width="32" height="18" rx="4" fill="#0f172a" stroke="#38bdf8" stroke-width="1.5"/>
+  <path d="M46 79 L50 82 L58 76" stroke="#7dd3fc" stroke-width="1.8" fill="none" stroke-linecap="round"/>
+</g>
+        </svg>
+      </div>
+      <div class="meta">
+        <div class="num">R2 · #09</div>
+        <h3>Cloud Anchor</h3>
+        <p class="angle">云锚点下连</p>
+        <p class="tags">cloud remote</p>
+      </div>
+    </article>
+    <article class="card" data-id="10">
+      <div class="icon-frame">
+        <svg viewBox="0 0 108 108" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Ink Stamp">
+          <clipPath id="sq10"><rect x="4" y="4" width="100" height="100" rx="24"/></clipPath>
+          <g clip-path="url(#sq10)">
+  <rect width="108" height="108" fill="#fafaf9"/>
+  <circle cx="54" cy="54" r="38" fill="none" stroke="#1c1917" stroke-width="3"/>
+  <circle cx="54" cy="54" r="30" fill="none" stroke="#1c1917" stroke-width="1.5" stroke-dasharray="4 3"/>
+  <path d="M40 44 L50 54 L40 64" stroke="#1c1917" stroke-width="4" fill="none" stroke-linecap="round"/>
+  <line x1="52" y1="64" x2="70" y2="64" stroke="#1c1917" stroke-width="4" stroke-linecap="round"/>
+  <text x="28" y="90" font-family="system-ui" font-size="7" fill="#78716c" letter-spacing="1.5">REMOTE SHELL</text>
+</g>
+        </svg>
+      </div>
+      <div class="meta">
+        <div class="num">R2 · #10</div>
+        <h3>Ink Stamp</h3>
+        <p class="angle">印章式徽记</p>
+        <p class="tags">stamp brand</p>
+      </div>
+    </article>
+    <article class="card" data-id="11">
+      <div class="icon-frame">
+        <svg viewBox="0 0 108 108" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Tile Window">
+          <clipPath id="sq11"><rect x="4" y="4" width="100" height="100" rx="24"/></clipPath>
+          <g clip-path="url(#sq11)">
+  <rect width="108" height="108" fill="#0078d4"/>
+  <rect x="16" y="20" width="76" height="68" rx="4" fill="#0c0c0c"/>
+  <rect x="16" y="20" width="76" height="12" fill="#1f1f1f"/>
+  <circle cx="26" cy="26" r="2" fill="#e81123"/><circle cx="34" cy="26" r="2" fill="#fce100"/><circle cx="42" cy="26" r="2" fill="#00cc6a"/>
+  <path d="M28 48 L36 54 L28 60" stroke="#60cdff" stroke-width="2.5" fill="none" stroke-linecap="round"/>
+  <line x1="42" y1="60" x2="64" y2="60" stroke="#60cdff" stroke-width="2.5" stroke-linecap="round"/>
+  <text x="28" y="74" font-family="ui-monospace,monospace" font-size="9" fill="#a1a1a1">ssh · mosh</text>
+</g>
+        </svg>
+      </div>
+      <div class="meta">
+        <div class="num">R2 · #11</div>
+        <h3>Tile Window</h3>
+        <p class="angle">磁贴窗口</p>
+        <p class="tags">windows metro</p>
+      </div>
+    </article>
+    <article class="card" data-id="12">
+      <div class="icon-frame">
+        <svg viewBox="0 0 108 108" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Lanyard Tag">
+          <clipPath id="sq12"><rect x="4" y="4" width="100" height="100" rx="24"/></clipPath>
+          <g clip-path="url(#sq12)">
+  <rect width="108" height="108" fill="#18181b"/>
+  <path d="M44 12 L44 28 M64 12 L64 28" stroke="#71717a" stroke-width="3" stroke-linecap="round"/>
+  <path d="M44 16 Q54 28 64 16" stroke="#a1a1aa" stroke-width="2" fill="none"/>
+  <rect x="26" y="30" width="56" height="62" rx="8" fill="#27272a" stroke="#d4d4d8" stroke-width="1.5"/>
+  <rect x="34" y="40" width="40" height="24" rx="4" fill="#0a0a0a"/>
+  <path d="M42 48 L48 52 L42 56" stroke="#fafafa" stroke-width="2" fill="none" stroke-linecap="round"/>
+  <line x1="52" y1="56" x2="64" y2="56" stroke="#a1a1aa" stroke-width="2" stroke-linecap="round"/>
+  <rect x="34" y="72" width="40" height="6" rx="2" fill="#3f3f46"/>
+  <rect x="34" y="82" width="28" height="4" rx="1" fill="#52525b"/>
+</g>
+        </svg>
+      </div>
+      <div class="meta">
+        <div class="num">R2 · #12</div>
+        <h3>Lanyard Tag</h3>
+        <p class="angle">工牌挂绳标</p>
+        <p class="tags">ID badge</p>
+      </div>
+    </article>
+    <article class="card" data-id="13">
+      <div class="icon-frame">
+        <svg viewBox="0 0 108 108" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Cursor Trail">
+          <clipPath id="sq13"><rect x="4" y="4" width="100" height="100" rx="24"/></clipPath>
+          <g clip-path="url(#sq13)">
+  <rect width="108" height="108" fill="#09090b"/>
+  <rect x="22" y="30" width="8" height="22" rx="2" fill="#3f3f46" opacity="0.35"/>
+  <rect x="36" y="36" width="8" height="22" rx="2" fill="#52525b" opacity="0.55"/>
+  <rect x="50" y="42" width="8" height="22" rx="2" fill="#a1a1aa" opacity="0.75"/>
+  <rect x="64" y="48" width="10" height="24" rx="2" fill="#fafafa"/>
+  <circle cx="80" cy="60" r="6" fill="#a78bfa"/>
+</g>
+        </svg>
+      </div>
+      <div class="meta">
+        <div class="num">R2 · #13</div>
+        <h3>Cursor Trail</h3>
+        <p class="angle">光标拖尾</p>
+        <p class="tags">motion</p>
+      </div>
+    </article>
+    <article class="card" data-id="14">
+      <div class="icon-frame">
+        <svg viewBox="0 0 108 108" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Bridge Span">
+          <clipPath id="sq14"><rect x="4" y="4" width="100" height="100" rx="24"/></clipPath>
+          <g clip-path="url(#sq14)">
+  <rect width="108" height="108" fill="#0b1220"/>
+  <path d="M10 70 Q54 20 98 70" fill="none" stroke="#334155" stroke-width="6"/>
+  <path d="M10 70 Q54 28 98 70" fill="none" stroke="#38bdf8" stroke-width="2.5"/>
+  <line x1="10" y1="70" x2="98" y2="70" stroke="#1e293b" stroke-width="4"/>
+  <rect x="18" y="66" width="12" height="18" rx="2" fill="#64748b"/>
+  <rect x="78" y="66" width="12" height="18" rx="2" fill="#64748b"/>
+  <circle cx="54" cy="48" r="5" fill="#22d3ee"/>
+</g>
+        </svg>
+      </div>
+      <div class="meta">
+        <div class="num">R2 · #14</div>
+        <h3>Bridge Span</h3>
+        <p class="angle">跨海桥接</p>
+        <p class="tags">bridge network</p>
+      </div>
+    </article>
+    <article class="card" data-id="15">
+      <div class="icon-frame">
+        <svg viewBox="0 0 108 108" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Soft Orb Terminal">
+          <clipPath id="sq15"><rect x="4" y="4" width="100" height="100" rx="24"/></clipPath>
+          <g clip-path="url(#sq15)">
+  <defs>
+    <radialGradient id="orb" cx="35%" cy="30%" r="70%">
+      <stop offset="0%" stop-color="#c4b5fd"/>
+      <stop offset="55%" stop-color="#6d28d9"/>
+      <stop offset="100%" stop-color="#1e1b4b"/>
+    </radialGradient>
+  </defs>
+  <rect width="108" height="108" fill="#0f0a1a"/>
+  <circle cx="54" cy="54" r="36" fill="url(#orb)"/>
+  <path d="M40 50 L48 56 L40 62" stroke="#fff" stroke-width="3" fill="none" stroke-linecap="round" opacity="0.95"/>
+  <line x1="52" y1="62" x2="70" y2="62" stroke="#fff" stroke-width="3" stroke-linecap="round" opacity="0.85"/>
+</g>
+        </svg>
+      </div>
+      <div class="meta">
+        <div class="num">R2 · #15</div>
+        <h3>Soft Orb Terminal</h3>
+        <p class="angle">柔光球体终端</p>
+        <p class="tags">soft 3d</p>
+      </div>
+    </article>
+    <article class="card" data-id="16">
+      <div class="icon-frame">
+        <svg viewBox="0 0 108 108" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Map Pin Host">
+          <clipPath id="sq16"><rect x="4" y="4" width="100" height="100" rx="24"/></clipPath>
+          <g clip-path="url(#sq16)">
+  <rect width="108" height="108" fill="#0f172a"/>
+  <path d="M54 18 C38 18 28 32 28 44 C28 62 54 88 54 88 C54 88 80 62 80 44 C80 32 70 18 54 18Z" fill="#1d4ed8" stroke="#93c5fd" stroke-width="1.5"/>
+  <circle cx="54" cy="44" r="12" fill="#0f172a"/>
+  <path d="M48 44 L52 48 L60 40" stroke="#60a5fa" stroke-width="2" fill="none" stroke-linecap="round"/>
+</g>
+        </svg>
+      </div>
+      <div class="meta">
+        <div class="num">R2 · #16</div>
+        <h3>Map Pin Host</h3>
+        <p class="angle">主机地图钉</p>
+        <p class="tags">host pin</p>
+      </div>
+    </article>
+    <article class="card" data-id="17">
+      <div class="icon-frame">
+        <svg viewBox="0 0 108 108" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Typewriter">
+          <clipPath id="sq17"><rect x="4" y="4" width="100" height="100" rx="24"/></clipPath>
+          <g clip-path="url(#sq17)">
+  <rect width="108" height="108" fill="#1c1917"/>
+  <rect x="18" y="36" width="72" height="40" rx="6" fill="#44403c"/>
+  <rect x="26" y="24" width="56" height="20" rx="3" fill="#f5f5f4"/>
+  <path d="M34 34 h40" stroke="#a8a29e" stroke-width="1"/>
+  <path d="M34 38 h28" stroke="#d6d3d1" stroke-width="1"/>
+  <circle cx="36" cy="62" r="5" fill="#292524"/><circle cx="54" cy="62" r="5" fill="#292524"/><circle cx="72" cy="62" r="5" fill="#292524"/>
+  <rect x="30" y="78" width="48" height="8" rx="2" fill="#57534e"/>
+</g>
+        </svg>
+      </div>
+      <div class="meta">
+        <div class="num">R2 · #17</div>
+        <h3>Typewriter</h3>
+        <p class="angle">打字机卷轴</p>
+        <p class="tags">classic craft</p>
+      </div>
+    </article>
+    <article class="card" data-id="18">
+      <div class="icon-frame">
+        <svg viewBox="0 0 108 108" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Mesh Nodes">
+          <clipPath id="sq18"><rect x="4" y="4" width="100" height="100" rx="24"/></clipPath>
+          <g clip-path="url(#sq18)">
+  <rect width="108" height="108" fill="#09090b"/>
+  <g stroke="#3f3f46" stroke-width="1.5">
+    <line x1="28" y1="30" x2="54" y2="54"/><line x1="80" y1="30" x2="54" y2="54"/>
+    <line x1="28" y1="78" x2="54" y2="54"/><line x1="80" y1="78" x2="54" y2="54"/>
+    <line x1="28" y1="30" x2="80" y2="30"/><line x1="28" y1="78" x2="80" y2="78"/>
+  </g>
+  <circle cx="28" cy="30" r="7" fill="#27272a" stroke="#a78bfa" stroke-width="2"/>
+  <circle cx="80" cy="30" r="7" fill="#27272a" stroke="#38bdf8" stroke-width="2"/>
+  <circle cx="28" cy="78" r="7" fill="#27272a" stroke="#34d399" stroke-width="2"/>
+  <circle cx="80" cy="78" r="7" fill="#27272a" stroke="#fbbf24" stroke-width="2"/>
+  <circle cx="54" cy="54" r="10" fill="#18181b" stroke="#fafafa" stroke-width="2"/>
+  <path d="M50 54 L54 58 L60 50" stroke="#fafafa" stroke-width="1.8" fill="none" stroke-linecap="round"/>
+</g>
+        </svg>
+      </div>
+      <div class="meta">
+        <div class="num">R2 · #18</div>
+        <h3>Mesh Nodes</h3>
+        <p class="angle">网状节点</p>
+        <p class="tags">mesh</p>
+      </div>
+    </article>
+    <article class="card" data-id="19">
+      <div class="icon-frame">
+        <svg viewBox="0 0 108 108" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Night Scope">
+          <clipPath id="sq19"><rect x="4" y="4" width="100" height="100" rx="24"/></clipPath>
+          <g clip-path="url(#sq19)">
+  <rect width="108" height="108" fill="#022c22"/>
+  <circle cx="54" cy="54" r="38" fill="none" stroke="#064e3b" stroke-width="4"/>
+  <circle cx="54" cy="54" r="28" fill="#021a14" stroke="#10b981" stroke-width="1.5"/>
+  <line x1="54" y1="30" x2="54" y2="78" stroke="#10b981" stroke-width="1" opacity="0.4"/>
+  <line x1="30" y1="54" x2="78" y2="54" stroke="#10b981" stroke-width="1" opacity="0.4"/>
+  <path d="M42 50 L50 56 L42 62" stroke="#6ee7b7" stroke-width="2.5" fill="none" stroke-linecap="round"/>
+  <line x1="54" y1="62" x2="68" y2="62" stroke="#6ee7b7" stroke-width="2.5" stroke-linecap="round"/>
+</g>
+        </svg>
+      </div>
+      <div class="meta">
+        <div class="num">R2 · #19</div>
+        <h3>Night Scope</h3>
+        <p class="angle">夜视瞄准终端</p>
+        <p class="tags">scope</p>
+      </div>
+    </article>
+    <article class="card" data-id="20">
+      <div class="icon-frame">
+        <svg viewBox="0 0 108 108" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Fold Device">
+          <clipPath id="sq20"><rect x="4" y="4" width="100" height="100" rx="24"/></clipPath>
+          <g clip-path="url(#sq20)">
+  <rect width="108" height="108" fill="#18181b"/>
+  <rect x="14" y="22" width="36" height="64" rx="6" fill="#27272a" stroke="#71717a" stroke-width="1.5"/>
+  <rect x="58" y="22" width="36" height="64" rx="6" fill="#0a0a0a" stroke="#a78bfa" stroke-width="2"/>
+  <line x1="50" y1="28" x2="50" y2="80" stroke="#3f3f46" stroke-width="2" stroke-dasharray="3 2"/>
+  <path d="M22 40 h16 M22 48 h12" stroke="#52525b" stroke-width="2" stroke-linecap="round"/>
+  <path d="M68 44 L74 50 L68 56" stroke="#c4b5fd" stroke-width="2.2" fill="none" stroke-linecap="round"/>
+  <line x1="78" y1="56" x2="86" y2="56" stroke="#c4b5fd" stroke-width="2.2" stroke-linecap="round"/>
+</g>
+        </svg>
+      </div>
+      <div class="meta">
+        <div class="num">R2 · #20</div>
+        <h3>Fold Device</h3>
+        <p class="angle">折叠屏分栏</p>
+        <p class="tags">foldable</p>
+      </div>
+    </article>
+    <article class="card" data-id="21">
+      <div class="icon-frame">
+        <svg viewBox="0 0 108 108" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Capsule Chip">
+          <clipPath id="sq21"><rect x="4" y="4" width="100" height="100" rx="24"/></clipPath>
+          <g clip-path="url(#sq21)">
+  <rect width="108" height="108" fill="#0c0a09"/>
+  <rect x="18" y="36" width="72" height="36" rx="18" fill="#1c1917" stroke="#a8a29e" stroke-width="2"/>
+  <rect x="30" y="44" width="20" height="20" rx="4" fill="#292524" stroke="#fbbf24" stroke-width="1.5"/>
+  <path d="M36 50 h8 M36 56 h6" stroke="#fbbf24" stroke-width="1.5" stroke-linecap="round"/>
+  <circle cx="66" cy="54" r="6" fill="#22c55e"/>
+  <circle cx="80" cy="54" r="4" fill="#3b82f6" opacity="0.8"/>
+</g>
+        </svg>
+      </div>
+      <div class="meta">
+        <div class="num">R2 · #21</div>
+        <h3>Capsule Chip</h3>
+        <p class="angle">胶囊芯片</p>
+        <p class="tags">chip</p>
+      </div>
+    </article>
+    <article class="card" data-id="22">
+      <div class="icon-frame">
+        <svg viewBox="0 0 108 108" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Scroll Ribbon">
+          <clipPath id="sq22"><rect x="4" y="4" width="100" height="100" rx="24"/></clipPath>
+          <g clip-path="url(#sq22)">
+  <rect width="108" height="108" fill="#1e1b4b"/>
+  <path d="M32 20 h44 a8 8 0 0 1 0 16 H32 a8 8 0 0 1 0-16z" fill="#312e81"/>
+  <rect x="28" y="32" width="52" height="52" rx="4" fill="#0f0a24" stroke="#a5b4fc" stroke-width="1.5"/>
+  <path d="M38 48 h32 M38 56 h24 M38 64 h28" stroke="#818cf8" stroke-width="2" stroke-linecap="round" opacity="0.8"/>
+  <path d="M32 84 h44 a8 8 0 0 0 0-16" fill="none" stroke="#6366f1" stroke-width="3"/>
+</g>
+        </svg>
+      </div>
+      <div class="meta">
+        <div class="num">R2 · #22</div>
+        <h3>Scroll Ribbon</h3>
+        <p class="angle">卷轴回滚</p>
+        <p class="tags">scrollback</p>
+      </div>
+    </article>
+    <article class="card" data-id="23">
+      <div class="icon-frame">
+        <svg viewBox="0 0 108 108" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Compass Remote">
+          <clipPath id="sq23"><rect x="4" y="4" width="100" height="100" rx="24"/></clipPath>
+          <g clip-path="url(#sq23)">
+  <rect width="108" height="108" fill="#0f172a"/>
+  <circle cx="54" cy="54" r="36" fill="#1e293b" stroke="#64748b" stroke-width="2"/>
+  <circle cx="54" cy="54" r="28" fill="none" stroke="#334155" stroke-width="1"/>
+  <path d="M54 30 L62 54 L54 48 L46 54 Z" fill="#38bdf8"/>
+  <path d="M54 78 L46 54 L54 60 L62 54 Z" fill="#475569"/>
+  <circle cx="54" cy="54" r="4" fill="#f8fafc"/>
+</g>
+        </svg>
+      </div>
+      <div class="meta">
+        <div class="num">R2 · #23</div>
+        <h3>Compass Remote</h3>
+        <p class="angle">罗盘指向主机</p>
+        <p class="tags">navigation</p>
+      </div>
+    </article>
+    <article class="card" data-id="24">
+      <div class="icon-frame">
+        <svg viewBox="0 0 108 108" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Minimal Block">
+          <clipPath id="sq24"><rect x="4" y="4" width="100" height="100" rx="24"/></clipPath>
+          <g clip-path="url(#sq24)">
+  <rect width="108" height="108" fill="#e7e5e4"/>
+  <rect x="22" y="22" width="64" height="64" rx="8" fill="#1c1917"/>
+  <path d="M38 40 L52 54 L38 68" stroke="#fafaf9" stroke-width="7" fill="none" stroke-linecap="square" stroke-linejoin="miter"/>
+  <line x1="52" y1="68" x2="74" y2="68" stroke="#fafaf9" stroke-width="7" stroke-linecap="square"/>
+</g>
+        </svg>
+      </div>
+      <div class="meta">
+        <div class="num">R2 · #24</div>
+        <h3>Minimal Block</h3>
+        <p class="angle">体块浮雕提示符</p>
+        <p class="tags">brutalist</p>
+      </div>
+    </article>
+    <article class="card" data-id="25">
+      <div class="icon-frame">
+        <svg viewBox="0 0 108 108" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Aurora Pane">
+          <clipPath id="sq25"><rect x="4" y="4" width="100" height="100" rx="24"/></clipPath>
+          <g clip-path="url(#sq25)">
+  <defs>
+    <linearGradient id="au" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#0f766e"/><stop offset="50%" stop-color="#5b21b6"/><stop offset="100%" stop-color="#9d174d"/>
+    </linearGradient>
+  </defs>
+  <rect width="108" height="108" fill="#020617"/>
+  <rect x="16" y="20" width="76" height="68" rx="12" fill="url(#au)" opacity="0.85"/>
+  <rect x="24" y="32" width="60" height="44" rx="8" fill="#020617" opacity="0.75"/>
+  <path d="M36 48 L44 54 L36 60" stroke="#5eead4" stroke-width="2.5" fill="none" stroke-linecap="round"/>
+  <line x1="50" y1="60" x2="68" y2="60" stroke="#e9d5ff" stroke-width="2.5" stroke-linecap="round"/>
+</g>
+        </svg>
+      </div>
+      <div class="meta">
+        <div class="num">R2 · #25</div>
+        <h3>Aurora Pane</h3>
+        <p class="angle">极光窗格</p>
+        <p class="tags">aurora</p>
+      </div>
+    </article>
+    <article class="card" data-id="26">
+      <div class="icon-frame">
+        <svg viewBox="0 0 108 108" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Bolt Attach">
+          <clipPath id="sq26"><rect x="4" y="4" width="100" height="100" rx="24"/></clipPath>
+          <g clip-path="url(#sq26)">
+  <rect width="108" height="108" fill="#18181b"/>
+  <path d="M58 16 L34 58 H52 L46 92 L78 46 H58 Z" fill="#fbbf24" stroke="#fef3c7" stroke-width="1"/>
+  <rect x="20" y="70" width="28" height="16" rx="3" fill="#27272a" stroke="#a1a1aa" stroke-width="1"/>
+  <path d="M26 78 h12" stroke="#fbbf24" stroke-width="2" stroke-linecap="round"/>
+</g>
+        </svg>
+      </div>
+      <div class="meta">
+        <div class="num">R2 · #26</div>
+        <h3>Bolt Attach</h3>
+        <p class="angle">闪电附着</p>
+        <p class="tags">attach speed</p>
+      </div>
+    </article>
+    <article class="card" data-id="27">
+      <div class="icon-frame">
+        <svg viewBox="0 0 108 108" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Isometric Box">
+          <clipPath id="sq27"><rect x="4" y="4" width="100" height="100" rx="24"/></clipPath>
+          <g clip-path="url(#sq27)">
+  <rect width="108" height="108" fill="#0c0a09"/>
+  <path d="M54 22 L86 40 L86 72 L54 90 L22 72 L22 40 Z" fill="#292524" stroke="#a8a29e" stroke-width="1.5"/>
+  <path d="M54 22 L54 54 L86 72 L86 40 Z" fill="#44403c"/>
+  <path d="M54 22 L22 40 L22 72 L54 54 Z" fill="#1c1917"/>
+  <path d="M40 48 L48 52 L40 56" stroke="#fbbf24" stroke-width="2" fill="none" stroke-linecap="round"/>
+  <line x1="52" y1="56" x2="64" y2="56" stroke="#fbbf24" stroke-width="2" stroke-linecap="round"/>
+</g>
+        </svg>
+      </div>
+      <div class="meta">
+        <div class="num">R2 · #27</div>
+        <h3>Isometric Box</h3>
+        <p class="angle">等距服务器盒</p>
+        <p class="tags">isometric</p>
+      </div>
+    </article>
+    <article class="card" data-id="28">
+      <div class="icon-frame">
+        <svg viewBox="0 0 108 108" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Waveform Prompt">
+          <clipPath id="sq28"><rect x="4" y="4" width="100" height="100" rx="24"/></clipPath>
+          <g clip-path="url(#sq28)">
+  <rect width="108" height="108" fill="#0a0a0c"/>
+  <g fill="#3f3f46">
+    <rect x="18" y="48" width="5" height="12" rx="1"/><rect x="26" y="40" width="5" height="28" rx="1"/>
+    <rect x="34" y="44" width="5" height="20" rx="1"/>
+  </g>
+  <g fill="#a78bfa">
+    <rect x="46" y="36" width="5" height="36" rx="1"/><rect x="54" y="28" width="5" height="52" rx="1"/>
+    <rect x="62" y="38" width="5" height="32" rx="1"/>
+  </g>
+  <g fill="#52525b">
+    <rect x="74" y="42" width="5" height="24" rx="1"/><rect x="82" y="48" width="5" height="12" rx="1"/>
+  </g>
+  <path d="M22 78 L30 84 L22 90" stroke="#fafafa" stroke-width="2.5" fill="none" stroke-linecap="round"/>
+  <line x1="36" y1="90" x2="52" y2="90" stroke="#fafafa" stroke-width="2.5" stroke-linecap="round"/>
+</g>
+        </svg>
+      </div>
+      <div class="meta">
+        <div class="num">R2 · #28</div>
+        <h3>Waveform Prompt</h3>
+        <p class="angle">波形 + 提示符</p>
+        <p class="tags">audio wave metaphor</p>
+      </div>
+    </article>
+    <article class="card" data-id="29">
+      <div class="icon-frame">
+        <svg viewBox="0 0 108 108" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Portal Frame">
+          <clipPath id="sq29"><rect x="4" y="4" width="100" height="100" rx="24"/></clipPath>
+          <g clip-path="url(#sq29)">
+  <rect width="108" height="108" fill="#0f0a1e"/>
+  <ellipse cx="54" cy="54" rx="34" ry="40" fill="none" stroke="#7c3aed" stroke-width="4"/>
+  <ellipse cx="54" cy="54" rx="24" ry="30" fill="#1a1030" stroke="#c4b5fd" stroke-width="1.5"/>
+  <path d="M44 48 L52 54 L44 60" stroke="#e9d5ff" stroke-width="2.5" fill="none" stroke-linecap="round"/>
+  <line x1="56" y1="60" x2="68" y2="60" stroke="#e9d5ff" stroke-width="2.5" stroke-linecap="round" opacity="0.8"/>
+  <circle cx="54" cy="30" r="3" fill="#a78bfa"/><circle cx="54" cy="78" r="3" fill="#a78bfa"/>
+</g>
+        </svg>
+      </div>
+      <div class="meta">
+        <div class="num">R2 · #29</div>
+        <h3>Portal Frame</h3>
+        <p class="angle">传送门边框</p>
+        <p class="tags">portal attach</p>
+      </div>
+    </article>
+    <article class="card" data-id="30">
+      <div class="icon-frame">
+        <svg viewBox="0 0 108 108" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Bookend Glyph">
+          <clipPath id="sq30"><rect x="4" y="4" width="100" height="100" rx="24"/></clipPath>
+          <g clip-path="url(#sq30)">
+  <rect width="108" height="108" fill="#fafafa"/>
+  <rect x="20" y="24" width="10" height="60" rx="2" fill="#18181b"/>
+  <rect x="78" y="24" width="10" height="60" rx="2" fill="#18181b"/>
+  <rect x="34" y="32" width="40" height="44" rx="4" fill="#f4f4f5" stroke="#18181b" stroke-width="2"/>
+  <path d="M44 48 L52 54 L44 60" stroke="#18181b" stroke-width="2.5" fill="none" stroke-linecap="round"/>
+  <line x1="56" y1="60" x2="66" y2="60" stroke="#18181b" stroke-width="2.5" stroke-linecap="round"/>
+</g>
+        </svg>
+      </div>
+      <div class="meta">
+        <div class="num">R2 · #30</div>
+        <h3>Bookend Glyph</h3>
+        <p class="angle">书挡式组合符号</p>
+        <p class="tags">library mark</p>
+      </div>
+    </article></div>
+
+  <footer>
+    <p>第 1 轮文件：m-tmux-30-app-icons.html · 本文件为独立第 2 轮。Not affiliated with the tmux project.</p>
+    <p>选定名称 + 图标编号后，可再出一版 1024 PNG 与商店文案套件。</p>
+  </footer>
+</div>
+<script>
+document.getElementById('bgPrev').addEventListener('change', (e) => {
+  const v = e.target.value;
+  document.querySelectorAll('.icon-frame').forEach(el => {
+    if (v === 'check') el.style.background = '';
+    else if (v === 'black') el.style.background = '#000';
+    else if (v === 'white') el.style.background = '#fff';
+    else if (v === 'blue') el.style.background = 'linear-gradient(145deg,#0f172a,#1e293b)';
+  });
+});
+document.getElementById('filter').addEventListener('input', (e) => {
+  const q = e.target.value.toLowerCase().trim();
+  document.querySelectorAll('#grid .card').forEach(c => {
+    c.style.display = !q || c.innerText.toLowerCase().includes(q) ? '' : 'none';
+  });
+});
+document.getElementById('grid').addEventListener('click', (e) => {
+  const card = e.target.closest('.card');
+  if (card) card.classList.toggle('picked');
+});
+document.querySelectorAll('#nameTable tbody tr').forEach(tr => {
+  tr.style.cursor = 'pointer';
+  tr.addEventListener('click', () => tr.classList.toggle('picked'));
+});
+</script>
+</body>
+</html>

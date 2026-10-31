@@ -1,0 +1,1188 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>m-tmux UI · 5 Directions · Emil Design Eng</title>
+<style>
+  :root {
+    --ease-out: cubic-bezier(0.23, 1, 0.32, 1);
+    --ease-inout: cubic-bezier(0.77, 0, 0.175, 1);
+    --ease-drawer: cubic-bezier(0.32, 0.72, 0, 1);
+    --page-bg: #0a0a0c;
+    --page-fg: #f4f4f5;
+    --page-muted: #8b8b93;
+    --page-card: #141418;
+    --page-line: rgba(255,255,255,.08);
+    --page-accent: #0a84ff;
+    --phone-w: 360px;
+    --phone-h: 740px;
+  }
+
+  * { box-sizing: border-box; }
+  html, body { margin: 0; min-height: 100%; }
+  body {
+    font-family: "SF Pro Text", "PingFang SC", "Inter", system-ui, -apple-system, sans-serif;
+    background:
+      radial-gradient(1200px 600px at 10% -10%, rgba(10,132,255,.12), transparent 55%),
+      radial-gradient(900px 500px at 90% 0%, rgba(48,209,88,.08), transparent 50%),
+      var(--page-bg);
+    color: var(--page-fg);
+    line-height: 1.45;
+  }
+
+  button {
+    font: inherit;
+    border: 0;
+    background: none;
+    color: inherit;
+    cursor: pointer;
+  }
+  button:active { transform: scale(0.97); }
+  @media (prefers-reduced-motion: reduce) {
+    *, *::before, *::after {
+      animation-duration: 0.01ms !important;
+      transition-duration: 0.01ms !important;
+    }
+  }
+
+  /* ── Page chrome ── */
+  .wrap { max-width: 1280px; margin: 0 auto; padding: 28px 20px 80px; }
+  .hero {
+    display: grid;
+    gap: 12px;
+    margin-bottom: 28px;
+  }
+  .eyebrow {
+    display: inline-flex; align-items: center; gap: 8px;
+    font-size: 12px; letter-spacing: .08em; text-transform: uppercase;
+    color: var(--page-muted);
+  }
+  .eyebrow i {
+    width: 6px; height: 6px; border-radius: 50%;
+    background: #30d158; box-shadow: 0 0 0 4px rgba(48,209,88,.15);
+  }
+  h1 {
+    font-size: clamp(28px, 4vw, 40px);
+    font-weight: 680; letter-spacing: -.03em; margin: 0;
+  }
+  .lede {
+    max-width: 68ch; color: var(--page-muted); font-size: 15px; margin: 0;
+  }
+  .principles {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+    gap: 10px;
+    margin-top: 8px;
+  }
+  .pill {
+    background: var(--page-card);
+    border: 1px solid var(--page-line);
+    border-radius: 12px;
+    padding: 12px 14px;
+    font-size: 12.5px;
+  }
+  .pill b { display: block; margin-bottom: 4px; color: var(--page-fg); font-size: 13px; }
+  .pill span { color: var(--page-muted); }
+
+  /* ── Direction picker ── */
+  .dir-bar {
+    display: flex; flex-wrap: wrap; gap: 8px;
+    margin: 28px 0 16px;
+    position: sticky; top: 0; z-index: 20;
+    padding: 12px 0;
+    background: linear-gradient(var(--page-bg) 70%, transparent);
+    backdrop-filter: blur(8px);
+  }
+  .dir-chip {
+    padding: 10px 14px;
+    border-radius: 999px;
+    border: 1px solid var(--page-line);
+    background: rgba(255,255,255,.03);
+    font-size: 13px;
+    font-weight: 560;
+    transition: transform 140ms var(--ease-out), background 160ms ease, border-color 160ms ease;
+  }
+  .dir-chip small {
+    display: block; font-weight: 450; color: var(--page-muted); font-size: 11px; margin-top: 2px;
+  }
+  .dir-chip[aria-selected="true"] {
+    background: rgba(10,132,255,.16);
+    border-color: rgba(10,132,255,.45);
+    color: #fff;
+  }
+  @media (hover: hover) and (pointer: fine) {
+    .dir-chip:hover { background: rgba(255,255,255,.06); }
+  }
+
+  .dir-meta {
+    display: grid;
+    grid-template-columns: 1.2fr .8fr;
+    gap: 16px;
+    margin-bottom: 18px;
+  }
+  @media (max-width: 860px) { .dir-meta { grid-template-columns: 1fr; } }
+  .dir-card {
+    background: var(--page-card);
+    border: 1px solid var(--page-line);
+    border-radius: 16px;
+    padding: 16px 18px;
+  }
+  .dir-card h2 { margin: 0 0 6px; font-size: 18px; letter-spacing: -.02em; }
+  .dir-card p { margin: 0; color: var(--page-muted); font-size: 13.5px; }
+  .swatches { display: flex; gap: 8px; flex-wrap: wrap; margin-top: 12px; }
+  .swatch {
+    width: 28px; height: 28px; border-radius: 8px;
+    border: 1px solid rgba(255,255,255,.12);
+  }
+  .kv { display: grid; gap: 8px; font-size: 12.5px; }
+  .kv div {
+    display: flex; justify-content: space-between; gap: 12px;
+    padding: 8px 10px; border-radius: 10px; background: rgba(255,255,255,.03);
+    border: 1px solid var(--page-line);
+  }
+  .kv b { color: var(--page-muted); font-weight: 500; }
+  .kv span { text-align: right; }
+
+  /* ── Screen tabs ── */
+  .screen-tabs {
+    display: flex; gap: 6px; flex-wrap: wrap;
+    margin: 8px 0 18px;
+  }
+  .screen-tab {
+    padding: 8px 12px;
+    border-radius: 10px;
+    font-size: 13px;
+    border: 1px solid transparent;
+    color: var(--page-muted);
+    transition: color 140ms ease, background 140ms var(--ease-out), border-color 140ms ease;
+  }
+  .screen-tab[aria-selected="true"] {
+    color: var(--page-fg);
+    background: rgba(255,255,255,.06);
+    border-color: var(--page-line);
+  }
+
+  .stage {
+    display: grid;
+    grid-template-columns: auto 1fr;
+    gap: 28px;
+    align-items: start;
+  }
+  @media (max-width: 920px) {
+    .stage { grid-template-columns: 1fr; justify-items: center; }
+  }
+
+  /* ── Phone shell ── */
+  .phone {
+    width: var(--phone-w);
+    height: var(--phone-h);
+    border-radius: 36px;
+    padding: 10px;
+    background: linear-gradient(160deg, #2a2a30, #111114 40%, #0a0a0c);
+    box-shadow:
+      0 0 0 1px rgba(255,255,255,.08),
+      0 30px 80px rgba(0,0,0,.55),
+      inset 0 1px 0 rgba(255,255,255,.08);
+    position: relative;
+  }
+  .phone-notch {
+    position: absolute; top: 16px; left: 50%; transform: translateX(-50%);
+    width: 108px; height: 24px; border-radius: 20px;
+    background: #000; z-index: 5;
+  }
+  .phone-screen {
+    width: 100%; height: 100%;
+    border-radius: 28px;
+    overflow: hidden;
+    position: relative;
+    background: var(--bg);
+    color: var(--fg);
+    display: flex; flex-direction: column;
+    font-size: 13px;
+  }
+
+  /* Status bar */
+  .sb {
+    height: 42px; padding: 14px 18px 0;
+    display: flex; justify-content: space-between; align-items: center;
+    font-size: 11.5px; font-weight: 600; color: var(--fg);
+    flex-shrink: 0;
+  }
+  .sb .icons { display: flex; gap: 5px; opacity: .85; font-size: 10px; }
+
+  /* App chrome shared */
+  .app-header {
+    display: flex; align-items: center; gap: 10px;
+    padding: 6px 14px 10px;
+    flex-shrink: 0;
+  }
+  .app-header h3 {
+    margin: 0; font-size: 17px; font-weight: 680; letter-spacing: -.02em;
+    flex: 1;
+  }
+  .app-header .sub {
+    margin: 0; color: var(--muted); font-size: 11px; font-weight: 450;
+  }
+  .icon-btn {
+    width: 32px; height: 32px; border-radius: 10px;
+    display: grid; place-items: center;
+    background: var(--surface-2);
+    color: var(--fg);
+    border: 1px solid var(--line);
+    transition: transform 140ms var(--ease-out), background 140ms ease;
+    font-size: 14px;
+  }
+  .icon-btn:active { transform: scale(0.95); }
+
+  .tabbar {
+    margin-top: auto;
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    border-top: 1px solid var(--line);
+    background: color-mix(in srgb, var(--bg) 88%, transparent);
+    backdrop-filter: blur(16px);
+    padding: 6px 8px calc(10px + env(safe-area-inset-bottom, 0px));
+    flex-shrink: 0;
+  }
+  .tabbar button {
+    display: grid; gap: 2px; place-items: center;
+    padding: 6px 4px;
+    color: var(--muted);
+    font-size: 10px;
+    border-radius: 10px;
+    transition: color 140ms ease, transform 140ms var(--ease-out);
+  }
+  .tabbar button strong { font-size: 15px; font-weight: 500; line-height: 1; }
+  .tabbar button[aria-current="page"] { color: var(--accent); font-weight: 600; }
+  .tabbar button:active { transform: scale(0.96); }
+
+  .scroll {
+    flex: 1; overflow: auto;
+    padding: 0 12px 12px;
+    scrollbar-width: none;
+  }
+  .scroll::-webkit-scrollbar { display: none; }
+
+  .card {
+    background: var(--card);
+    border: 1px solid var(--line);
+    border-radius: var(--radius);
+    padding: 12px;
+    margin-bottom: 10px;
+    transition: transform 150ms var(--ease-out), background 150ms ease, border-color 150ms ease;
+  }
+  .card:active { transform: scale(0.985); }
+  @media (hover: hover) and (pointer: fine) {
+    .card:hover { border-color: color-mix(in srgb, var(--accent) 35%, var(--line)); }
+  }
+
+  .row { display: flex; align-items: center; gap: 10px; }
+  .grow { flex: 1; min-width: 0; }
+  .muted { color: var(--muted); }
+  .tiny { font-size: 11px; }
+  .title { font-weight: 620; font-size: 14px; letter-spacing: -.01em; }
+  .badge {
+    font-size: 10px; font-weight: 620; padding: 3px 7px;
+    border-radius: 999px; background: var(--surface-2); color: var(--muted);
+    border: 1px solid var(--line);
+  }
+  .badge.ok { color: var(--ok); border-color: color-mix(in srgb, var(--ok) 35%, transparent); background: color-mix(in srgb, var(--ok) 12%, transparent); }
+  .badge.warn { color: var(--warn); border-color: color-mix(in srgb, var(--warn) 35%, transparent); background: color-mix(in srgb, var(--warn) 12%, transparent); }
+  .badge.acc { color: var(--accent); border-color: color-mix(in srgb, var(--accent) 35%, transparent); background: color-mix(in srgb, var(--accent) 12%, transparent); }
+
+  .dot {
+    width: 8px; height: 8px; border-radius: 50%; flex-shrink: 0;
+  }
+  .dot.g { background: var(--ok); box-shadow: 0 0 0 3px color-mix(in srgb, var(--ok) 20%, transparent); }
+  .dot.r { background: #ff453a; box-shadow: 0 0 0 3px rgba(255,69,58,.15); }
+  .dot.y { background: var(--warn); }
+  .dot.x { background: var(--muted); opacity: .5; }
+
+  .btn {
+    display: inline-flex; align-items: center; justify-content: center; gap: 6px;
+    padding: 10px 14px;
+    border-radius: 12px;
+    background: var(--accent);
+    color: var(--on-accent);
+    font-weight: 620; font-size: 13px;
+    transition: transform 140ms var(--ease-out), filter 140ms ease, opacity 140ms ease;
+  }
+  .btn:active { transform: scale(0.97); filter: brightness(.95); }
+  .btn.ghost {
+    background: var(--surface-2);
+    color: var(--fg);
+    border: 1px solid var(--line);
+  }
+  .btn.block { width: 100%; }
+  .btn.sm { padding: 6px 10px; font-size: 11.5px; border-radius: 9px; }
+
+  .field {
+    margin-bottom: 10px;
+  }
+  .field label {
+    display: block; font-size: 11px; color: var(--muted); margin-bottom: 5px; font-weight: 550;
+  }
+  .field input, .field .fake-input {
+    width: 100%;
+    padding: 11px 12px;
+    border-radius: 12px;
+    border: 1px solid var(--line);
+    background: var(--surface-2);
+    color: var(--fg);
+    font: inherit; font-size: 13px;
+    outline: none;
+  }
+  .field input:focus {
+    border-color: color-mix(in srgb, var(--accent) 55%, var(--line));
+    box-shadow: 0 0 0 3px color-mix(in srgb, var(--accent) 18%, transparent);
+  }
+  .seg {
+    display: grid; grid-template-columns: repeat(3, 1fr); gap: 6px;
+  }
+  .seg button {
+    padding: 10px 6px;
+    border-radius: 11px;
+    border: 1px solid var(--line);
+    background: var(--surface-2);
+    font-size: 11.5px; font-weight: 560;
+    transition: transform 140ms var(--ease-out), background 140ms ease, border-color 140ms ease, color 140ms ease;
+  }
+  .seg button[aria-checked="true"] {
+    background: color-mix(in srgb, var(--accent) 16%, var(--surface-2));
+    border-color: color-mix(in srgb, var(--accent) 45%, var(--line));
+    color: var(--accent);
+  }
+  .seg button:active { transform: scale(0.97); }
+
+  .toggle {
+    width: 42px; height: 26px; border-radius: 999px;
+    background: var(--surface-2); border: 1px solid var(--line);
+    position: relative; transition: background 180ms var(--ease-out);
+  }
+  .toggle::after {
+    content: ""; position: absolute; top: 2px; left: 2px;
+    width: 20px; height: 20px; border-radius: 50%;
+    background: #fff;
+    transition: transform 180ms var(--ease-out);
+    box-shadow: 0 1px 3px rgba(0,0,0,.25);
+  }
+  .toggle.on { background: var(--accent); border-color: transparent; }
+  .toggle.on::after { transform: translateX(16px); }
+
+  .setting-row {
+    display: flex; align-items: center; gap: 10px;
+    padding: 12px 0;
+    border-bottom: 1px solid var(--line);
+  }
+  .setting-row:last-child { border-bottom: 0; }
+  .setting-row .grow .t { font-weight: 580; font-size: 13.5px; }
+  .setting-row .grow .d { color: var(--muted); font-size: 11px; margin-top: 2px; }
+
+  /* Terminal */
+  .term-top {
+    display: flex; align-items: center; gap: 8px;
+    padding: 4px 10px 8px;
+    border-bottom: 1px solid var(--line);
+    flex-shrink: 0;
+  }
+  .term-body {
+    flex: 1;
+    background: var(--term-bg);
+    color: var(--term-fg);
+    font-family: "JetBrains Mono", "SF Mono", ui-monospace, Menlo, Consolas, monospace;
+    font-size: 11.5px;
+    line-height: 1.45;
+    padding: 10px 12px;
+    overflow: hidden;
+    white-space: pre-wrap;
+    position: relative;
+  }
+  .term-body .prompt { color: var(--term-accent); }
+  .term-body .dim { opacity: .55; }
+  .term-body .hl { color: var(--term-hl, #89d185); }
+  .term-body .cursor {
+    display: inline-block; width: 7px; height: 13px;
+    background: var(--term-fg); vertical-align: -2px;
+    animation: blink 1.05s steps(1) infinite;
+  }
+  @keyframes blink { 50% { opacity: 0; } }
+  .keybar {
+    display: flex; gap: 5px; flex-wrap: wrap;
+    padding: 8px 8px 6px;
+    background: color-mix(in srgb, var(--bg) 92%, #000);
+    border-top: 1px solid var(--line);
+    flex-shrink: 0;
+  }
+  .keybar button {
+    min-width: 36px; height: 30px; padding: 0 8px;
+    border-radius: 8px;
+    background: var(--surface-2);
+    border: 1px solid var(--line);
+    color: var(--fg);
+    font-size: 11px; font-weight: 600;
+    font-family: ui-monospace, monospace;
+    transition: transform 120ms var(--ease-out), background 120ms ease;
+  }
+  .keybar button:active { transform: scale(0.95); background: color-mix(in srgb, var(--accent) 20%, var(--surface-2)); }
+  .keybar .spacer { flex: 1; }
+
+  /* Snapshots */
+  .snap {
+    margin-top: 8px;
+    padding: 8px 10px;
+    border-radius: 10px;
+    background: var(--term-bg);
+    color: var(--term-fg);
+    font-family: ui-monospace, monospace;
+    font-size: 10px;
+    line-height: 1.35;
+    max-height: 54px;
+    overflow: hidden;
+    opacity: .9;
+    border: 1px solid color-mix(in srgb, var(--line) 80%, transparent);
+  }
+
+  .host-chip {
+    display: inline-flex; align-items: center; gap: 6px;
+    padding: 4px 8px; border-radius: 8px;
+    background: var(--surface-2); border: 1px solid var(--line);
+    font-size: 11px; margin-bottom: 8px;
+  }
+
+  .section-label {
+    font-size: 11px; font-weight: 620; color: var(--muted);
+    letter-spacing: .04em; text-transform: uppercase;
+    margin: 4px 2px 8px;
+  }
+
+  .list-enter .card {
+    animation: rise 280ms var(--ease-out) both;
+  }
+  .list-enter .card:nth-child(1) { animation-delay: 0ms; }
+  .list-enter .card:nth-child(2) { animation-delay: 40ms; }
+  .list-enter .card:nth-child(3) { animation-delay: 80ms; }
+  .list-enter .card:nth-child(4) { animation-delay: 120ms; }
+  @keyframes rise {
+    from { opacity: 0; transform: translateY(8px) scale(0.98); }
+    to { opacity: 1; transform: translateY(0) scale(1); }
+  }
+
+  /* Notes panel */
+  .notes h3 { margin: 0 0 10px; font-size: 15px; }
+  .notes ul { margin: 0; padding-left: 18px; color: var(--page-muted); font-size: 13px; }
+  .notes li { margin-bottom: 8px; }
+  .notes li strong { color: var(--page-fg); font-weight: 600; }
+  .matrix {
+    width: 100%; border-collapse: collapse; font-size: 12px; margin-top: 14px;
+  }
+  .matrix th, .matrix td {
+    text-align: left; padding: 8px 10px;
+    border-bottom: 1px solid var(--page-line);
+    vertical-align: top;
+  }
+  .matrix th { color: var(--page-muted); font-weight: 550; }
+  .matrix td:first-child { color: var(--page-muted); white-space: nowrap; width: 28%; }
+
+  .footer-note {
+    margin-top: 36px; padding-top: 18px;
+    border-top: 1px solid var(--page-line);
+    color: var(--page-muted); font-size: 12.5px;
+  }
+
+  /* ════════════ Theme tokens per direction ════════════ */
+  /* A Pulse Mono */
+  .t-a {
+    --bg: #09090b; --fg: #fafafa; --muted: #71717a;
+    --card: #121214; --surface-2: #18181b; --line: rgba(255,255,255,.08);
+    --accent: #fafafa; --on-accent: #09090b;
+    --ok: #22c55e; --warn: #eab308; --radius: 12px;
+    --term-bg: #050506; --term-fg: #e4e4e7; --term-accent: #a1a1aa; --term-hl: #fafafa;
+  }
+  /* B Glass Sequoia */
+  .t-b {
+    --bg: #0f1014; --fg: #f5f5f7; --muted: #8b93a7;
+    --card: rgba(255,255,255,.06); --surface-2: rgba(255,255,255,.07); --line: rgba(255,255,255,.10);
+    --accent: #0a84ff; --on-accent: #fff;
+    --ok: #30d158; --warn: #ffd60a; --radius: 16px;
+    --term-bg: #0b1410; --term-fg: #7dcf7a; --term-accent: #4ade80; --term-hl: #a7f3d0;
+  }
+  /* C Paper Light */
+  .t-c {
+    --bg: #f4f5f7; --fg: #111827; --muted: #6b7280;
+    --card: #ffffff; --surface-2: #eef0f4; --line: rgba(17,24,39,.08);
+    --accent: #2563eb; --on-accent: #fff;
+    --ok: #16a34a; --warn: #ca8a04; --radius: 14px;
+    --term-bg: #1c1c1e; --term-fg: #d1fae5; --term-accent: #6ee7b7; --term-hl: #a7f3d0;
+  }
+  /* D Terminal First */
+  .t-d {
+    --bg: #07120c; --fg: #d8f5d4; --muted: #6f9b72;
+    --card: #0c1a12; --surface-2: #102218; --line: rgba(125,207,122,.14);
+    --accent: #3ddc84; --on-accent: #04210f;
+    --ok: #3ddc84; --warn: #c8e64a; --radius: 10px;
+    --term-bg: #020805; --term-fg: #7dcf7a; --term-accent: #b6f2a8; --term-hl: #e2ffd8;
+  }
+  /* E Warm Night Operator */
+  .t-e {
+    --bg: #14110f; --fg: #f5efe6; --muted: #9c9186;
+    --card: #1c1815; --surface-2: #241f1b; --line: rgba(245,239,230,.08);
+    --accent: #e8a35c; --on-accent: #1a120a;
+    --ok: #7dcf8a; --warn: #e8a35c; --radius: 14px;
+    --term-bg: #0e0c0a; --term-fg: #e8dcc8; --term-accent: #e8a35c; --term-hl: #f0c98a;
+  }
+
+  /* Theme-specific decorations */
+  .t-b .phone-screen {
+    background:
+      radial-gradient(600px 300px at 20% -10%, rgba(10,132,255,.18), transparent 50%),
+      radial-gradient(500px 280px at 100% 0%, rgba(94,92,230,.12), transparent 45%),
+      var(--bg);
+  }
+  .t-b .card {
+    backdrop-filter: blur(18px);
+    box-shadow: inset 0 1px 0 rgba(255,255,255,.06);
+  }
+  .t-c .phone-screen { background: var(--bg); }
+  .t-c .card { box-shadow: 0 1px 2px rgba(17,24,39,.04), 0 8px 24px rgba(17,24,39,.04); }
+  .t-d .phone-screen {
+    background:
+      linear-gradient(180deg, rgba(61,220,132,.04), transparent 30%),
+      var(--bg);
+  }
+  .t-d .title, .t-d .app-header h3 { font-family: ui-monospace, monospace; letter-spacing: 0; }
+  .t-e .phone-screen {
+    background:
+      radial-gradient(500px 280px at 80% -20%, rgba(232,163,92,.12), transparent 50%),
+      var(--bg);
+  }
+
+  .hidden { display: none !important; }
+</style>
+</head>
+<body>
+  <div class="wrap">
+    <header class="hero">
+      <div class="eyebrow"><i></i> m-tmux · UI 质感提案 · emil-design-eng</div>
+      <h1>五版方向：效率 · 快捷 · 清爽质感</h1>
+      <p class="lede">
+        依据 Emil Kowalski 的 design engineering：高频操作无动画、按压
+        <code>scale(0.97)</code>、自定义 ease-out、列表 stagger 30–80ms、
+        只动画 transform/opacity。每版覆盖四个核心界面——会话列表、主机配置、设置、进入 Claude Code TUI 的终端页。
+      </p>
+      <div class="principles">
+        <div class="pill"><b>Taste compounds</b><span>看不见的细节叠加成「好用」</span></div>
+        <div class="pill"><b>Speed perception</b><span>180ms 胜过 400ms；ease-out 感觉更快</span></div>
+        <div class="pill"><b>Keyboard-first</b><span>进会话 / 切 tab：零装饰动画</span></div>
+        <div class="pill"><b>Good defaults</b><span>默认就好看，少让用户调</span></div>
+      </div>
+    </header>
+
+    <nav class="dir-bar" role="tablist" aria-label="设计方向">
+      <button class="dir-chip" role="tab" data-dir="a" aria-selected="true">
+        A · Pulse Mono
+        <small>极简黑白 · 密度优先</small>
+      </button>
+      <button class="dir-chip" role="tab" data-dir="b" aria-selected="false">
+        B · Glass Sequoia
+        <small>现行主题升级 · 玻璃</small>
+      </button>
+      <button class="dir-chip" role="tab" data-dir="c" aria-selected="false">
+        C · Paper Light
+        <small>日间清爽 · 纸质卡片</small>
+      </button>
+      <button class="dir-chip" role="tab" data-dir="d" aria-selected="false">
+        D · Terminal First
+        <small>绿磷终端 · 操作员感</small>
+      </button>
+      <button class="dir-chip" role="tab" data-dir="e" aria-selected="false">
+        E · Warm Night
+        <small>暖夜琥珀 · Claude 味</small>
+      </button>
+    </nav>
+
+    <!-- ══════ Direction A ══════ -->
+    <section class="dir-panel" data-dir="a">
+      <div class="dir-meta">
+        <div class="dir-card">
+          <h2>A · Pulse Mono — 黑白脉冲</h2>
+          <p>信息密度最高、对比最硬。接近 Raycast / Linear 的「工具感」：几乎无彩色装饰，状态用点与字重表达。适合每天开几十次会话的用户——视觉噪声最低，扫列表最快。</p>
+          <div class="swatches">
+            <span class="swatch" style="background:#09090b"></span>
+            <span class="swatch" style="background:#18181b"></span>
+            <span class="swatch" style="background:#fafafa"></span>
+            <span class="swatch" style="background:#22c55e"></span>
+            <span class="swatch" style="background:#71717a"></span>
+          </div>
+        </div>
+        <div class="dir-card kv">
+          <div><b>主色</b><span>近白 / 近黑反转按钮</span></div>
+          <div><b>圆角</b><span>12px · 偏利落</span></div>
+          <div><b>动画</b><span>按压 140ms · 列表 stagger 40ms</span></div>
+          <div><b>终端</b><span>纯灰阶 mono · 无绿磷滤镜</span></div>
+        </div>
+      </div>
+      <div class="screen-tabs" data-for="a">
+        <button class="screen-tab" data-screen="sessions" aria-selected="true">会话列表</button>
+        <button class="screen-tab" data-screen="hosts" aria-selected="false">主机配置</button>
+        <button class="screen-tab" data-screen="settings" aria-selected="false">设置</button>
+        <button class="screen-tab" data-screen="term" aria-selected="false">Claude TUI</button>
+      </div>
+      <div class="stage">
+        <div class="phone"><div class="phone-notch"></div>
+          <div class="phone-screen t-a" id="screen-a">
+            <!-- filled by JS templates -->
+          </div>
+        </div>
+        <div class="dir-card notes">
+          <h3>交互要点（A）</h3>
+          <ul>
+            <li><strong>会话卡</strong>：左对齐单列，快照用 mono 灰字；状态只靠 8px 圆点</li>
+            <li><strong>主机</strong>：transport 三段选择器，已存密码显示密文占位</li>
+            <li><strong>设置</strong>：分组列表，toggle 无弹簧弹跳（bounce=0）</li>
+            <li><strong>TUI</strong>：顶栏极薄（会话名 + SSH 标签）；快捷键条常驻，按压 scale 0.95</li>
+            <li><strong>不做</strong>：进会话页面转场、tab 切换动画（高频）</li>
+          </ul>
+          <table class="matrix">
+            <tr><th>场景</th><th>动效决策</th></tr>
+            <tr><td>打开会话</td><td>无动画（100+/天）</td></tr>
+            <tr><td>按钮按压</td><td>scale(0.97) 140ms ease-out</td></tr>
+            <tr><td>列表首屏</td><td>stagger 40ms，可交互不阻塞</td></tr>
+            <tr><td>Toast / 探测</td><td>自下 180ms ease-out</td></tr>
+          </table>
+        </div>
+      </div>
+    </section>
+
+    <!-- B -->
+    <section class="dir-panel hidden" data-dir="b">
+      <div class="dir-meta">
+        <div class="dir-card">
+          <h2>B · Glass Sequoia — 玻璃升级</h2>
+          <p>沿用现有 Sequoia 深色 + 系统蓝，但把「毛玻璃」做干净：更薄的描边、内高光、蓝紫径向光晕。最贴近当前 APK 迁移成本最低，质感从 Material 默认感提升到 iOS / Termius 水准。</p>
+          <div class="swatches">
+            <span class="swatch" style="background:#0f1014"></span>
+            <span class="swatch" style="background:#1c1c22"></span>
+            <span class="swatch" style="background:#0a84ff"></span>
+            <span class="swatch" style="background:#30d158"></span>
+            <span class="swatch" style="background:#7dcf7a"></span>
+          </div>
+        </div>
+        <div class="dir-card kv">
+          <div><b>主色</b><span>#0A84FF 系统蓝</span></div>
+          <div><b>圆角</b><span>16px · 更软</span></div>
+          <div><b>表面</b><span>rgba 玻璃 + blur</span></div>
+          <div><b>终端</b><span>Termius 绿字深底</span></div>
+        </div>
+      </div>
+      <div class="screen-tabs" data-for="b">
+        <button class="screen-tab" data-screen="sessions" aria-selected="true">会话列表</button>
+        <button class="screen-tab" data-screen="hosts" aria-selected="false">主机配置</button>
+        <button class="screen-tab" data-screen="settings" aria-selected="false">设置</button>
+        <button class="screen-tab" data-screen="term" aria-selected="false">Claude TUI</button>
+      </div>
+      <div class="stage">
+        <div class="phone"><div class="phone-notch"></div>
+          <div class="phone-screen t-b" id="screen-b"></div>
+        </div>
+        <div class="dir-card notes">
+          <h3>交互要点（B）</h3>
+          <ul>
+            <li><strong>迁移友好</strong>：色板与现有 ThemeTokens 对齐，Compose 改半径/玻璃即可</li>
+            <li><strong>Env 点</strong>：tmux / mosh / UDP 三色点横排，失败用橙字一行原因</li>
+            <li><strong>顶栏</strong>：host · session · transport 胶囊，弱网时 transport 变 warn</li>
+            <li><strong>按压</strong>：卡片与按钮统一 0.97，玻璃层用 inset 高光不靠投影</li>
+          </ul>
+          <table class="matrix">
+            <tr><th>场景</th><th>动效决策</th></tr>
+            <tr><td>环境检查完成</td><td>点颜色 crossfade + 2px blur 掩码 160ms</td></tr>
+            <tr><td>Mosh→SSH 降级</td><td>顶栏 badge 文案切换，无整页动画</td></tr>
+            <tr><td>抽屉/更多</td><td>drawer curve 280ms</td></tr>
+          </table>
+        </div>
+      </div>
+    </section>
+
+    <!-- C -->
+    <section class="dir-panel hidden" data-dir="c">
+      <div class="dir-meta">
+        <div class="dir-card">
+          <h2>C · Paper Light — 纸质日间</h2>
+          <p>白天户外/办公室可读性优先。白卡片、浅灰底、靛蓝强调。终端仍保持深色区域（嵌套暗岛），避免绿字在白底上刺眼。清爽但不幼稚：阴影极轻，分割线 8% 黑。</p>
+          <div class="swatches">
+            <span class="swatch" style="background:#f4f5f7"></span>
+            <span class="swatch" style="background:#ffffff;border:1px solid #ddd"></span>
+            <span class="swatch" style="background:#2563eb"></span>
+            <span class="swatch" style="background:#16a34a"></span>
+            <span class="swatch" style="background:#1c1c1e"></span>
+          </div>
+        </div>
+        <div class="dir-card kv">
+          <div><b>主色</b><span>#2563EB indigo</span></div>
+          <div><b>表面</b><span>真白卡片 + 软阴影</span></div>
+          <div><b>对比</b><span>正文 #111 · 次要 #6B7280</span></div>
+          <div><b>终端岛</b><span>深色 inset 不污染页面</span></div>
+        </div>
+      </div>
+      <div class="screen-tabs" data-for="c">
+        <button class="screen-tab" data-screen="sessions" aria-selected="true">会话列表</button>
+        <button class="screen-tab" data-screen="hosts" aria-selected="false">主机配置</button>
+        <button class="screen-tab" data-screen="settings" aria-selected="false">设置</button>
+        <button class="screen-tab" data-screen="term" aria-selected="false">Claude TUI</button>
+      </div>
+      <div class="stage">
+        <div class="phone"><div class="phone-notch"></div>
+          <div class="phone-screen t-c" id="screen-c"></div>
+        </div>
+        <div class="dir-card notes">
+          <h3>交互要点（C）</h3>
+          <ul>
+            <li><strong>Appearance</strong>：可与系统 Light 绑定，是 BigSurSoft 的精修版</li>
+            <li><strong>可读性</strong>：会话标题 14–15px 半粗，快照区保持暗底</li>
+            <li><strong>主机表单</strong>：字段 focus ring 3px 半透明蓝，不用粗描边</li>
+            <li><strong>设置</strong>：分组卡片而非满屏列表线，视觉更「清爽」</li>
+          </ul>
+          <table class="matrix">
+            <tr><th>场景</th><th>动效决策</th></tr>
+            <tr><td>Focus 输入</td><td>border + ring 160ms ease</td></tr>
+            <tr><td>Toggle</td><td>thumb 180ms ease-out，无 bounce</td></tr>
+            <tr><td>暗终端岛</td><td>静态，不随主题闪烁</td></tr>
+          </table>
+        </div>
+      </div>
+    </section>
+
+    <!-- D -->
+    <section class="dir-panel hidden" data-dir="d">
+      <div class="dir-meta">
+        <div class="dir-card">
+          <h2>D · Terminal First — 终端即产品</h2>
+          <p>整 app 都像「站在 shell 里」：等宽标题、磷光绿强调、低饱和绿描边。会话列表看起来像 `tmux ls` 的 GUI 包装。适合重度 CLI 用户与品牌差异化；对非技术用户可能偏硬核。</p>
+          <div class="swatches">
+            <span class="swatch" style="background:#07120c"></span>
+            <span class="swatch" style="background:#0c1a12"></span>
+            <span class="swatch" style="background:#3ddc84"></span>
+            <span class="swatch" style="background:#7dcf7a"></span>
+            <span class="swatch" style="background:#b6f2a8"></span>
+          </div>
+        </div>
+        <div class="dir-card kv">
+          <div><b>主色</b><span>#3DDC84 磷光</span></div>
+          <div><b>字体</b><span>标题也可用 mono</span></div>
+          <div><b>圆角</b><span>10px · 更「设备」</span></div>
+          <div><b>氛围</b><span>扫描线可选（默认关）</span></div>
+        </div>
+      </div>
+      <div class="screen-tabs" data-for="d">
+        <button class="screen-tab" data-screen="sessions" aria-selected="true">会话列表</button>
+        <button class="screen-tab" data-screen="hosts" aria-selected="false">主机配置</button>
+        <button class="screen-tab" data-screen="settings" aria-selected="false">设置</button>
+        <button class="screen-tab" data-screen="term" aria-selected="false">Claude TUI</button>
+      </div>
+      <div class="stage">
+        <div class="phone"><div class="phone-notch"></div>
+          <div class="phone-screen t-d" id="screen-d"></div>
+        </div>
+        <div class="dir-card notes">
+          <h3>交互要点（D）</h3>
+          <ul>
+            <li><strong>列表行</strong>：`tx · claude-help` 等宽；右侧 `SSH 12ms` 像 statusline</li>
+            <li><strong>主机</strong>：字段 label 用 `// auth` 风格注释感</li>
+            <li><strong>TUI</strong>：边框与 app chrome 同色相，进出无「换皮肤」感</li>
+            <li><strong>克制</strong>：不做 CRT 抖动/闪烁（会晕，且违反 reduced-motion）</li>
+          </ul>
+          <table class="matrix">
+            <tr><th>场景</th><th>动效决策</th></tr>
+            <tr><td>连接成功</td><td>状态点亮 120ms，无全屏闪</td></tr>
+            <tr><td>命令回显</td><td>光标 blink steps(1) 仅终端</td></tr>
+            <tr><td>错误</td><td>warn 黄字，不用红闪</td></tr>
+          </table>
+        </div>
+      </div>
+    </section>
+
+    <!-- E -->
+    <section class="dir-panel hidden" data-dir="e">
+      <div class="dir-meta">
+        <div class="dir-card">
+          <h2>E · Warm Night Operator — 暖夜操作台</h2>
+          <p>深暖灰 + 琥珀强调，气质接近 Claude / 夜间编辑器。比冷蓝「人味」更重，适合长时间盯 Claude Code TUI。效率不减：同样的信息架构，只换温度与强调色。</p>
+          <div class="swatches">
+            <span class="swatch" style="background:#14110f"></span>
+            <span class="swatch" style="background:#1c1815"></span>
+            <span class="swatch" style="background:#e8a35c"></span>
+            <span class="swatch" style="background:#f5efe6"></span>
+            <span class="swatch" style="background:#7dcf8a"></span>
+          </div>
+        </div>
+        <div class="dir-card kv">
+          <div><b>主色</b><span>#E8A35C 琥珀</span></div>
+          <div><b>背景</b><span>暖炭 #14110F</span></div>
+          <div><b>终端</b><span>象牙字 + 琥珀 prompt</span></div>
+          <div><b>情绪</b><span>沉浸 · 少刺眼蓝光</span></div>
+        </div>
+      </div>
+      <div class="screen-tabs" data-for="e">
+        <button class="screen-tab" data-screen="sessions" aria-selected="true">会话列表</button>
+        <button class="screen-tab" data-screen="hosts" aria-selected="false">主机配置</button>
+        <button class="screen-tab" data-screen="settings" aria-selected="false">设置</button>
+        <button class="screen-tab" data-screen="term" aria-selected="false">Claude TUI</button>
+      </div>
+      <div class="stage">
+        <div class="phone"><div class="phone-notch"></div>
+          <div class="phone-screen t-e" id="screen-e"></div>
+        </div>
+        <div class="dir-card notes">
+          <h3>交互要点（E）</h3>
+          <ul>
+            <li><strong>Claude 场景</strong>：会话名 `claude-help` 用琥珀点；进行中任务弱脉冲（低频率）</li>
+            <li><strong>对比</strong>：正文象牙色，避免纯白刺眼；muted 暖灰</li>
+            <li><strong>主机</strong>：UDP 失败用琥珀 warn 条，文案可操作（去安全组）</li>
+            <li><strong>设置</strong>：「防休眠 / 字号」等终端相关优先置顶</li>
+          </ul>
+          <table class="matrix">
+            <tr><th>场景</th><th>动效决策</th></tr>
+            <tr><td>AI 输出中</td><td>顶栏小点 opacity 呼吸 1.2s linear（可关）</td></tr>
+            <tr><td>按压</td><td>统一 0.97 · 琥珀 ripple 可选</td></tr>
+            <tr><td>切换主题</td><td>bg 200ms ease，不用整页 dissolve</td></tr>
+          </table>
+        </div>
+      </div>
+    </section>
+
+    <div class="footer-note">
+      <strong>实现映射建议：</strong>
+      选中方向后，将 CSS 变量落进 <code>ThemeTokens.kt</code>；卡片半径 → <code>cardRadiusDp</code>；
+      按压反馈 → 全局 <code>Modifier.clickable</code> 的 indication；
+      列表 stagger 仅首屏首次进入；终端页沿用 Termux view，只换 chrome + keybar。
+      <br/><br/>
+      设计原则来源：本地技能 <code>emil-design-eng</code>（Emil Kowalski · animations.dev 哲学）。
+      文件：<code>dist/ui-proposals/m-tmux-ui-5-directions.html</code>
+    </div>
+  </div>
+
+<script>
+/* Shared mock content builders — theme class is on .phone-screen */
+const TERM_BODY = `<span class="dim"># claude-help · mosh/ssh · 122×89</span>
+<span class="prompt">❯</span> claude
+
+<span class="hl">Claude Code</span> <span class="dim">v1.0 · session claude-help</span>
+<span class="dim">────────────────────────────────────</span>
+ Thinking about the m-tmux attach path…
+
+ <span class="hl">●</span> Read TerminalSessionController.kt
+ <span class="hl">●</span> Fix mosh UDP gate for AUTO
+
+<span class="dim">────────────────</span>
+<span class="prompt">›</span> 继续排查腾讯云 UDP<span class="cursor"></span>`;
+
+function tabbar(active) {
+  const items = [
+    ['sessions', '☰', '会话'],
+    ['hosts', '⬡', '主机'],
+    ['settings', '⚙', '设置'],
+  ];
+  return `<nav class="tabbar">${items.map(([id, icon, label]) =>
+    `<button type="button" data-nav="${id}" ${active===id?'aria-current="page"':''}><strong>${icon}</strong>${label}</button>`
+  ).join('')}</nav>`;
+}
+
+function sb() {
+  return `<div class="sb"><span>9:41</span><span class="icons">●●● 5G █</span></div>`;
+}
+
+function screenSessions(dir) {
+  const hostLabel = dir === 'd' ? 'host:tx' : 'tx';
+  return `
+    ${sb()}
+    <div class="app-header">
+      <div class="grow">
+        <h3>会话</h3>
+        <p class="sub">2 主机 · 4 会话 · 轻扫刷新</p>
+      </div>
+      <button class="icon-btn" title="新建">＋</button>
+      <button class="icon-btn" title="刷新">↻</button>
+    </div>
+    <div class="scroll list-enter">
+      <div class="host-chip"><span class="dot g"></span> ${hostLabel} <span class="muted tiny">SSH · 12ms</span></div>
+      <div class="card" data-open-term>
+        <div class="row">
+          <span class="dot g"></span>
+          <div class="grow">
+            <div class="title">claude-help</div>
+            <div class="muted tiny">已附着 · 上次 2 分钟前</div>
+          </div>
+          <span class="badge acc">LIVE</span>
+        </div>
+        <div class="snap"><span class="prompt">›</span> 继续排查腾讯云 UDP
+<span class="dim">● Read … ● Fix mosh gate</span></div>
+      </div>
+      <div class="card" data-open-term>
+        <div class="row">
+          <span class="dot y"></span>
+          <div class="grow">
+            <div class="title">tvapk</div>
+            <div class="muted tiny">后台 · 构建日志</div>
+          </div>
+          <span class="badge">1 win</span>
+        </div>
+        <div class="snap">BUILD SUCCESSFUL in 37s
+:app:assembleDebug</div>
+      </div>
+      <div class="host-chip" style="margin-top:6px"><span class="dot g"></span> ${dir==='d'?'host:lax':'lax'} <span class="muted tiny">AUTO · 48ms</span></div>
+      <div class="card">
+        <div class="row">
+          <span class="dot g"></span>
+          <div class="grow">
+            <div class="title">lemon-nginx</div>
+            <div class="muted tiny">静态分发</div>
+          </div>
+          <span class="badge ok">SSH</span>
+        </div>
+      </div>
+      <div class="card">
+        <div class="row">
+          <span class="dot x"></span>
+          <div class="grow">
+            <div class="title">probe-lab</div>
+            <div class="muted tiny">未连接</div>
+          </div>
+          <span class="badge warn">UDP ✗</span>
+        </div>
+      </div>
+    </div>
+    ${tabbar('sessions')}
+  `;
+}
+
+function screenHosts(dir) {
+  const comment = dir === 'd';
+  return `
+    ${sb()}
+    <div class="app-header">
+      <button class="icon-btn">‹</button>
+      <div class="grow">
+        <h3>编辑主机</h3>
+        <p class="sub">tx · 已保存认证 · 可只改模式</p>
+      </div>
+    </div>
+    <div class="scroll">
+      <div class="field">
+        <label>${comment ? '// alias' : '别名'}</label>
+        <input value="tx" readonly />
+      </div>
+      <div class="field">
+        <label>${comment ? '// host' : '主机名 / IP'}</label>
+        <input value="203.0.113.42" readonly />
+      </div>
+      <div class="row" style="gap:8px">
+        <div class="field grow">
+          <label>${comment ? '// port' : '端口'}</label>
+          <input value="22" readonly />
+        </div>
+        <div class="field grow">
+          <label>${comment ? '// user' : '用户名'}</label>
+          <input value="ubuntu" readonly />
+        </div>
+      </div>
+      <div class="field">
+        <label>${comment ? '// password (stored)' : '密码（已保存 · 密文）'}</label>
+        <input type="password" value="••••••••" readonly />
+      </div>
+      <div class="section-label">连接模式</div>
+      <div class="seg" role="radiogroup">
+        <button type="button" aria-checked="false">AUTO</button>
+        <button type="button" aria-checked="true">SSH</button>
+        <button type="button" aria-checked="false">Mosh</button>
+      </div>
+      <p class="muted tiny" style="margin:10px 2px 14px">
+        AUTO 仅在环境检查确认 UDP 通后才优先 Mosh；当前腾讯云建议 SSH。
+      </p>
+      <div class="card" style="margin-bottom:12px">
+        <div class="row" style="margin-bottom:8px">
+          <span class="tiny muted">环境</span>
+        </div>
+        <div class="row" style="gap:14px;margin-bottom:6px">
+          <span class="row" style="gap:5px"><span class="dot g"></span><span class="tiny">tmux</span></span>
+          <span class="row" style="gap:5px"><span class="dot g"></span><span class="tiny">mosh</span></span>
+          <span class="row" style="gap:5px"><span class="dot r"></span><span class="tiny">UDP</span></span>
+        </div>
+        <p class="tiny" style="margin:0;color:var(--warn)">SSH 已握手，UDP 60001 无回包 · 放行 60000–61000</p>
+      </div>
+      <button class="btn block">保存</button>
+      <div style="height:8px"></div>
+      <button class="btn ghost block">环境检查</button>
+    </div>
+  `;
+}
+
+function screenSettings(dir) {
+  return `
+    ${sb()}
+    <div class="app-header">
+      <div class="grow">
+        <h3>设置</h3>
+        <p class="sub">0.1.36 · 效率默认</p>
+      </div>
+    </div>
+    <div class="scroll">
+      <div class="section-label">终端</div>
+      <div class="card">
+        <div class="setting-row">
+          <div class="grow"><div class="t">外观</div><div class="d">字体 · 配色 · TERM</div></div>
+          <span class="muted tiny">›</span>
+        </div>
+        <div class="setting-row">
+          <div class="grow"><div class="t">字号</div><div class="d">16 px</div></div>
+          <span class="badge">±2</span>
+        </div>
+        <div class="setting-row">
+          <div class="grow"><div class="t">防止休眠</div><div class="d">会话中保持亮屏</div></div>
+          <div class="toggle on" role="switch" aria-checked="true"></div>
+        </div>
+        <div class="setting-row">
+          <div class="grow"><div class="t">回滚缓冲</div><div class="d">1000 行</div></div>
+          <span class="muted tiny">›</span>
+        </div>
+      </div>
+      <div class="section-label">效率</div>
+      <div class="card">
+        <div class="setting-row">
+          <div class="grow"><div class="t">启动打开上次会话</div><div class="d">冷启动直达 TUI</div></div>
+          <div class="toggle" role="switch"></div>
+        </div>
+        <div class="setting-row">
+          <div class="grow"><div class="t">命令补全</div><div class="d">片段 + 历史</div></div>
+          <div class="toggle on"></div>
+        </div>
+        <div class="setting-row">
+          <div class="grow"><div class="t">键盘布局</div><div class="d">General · 可编辑</div></div>
+          <span class="muted tiny">›</span>
+        </div>
+      </div>
+      <div class="section-label">关于</div>
+      <div class="card">
+        <div class="setting-row">
+          <div class="grow"><div class="t">导出诊断日志</div><div class="d">不含密码</div></div>
+          <span class="muted tiny">›</span>
+        </div>
+      </div>
+    </div>
+    ${tabbar('settings')}
+  `;
+}
+
+function screenTerm(dir) {
+  const transport = dir === 'a' || dir === 'c' ? 'SSH' : (dir === 'd' ? 'SSH 12ms' : 'SSH');
+  return `
+    ${sb()}
+    <div class="term-top">
+      <button class="icon-btn">‹</button>
+      <div class="grow">
+        <div class="title" style="font-size:13px">tx · claude-help</div>
+        <div class="muted tiny">Claude Code TUI</div>
+      </div>
+      <span class="badge ok">${transport}</span>
+      <button class="icon-btn">⋯</button>
+    </div>
+    <div class="term-body">${TERM_BODY}</div>
+    <div class="keybar">
+      <button>Esc</button>
+      <button>Tab</button>
+      <button>Ctrl</button>
+      <button>Alt</button>
+      <button>←</button>
+      <button>↓</button>
+      <button>↑</button>
+      <button>→</button>
+      <span class="spacer"></span>
+      <button>/</button>
+      <button>⌃C</button>
+    </div>
+  `;
+}
+
+const builders = {
+  sessions: screenSessions,
+  hosts: screenHosts,
+  settings: screenSettings,
+  term: screenTerm,
+};
+
+const state = { a: 'sessions', b: 'sessions', c: 'sessions', d: 'sessions', e: 'sessions' };
+
+function render(dir) {
+  const el = document.getElementById('screen-' + dir);
+  if (!el) return;
+  const screen = state[dir];
+  el.innerHTML = builders[screen](dir);
+  // rebind
+  el.querySelectorAll('[data-open-term]').forEach(card => {
+    card.addEventListener('click', () => {
+      state[dir] = 'term';
+      syncTabs(dir);
+      render(dir);
+    });
+  });
+  el.querySelectorAll('.tabbar [data-nav]').forEach(btn => {
+    btn.addEventListener('click', () => {
+      state[dir] = btn.getAttribute('data-nav');
+      syncTabs(dir);
+      render(dir);
+    });
+  });
+  el.querySelectorAll('.seg button').forEach(btn => {
+    btn.addEventListener('click', () => {
+      el.querySelectorAll('.seg button').forEach(b => b.setAttribute('aria-checked', 'false'));
+      btn.setAttribute('aria-checked', 'true');
+    });
+  });
+  el.querySelectorAll('.toggle').forEach(t => {
+    t.addEventListener('click', () => t.classList.toggle('on'));
+  });
+  // back from term/hosts
+  const back = el.querySelector('.term-top .icon-btn, .app-header .icon-btn');
+  if (back && (screen === 'term' || screen === 'hosts')) {
+    back.addEventListener('click', () => {
+      state[dir] = 'sessions';
+      syncTabs(dir);
+      render(dir);
+    });
+  }
+}
+
+function syncTabs(dir) {
+  document.querySelectorAll(`.screen-tabs[data-for="${dir}"] .screen-tab`).forEach(t => {
+    t.setAttribute('aria-selected', t.getAttribute('data-screen') === state[dir] ? 'true' : 'false');
+  });
+}
+
+// Direction switching
+document.querySelectorAll('.dir-chip').forEach(chip => {
+  chip.addEventListener('click', () => {
+    const dir = chip.getAttribute('data-dir');
+    document.querySelectorAll('.dir-chip').forEach(c => c.setAttribute('aria-selected', c === chip ? 'true' : 'false'));
+    document.querySelectorAll('.dir-panel').forEach(p => {
+      p.classList.toggle('hidden', p.getAttribute('data-dir') !== dir);
+    });
+    render(dir);
+  });
+});
+
+// Screen tabs
+document.querySelectorAll('.screen-tabs').forEach(bar => {
+  const dir = bar.getAttribute('data-for');
+  bar.querySelectorAll('.screen-tab').forEach(tab => {
+    tab.addEventListener('click', () => {
+      state[dir] = tab.getAttribute('data-screen');
+      syncTabs(dir);
+      render(dir);
+    });
+  });
+});
+
+// Initial render all (so switching is instant)
+['a','b','c','d','e'].forEach(render);
+</script>
+</body>
+</html>

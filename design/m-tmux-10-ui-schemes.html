@@ -1,0 +1,727 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>m-tmux · 10 套 UI 设计方案</title>
+<style>
+  :root {
+    --bg: #0b0c0f;
+    --panel: #12141a;
+    --border: #2a2e38;
+    --text: #e8eaed;
+    --muted: #8b919c;
+    --accent: #6c9eff;
+    --ok: #3dd68c;
+    --warn: #f5a524;
+  }
+  * { box-sizing: border-box; }
+  html, body { margin: 0; padding: 0; background: var(--bg); color: var(--text);
+    font-family: "SF Pro Text", "Segoe UI", system-ui, -apple-system, "PingFang SC", "Noto Sans SC", sans-serif;
+    line-height: 1.5; }
+  a { color: var(--accent); }
+  .wrap { max-width: 1280px; margin: 0 auto; padding: 28px 20px 80px; }
+  header.doc {
+    border-bottom: 1px solid var(--border); padding-bottom: 24px; margin-bottom: 28px;
+  }
+  header.doc h1 { font-size: 28px; font-weight: 700; margin: 0 0 8px; letter-spacing: -0.02em; }
+  header.doc p { color: var(--muted); margin: 0 0 10px; max-width: 72ch; }
+  .meta { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 14px; }
+  .chip { background: #1a1d26; border: 1px solid var(--border); border-radius: 999px;
+    padding: 4px 12px; font-size: 12px; color: var(--muted); }
+  .chip strong { color: var(--text); font-weight: 600; }
+
+  /* Research */
+  .research { display: grid; grid-template-columns: repeat(auto-fill, minmax(240px, 1fr)); gap: 12px; margin: 20px 0 32px; }
+  .r-card { background: var(--panel); border: 1px solid var(--border); border-radius: 12px; padding: 14px 16px; }
+  .r-card h3 { margin: 0 0 6px; font-size: 14px; }
+  .r-card p { margin: 0; font-size: 12px; color: var(--muted); }
+
+  /* Scheme nav */
+  .scheme-nav {
+    display: flex; flex-wrap: wrap; gap: 8px; position: sticky; top: 0; z-index: 40;
+    background: rgba(11,12,15,0.92); backdrop-filter: blur(12px);
+    padding: 12px 0; border-bottom: 1px solid var(--border); margin: 0 -4px 24px;
+  }
+  .scheme-nav button {
+    border: 1px solid var(--border); background: #151821; color: var(--muted);
+    border-radius: 10px; padding: 8px 12px; font-size: 12px; cursor: pointer;
+    transition: .15s ease;
+  }
+  .scheme-nav button:hover { color: var(--text); border-color: #3d4454; }
+  .scheme-nav button.active {
+    color: #fff; background: linear-gradient(135deg, #2a4a8a, #1e3a6e);
+    border-color: #4a7ad4;
+  }
+
+  .scheme { display: none; }
+  .scheme.active { display: block; animation: fade .25s ease; }
+  @keyframes fade { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: none; } }
+
+  .scheme-head {
+    display: grid; grid-template-columns: 1fr; gap: 16px;
+    background: var(--panel); border: 1px solid var(--border); border-radius: 16px;
+    padding: 20px 22px; margin-bottom: 20px;
+  }
+  .scheme-head h2 { margin: 0 0 6px; font-size: 22px; }
+  .scheme-head .tagline { color: var(--accent); font-size: 13px; font-weight: 600; margin-bottom: 8px; }
+  .scheme-head .desc { color: var(--muted); font-size: 14px; margin: 0 0 12px; max-width: 80ch; }
+  .refs { display: flex; flex-wrap: wrap; gap: 8px; }
+  .ref { font-size: 11px; padding: 3px 10px; border-radius: 6px; background: #1c2030; color: #a8b4d0; border: 1px solid #2c3348; }
+  .diff { margin-top: 12px; font-size: 13px; color: #c8cdd8; }
+  .diff strong { color: var(--ok); }
+
+  .page-tabs { display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 16px; }
+  .page-tabs button {
+    border: 1px solid var(--border); background: transparent; color: var(--muted);
+    border-radius: 8px; padding: 6px 12px; font-size: 12px; cursor: pointer;
+  }
+  .page-tabs button.active { background: #222836; color: #fff; border-color: #4a5568; }
+
+  .phones {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+    gap: 20px;
+  }
+  .phone-wrap { display: flex; flex-direction: column; align-items: center; gap: 10px; }
+  .phone-label { font-size: 12px; color: var(--muted); letter-spacing: 0.04em; text-transform: uppercase; }
+  .phone {
+    width: 280px; height: 560px; border-radius: 28px; overflow: hidden;
+    border: 2px solid #2e3340; box-shadow: 0 20px 50px rgba(0,0,0,.45);
+    display: flex; flex-direction: column; position: relative;
+    font-size: 12px;
+  }
+  .phone .status {
+    height: 28px; display: flex; align-items: center; justify-content: space-between;
+    padding: 0 16px; font-size: 10px; font-weight: 600; flex-shrink: 0;
+  }
+  .phone .body { flex: 1; overflow: hidden; display: flex; flex-direction: column; min-height: 0; }
+  .phone .nav-bottom {
+    height: 52px; display: grid; grid-template-columns: repeat(3, 1fr);
+    align-items: center; text-align: center; font-size: 10px; flex-shrink: 0;
+    border-top: 1px solid rgba(255,255,255,.08);
+  }
+  .phone .nav-bottom span { opacity: .55; }
+  .phone .nav-bottom span.on { opacity: 1; font-weight: 600; }
+
+  /* Terminal common */
+  .term-canvas {
+    flex: 1; font-family: "JetBrains Mono", "SF Mono", ui-monospace, monospace;
+    font-size: 10.5px; line-height: 1.45; padding: 8px 10px; overflow: hidden;
+    white-space: pre; letter-spacing: -0.01em;
+  }
+  .keybar {
+    display: flex; gap: 4px; padding: 6px 8px; flex-shrink: 0;
+    overflow: hidden; font-size: 10px; font-weight: 600;
+  }
+  .keybar b {
+    flex: 1; text-align: center; padding: 8px 0; border-radius: 6px;
+  }
+  .pill {
+    display: inline-flex; align-items: center; gap: 4px;
+    border-radius: 999px; padding: 2px 8px; font-size: 10px;
+  }
+  .row-item {
+    display: flex; align-items: center; gap: 10px;
+    padding: 10px 14px; border-bottom: 1px solid rgba(255,255,255,.06);
+  }
+  .row-item .av {
+    width: 36px; height: 36px; border-radius: 10px; display: grid; place-items: center;
+    font-weight: 700; font-size: 13px; flex-shrink: 0;
+  }
+  .row-item .meta { flex: 1; min-width: 0; }
+  .row-item .t { font-weight: 600; font-size: 13px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .row-item .s { font-size: 11px; opacity: .65; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .topbar {
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 8px 14px; font-weight: 700; font-size: 15px; flex-shrink: 0;
+  }
+  .topbar .sub { font-size: 11px; font-weight: 500; opacity: .6; }
+  .section { padding: 10px 14px 4px; font-size: 11px; font-weight: 600; letter-spacing: .06em; text-transform: uppercase; opacity: .5; }
+  .switch-row {
+    display: flex; justify-content: space-between; align-items: center;
+    padding: 12px 14px; border-bottom: 1px solid rgba(255,255,255,.05);
+  }
+  .toggle { width: 36px; height: 20px; border-radius: 99px; position: relative; }
+  .toggle::after {
+    content: ""; position: absolute; top: 2px; left: 2px; width: 16px; height: 16px;
+    border-radius: 50%; background: #fff; transition: .2s;
+  }
+  .toggle.on::after { left: 18px; }
+  .preview-block {
+    margin: 12px; border-radius: 12px; padding: 12px;
+    font-family: ui-monospace, monospace; font-size: 11px; line-height: 1.5;
+  }
+  .font-slider {
+    margin: 8px 14px; height: 4px; border-radius: 2px; position: relative;
+  }
+  .font-slider::after {
+    content: ""; position: absolute; top: -5px; width: 14px; height: 14px;
+    border-radius: 50%; left: 55%;
+  }
+  .badge { font-size: 9px; padding: 1px 6px; border-radius: 4px; font-weight: 700; }
+  .fab {
+    position: absolute; right: 16px; bottom: 64px; width: 48px; height: 48px;
+    border-radius: 16px; display: grid; place-items: center; font-size: 22px;
+    box-shadow: 0 8px 20px rgba(0,0,0,.35); z-index: 2;
+  }
+  .hide { display: none !important; }
+  footer.note { margin-top: 48px; padding-top: 20px; border-top: 1px solid var(--border);
+    color: var(--muted); font-size: 12px; }
+
+  /* ========== SCHEME THEMES applied via data-s ========== */
+
+  /* S1 Termius */
+  [data-s="1"] .phone { background: #0f1115; color: #e6e8ec; }
+  [data-s="1"] .status { background: #0f1115; color: #9aa0a6; }
+  [data-s="1"] .topbar { background: #0f1115; }
+  [data-s="1"] .nav-bottom { background: #161920; color: #8b919c; }
+  [data-s="1"] .nav-bottom span.on { color: #4c8dff; }
+  [data-s="1"] .term-canvas { background: #0a0c10; color: #c8ccd4; }
+  [data-s="1"] .keybar { background: #1a1d24; }
+  [data-s="1"] .keybar b { background: #2a2f3a; color: #d0d4dc; }
+  [data-s="1"] .av { background: #1e3a6e; color: #8eb6ff; }
+  [data-s="1"] .toggle { background: #3a3f4b; }
+  [data-s="1"] .toggle.on { background: #4c8dff; }
+  [data-s="1"] .preview-block { background: #0a0c10; color: #a8d4ff; border: 1px solid #243044; }
+  [data-s="1"] .font-slider { background: #2a2f3a; }
+  [data-s="1"] .font-slider::after { background: #4c8dff; }
+  [data-s="1"] .pill.live { background: #14301f; color: #3dd68c; }
+  [data-s="1"] .c-dim { color: #6a7380; } .c-blue { color: #6db3ff; } .c-grn { color: #5ce0a0; } .c-yel { color: #e8c547; }
+
+  /* S2 Blink */
+  [data-s="2"] .phone { background: #000; color: #d0d0d0; border-color: #222; }
+  [data-s="2"] .status { background: #000; color: #666; }
+  [data-s="2"] .topbar { background: #000; border-bottom: 1px solid #1a1a1a; font-family: ui-monospace, monospace; font-size: 13px; font-weight: 500; }
+  [data-s="2"] .nav-bottom { background: #0a0a0a; color: #555; font-family: ui-monospace, monospace; }
+  [data-s="2"] .nav-bottom span.on { color: #00ff9c; }
+  [data-s="2"] .term-canvas { background: #000; color: #00ff9c; }
+  [data-s="2"] .keybar { background: #0d0d0d; border-top: 1px solid #1a1a1a; }
+  [data-s="2"] .keybar b { background: #141414; color: #888; border: 1px solid #222; border-radius: 2px; }
+  [data-s="2"] .av { background: #111; color: #00ff9c; border: 1px solid #00ff9c33; border-radius: 4px; }
+  [data-s="2"] .row-item { border-color: #151515; }
+  [data-s="2"] .toggle { background: #222; }
+  [data-s="2"] .toggle.on { background: #00aa66; }
+  [data-s="2"] .preview-block { background: #000; color: #00ff9c; border: 1px solid #1a1a1a; border-radius: 2px; }
+  [data-s="2"] .font-slider { background: #222; }
+  [data-s="2"] .font-slider::after { background: #00ff9c; }
+  [data-s="2"] .pill.live { background: transparent; color: #00ff9c; border: 1px solid #00ff9c55; }
+
+  /* S3 Prompt / Panic */
+  [data-s="3"] .phone { background: #1c1a17; color: #f0ebe3; }
+  [data-s="3"] .status { background: #1c1a17; color: #a89f91; }
+  [data-s="3"] .topbar { background: #1c1a17; font-weight: 600; letter-spacing: -0.02em; }
+  [data-s="3"] .nav-bottom { background: #242119; color: #8a8174; }
+  [data-s="3"] .nav-bottom span.on { color: #f0a060; }
+  [data-s="3"] .term-canvas { background: #141210; color: #e8dcc8; }
+  [data-s="3"] .keybar { background: #2a261f; }
+  [data-s="3"] .keybar b { background: #3a342b; color: #e8dcc8; border-radius: 10px; }
+  [data-s="3"] .av { background: #3d2e1f; color: #f0a060; border-radius: 50%; }
+  [data-s="3"] .toggle { background: #3a342b; }
+  [data-s="3"] .toggle.on { background: #e08a40; }
+  [data-s="3"] .preview-block { background: #141210; color: #e8dcc8; border: 1px solid #3a342b; border-radius: 14px; }
+  [data-s="3"] .font-slider { background: #3a342b; }
+  [data-s="3"] .font-slider::after { background: #f0a060; }
+  [data-s="3"] .pill.live { background: #3a2a18; color: #f0a060; }
+
+  /* S4 Material You */
+  [data-s="4"] .phone { background: #131318; color: #e4e1e9; }
+  [data-s="4"] .status { background: #131318; color: #c7c4cf; }
+  [data-s="4"] .topbar { background: #131318; font-size: 22px; font-weight: 400; padding-top: 12px; }
+  [data-s="4"] .nav-bottom { background: #211f26; color: #cac4d0; border-radius: 0; }
+  [data-s="4"] .nav-bottom span.on { color: #d0bcff; }
+  [data-s="4"] .term-canvas { background: #0e0e12; color: #e4e1e9; border-radius: 16px 16px 0 0; margin: 0 8px; }
+  [data-s="4"] .keybar { background: #211f26; margin: 0 8px 0; border-radius: 0 0 16px 16px; }
+  [data-s="4"] .keybar b { background: #2b2930; color: #e8def8; border-radius: 12px; }
+  [data-s="4"] .av { background: #4f378b; color: #e8def8; border-radius: 16px; }
+  [data-s="4"] .fab { background: #d0bcff; color: #381e72; }
+  [data-s="4"] .toggle { background: #49454f; }
+  [data-s="4"] .toggle.on { background: #d0bcff; }
+  [data-s="4"] .toggle.on::after { background: #381e72; }
+  [data-s="4"] .preview-block { background: #1d1b20; color: #e8def8; border-radius: 16px; }
+  [data-s="4"] .font-slider { background: #49454f; }
+  [data-s="4"] .font-slider::after { background: #d0bcff; }
+  [data-s="4"] .pill.live { background: #2d3b2e; color: #a8f0b8; border-radius: 8px; }
+  [data-s="4"] .row-item { margin: 4px 10px; border: none; border-radius: 16px; background: #1d1b20; }
+
+  /* S5 Glass Sequoia */
+  [data-s="5"] .phone {
+    background: linear-gradient(160deg, #1a2744 0%, #0d1526 40%, #1a1530 100%);
+    color: #f2f4f8; border-color: #3a4a6a;
+  }
+  [data-s="5"] .status { background: transparent; color: rgba(255,255,255,.7); }
+  [data-s="5"] .topbar {
+    background: rgba(255,255,255,.08); backdrop-filter: blur(20px);
+    border-bottom: 1px solid rgba(255,255,255,.1); margin: 0 8px; border-radius: 14px;
+  }
+  [data-s="5"] .nav-bottom {
+    background: rgba(20,24,40,.75); backdrop-filter: blur(20px);
+    margin: 0 10px 10px; border-radius: 18px; border: 1px solid rgba(255,255,255,.12);
+  }
+  [data-s="5"] .nav-bottom span.on { color: #7ec8ff; }
+  [data-s="5"] .term-canvas {
+    background: rgba(8,12,24,.65); color: #dce8ff; margin: 8px; border-radius: 16px;
+    border: 1px solid rgba(255,255,255,.08);
+  }
+  [data-s="5"] .keybar { background: transparent; }
+  [data-s="5"] .keybar b {
+    background: rgba(255,255,255,.1); color: #fff; border-radius: 12px;
+    border: 1px solid rgba(255,255,255,.12); backdrop-filter: blur(8px);
+  }
+  [data-s="5"] .av { background: rgba(126,200,255,.2); color: #7ec8ff; border-radius: 12px; border: 1px solid rgba(126,200,255,.3); }
+  [data-s="5"] .row-item { background: rgba(255,255,255,.05); margin: 4px 10px; border-radius: 14px; border: 1px solid rgba(255,255,255,.06); }
+  [data-s="5"] .toggle { background: rgba(255,255,255,.15); }
+  [data-s="5"] .toggle.on { background: #3d8bfd; }
+  [data-s="5"] .preview-block { background: rgba(0,0,0,.35); color: #b8d4ff; border: 1px solid rgba(255,255,255,.1); border-radius: 16px; }
+  [data-s="5"] .font-slider { background: rgba(255,255,255,.15); }
+  [data-s="5"] .font-slider::after { background: #7ec8ff; box-shadow: 0 0 8px #7ec8ff; }
+  [data-s="5"] .pill.live { background: rgba(61,214,140,.15); color: #6ef0b0; border: 1px solid rgba(61,214,140,.3); }
+
+  /* S6 Warp Agent */
+  [data-s="6"] .phone { background: #0c0e12; color: #e8eaef; }
+  [data-s="6"] .status { background: #0c0e12; color: #7a8294; }
+  [data-s="6"] .topbar { background: #12151c; border-bottom: 1px solid #1e2430; font-size: 13px; }
+  [data-s="6"] .nav-bottom { background: #12151c; color: #6b7385; }
+  [data-s="6"] .nav-bottom span.on { color: #a78bfa; }
+  [data-s="6"] .term-canvas { background: #080a0e; color: #c8ceda; }
+  [data-s="6"] .agent-bar {
+    display: flex; gap: 6px; padding: 6px 10px; background: #12151c; border-bottom: 1px solid #1e2430;
+    flex-shrink: 0; font-size: 10px;
+  }
+  [data-s="6"] .agent-bar span {
+    background: #1a1f2e; border: 1px solid #2a3145; border-radius: 6px; padding: 3px 8px; color: #a0a8bc;
+  }
+  [data-s="6"] .agent-bar span.a { border-color: #6d5a9e; color: #c4b5fd; background: #1a1530; }
+  [data-s="6"] .keybar { background: #12151c; }
+  [data-s="6"] .keybar b { background: #1a1f2e; color: #b0b8c8; border-radius: 6px; }
+  [data-s="6"] .av { background: linear-gradient(135deg,#4c1d95,#1e3a8a); color: #e9d5ff; border-radius: 8px; }
+  [data-s="6"] .toggle { background: #2a3145; }
+  [data-s="6"] .toggle.on { background: #7c3aed; }
+  [data-s="6"] .preview-block { background: #080a0e; color: #c4b5fd; border: 1px solid #2a3145; border-radius: 8px; }
+  [data-s="6"] .font-slider { background: #2a3145; }
+  [data-s="6"] .font-slider::after { background: #a78bfa; }
+  [data-s="6"] .pill.live { background: #1a1530; color: #c4b5fd; }
+
+  /* S7 Raycast */
+  [data-s="7"] .phone { background: #0d0d0f; color: #ededef; }
+  [data-s="7"] .status { background: #0d0d0f; color: #6e6e73; }
+  [data-s="7"] .topbar { background: #0d0d0f; font-size: 13px; font-weight: 500; }
+  [data-s="7"] .cmd {
+    margin: 8px 12px; background: #1c1c1e; border: 1px solid #2c2c2e; border-radius: 10px;
+    padding: 10px 12px; display: flex; gap: 8px; align-items: center; color: #8e8e93; font-size: 12px;
+  }
+  [data-s="7"] .cmd kbd { background: #2c2c2e; padding: 2px 6px; border-radius: 4px; font-size: 10px; color: #aeaeb2; }
+  [data-s="7"] .nav-bottom { background: #0d0d0f; color: #6e6e73; border-top: 1px solid #1c1c1e; }
+  [data-s="7"] .nav-bottom span.on { color: #ff6363; }
+  [data-s="7"] .term-canvas { background: #000; color: #d4d4d8; }
+  [data-s="7"] .keybar { background: #1c1c1e; }
+  [data-s="7"] .keybar b { background: #2c2c2e; color: #d1d1d6; border-radius: 6px; }
+  [data-s="7"] .av { background: #2c2c2e; color: #ff6363; border-radius: 8px; }
+  [data-s="7"] .row-item:hover, [data-s="7"] .row-item.sel { background: #1c1c1e; }
+  [data-s="7"] .toggle { background: #3a3a3c; }
+  [data-s="7"] .toggle.on { background: #ff6363; }
+  [data-s="7"] .preview-block { background: #000; color: #ff8a8a; border: 1px solid #2c2c2e; border-radius: 10px; }
+  [data-s="7"] .font-slider { background: #3a3a3c; }
+  [data-s="7"] .font-slider::after { background: #ff6363; }
+  [data-s="7"] .pill.live { background: #2a1515; color: #ff8a8a; }
+
+  /* S8 Cyberpunk CRT */
+  [data-s="8"] .phone { background: #050805; color: #39ff14; border-color: #1a3a1a; box-shadow: 0 0 30px #0f3 0 20px 50px rgba(0,0,0,.5); }
+  [data-s="8"] .status { background: #050805; color: #1a8a10; font-family: ui-monospace, monospace; }
+  [data-s="8"] .topbar { background: #050805; font-family: ui-monospace, monospace; text-shadow: 0 0 6px #39ff14; border-bottom: 1px dashed #1a4a1a; font-size: 12px; }
+  [data-s="8"] .nav-bottom { background: #0a100a; color: #1a6a12; font-family: ui-monospace, monospace; border-top: 1px dashed #1a4a1a; }
+  [data-s="8"] .nav-bottom span.on { color: #39ff14; text-shadow: 0 0 8px #39ff14; }
+  [data-s="8"] .term-canvas {
+    background: #020402; color: #39ff14; text-shadow: 0 0 2px #39ff1488;
+    background-image: repeating-linear-gradient(0deg, transparent, transparent 2px, rgba(0,0,0,.15) 2px, rgba(0,0,0,.15) 4px);
+  }
+  [data-s="8"] .keybar { background: #0a100a; border-top: 1px solid #1a4a1a; }
+  [data-s="8"] .keybar b { background: #0d1a0d; color: #39ff14; border: 1px solid #1a5a1a; border-radius: 0; font-family: ui-monospace, monospace; }
+  [data-s="8"] .av { background: #0a1a0a; color: #39ff14; border: 1px solid #39ff14; border-radius: 0; font-family: ui-monospace, monospace; }
+  [data-s="8"] .row-item { border-color: #0f2a0f; font-family: ui-monospace, monospace; }
+  [data-s="8"] .toggle { background: #0a2a0a; border: 1px solid #1a5a1a; border-radius: 0; }
+  [data-s="8"] .toggle.on { background: #1a5a1a; }
+  [data-s="8"] .toggle::after { border-radius: 0; background: #39ff14; }
+  [data-s="8"] .preview-block { background: #020402; color: #39ff14; border: 1px solid #1a5a1a; border-radius: 0; text-shadow: 0 0 4px #39ff14; }
+  [data-s="8"] .font-slider { background: #0a2a0a; border-radius: 0; }
+  [data-s="8"] .font-slider::after { background: #39ff14; border-radius: 0; }
+  [data-s="8"] .pill.live { background: #0a2a0a; color: #39ff14; border: 1px solid #39ff14; border-radius: 0; }
+
+  /* S9 Linear light */
+  [data-s="9"] .phone { background: #f7f8f9; color: #1a1d21; border-color: #d8dce3; }
+  [data-s="9"] .status { background: #f7f8f9; color: #6b7280; }
+  [data-s="9"] .topbar { background: #f7f8f9; border-bottom: 1px solid #e5e7eb; color: #111; }
+  [data-s="9"] .nav-bottom { background: #fff; color: #9ca3af; border-top: 1px solid #e5e7eb; }
+  [data-s="9"] .nav-bottom span.on { color: #5e6ad2; }
+  [data-s="9"] .term-canvas { background: #1a1b26; color: #a9b1d6; }
+  [data-s="9"] .keybar { background: #eef0f4; }
+  [data-s="9"] .keybar b { background: #fff; color: #374151; border: 1px solid #e5e7eb; border-radius: 8px; box-shadow: 0 1px 2px rgba(0,0,0,.04); }
+  [data-s="9"] .av { background: #eef0ff; color: #5e6ad2; border-radius: 10px; }
+  [data-s="9"] .row-item { border-color: #eef0f3; background: #fff; }
+  [data-s="9"] .section { color: #9ca3af; opacity: 1; }
+  [data-s="9"] .toggle { background: #d1d5db; }
+  [data-s="9"] .toggle.on { background: #5e6ad2; }
+  [data-s="9"] .preview-block { background: #1a1b26; color: #a9b1d6; border-radius: 12px; box-shadow: 0 4px 16px rgba(0,0,0,.08); }
+  [data-s="9"] .font-slider { background: #e5e7eb; }
+  [data-s="9"] .font-slider::after { background: #5e6ad2; }
+  [data-s="9"] .pill.live { background: #ecfdf5; color: #059669; }
+  [data-s="9"] .switch-row { border-color: #eef0f3; background: #fff; }
+
+  /* S10 Fluent */
+  [data-s="10"] .phone { background: #1f1f1f; color: #fff; }
+  [data-s="10"] .status { background: #1f1f1f; color: #a0a0a0; }
+  [data-s="10"] .fluent-rail {
+    display: flex; flex: 1; min-height: 0;
+  }
+  [data-s="10"] .rail {
+    width: 48px; background: #2b2b2b; border-right: 1px solid #3a3a3a;
+    display: flex; flex-direction: column; align-items: center; gap: 12px; padding: 12px 0;
+    font-size: 14px; flex-shrink: 0;
+  }
+  [data-s="10"] .rail span { opacity: .5; width: 32px; height: 32px; display: grid; place-items: center; border-radius: 6px; }
+  [data-s="10"] .rail span.on { opacity: 1; background: #3d3d3d; color: #60cdff; }
+  [data-s="10"] .fluent-main { flex: 1; display: flex; flex-direction: column; min-width: 0; background: #202020; }
+  [data-s="10"] .topbar { background: #2b2b2b; font-size: 13px; font-weight: 600; border-bottom: 1px solid #3a3a3a; }
+  [data-s="10"] .nav-bottom { display: none !important; }
+  [data-s="10"] .term-canvas { background: #0c0c0c; color: #cccccc; }
+  [data-s="10"] .keybar { background: #2b2b2b; border-top: 1px solid #3a3a3a; }
+  [data-s="10"] .keybar b { background: #3d3d3d; color: #fff; border-radius: 4px; }
+  [data-s="10"] .av { background: #0078d4; color: #fff; border-radius: 4px; }
+  [data-s="10"] .toggle { background: #5a5a5a; border-radius: 10px; }
+  [data-s="10"] .toggle.on { background: #60cdff; }
+  [data-s="10"] .toggle.on::after { background: #000; }
+  [data-s="10"] .preview-block { background: #0c0c0c; color: #60cdff; border: 1px solid #3a3a3a; border-radius: 4px; }
+  [data-s="10"] .font-slider { background: #5a5a5a; }
+  [data-s="10"] .font-slider::after { background: #60cdff; }
+  [data-s="10"] .pill.live { background: #0e3a1a; color: #6ccb5f; border-radius: 2px; }
+  [data-s="10"] .row-item { border-color: #2f2f2f; }
+
+  .all-grid { display: none; }
+  .all-grid.show {
+    display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 16px; margin-top: 12px;
+  }
+  .mini-note { font-size: 11px; color: var(--muted); margin-top: 8px; }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header class="doc">
+    <h1>m-tmux · 10 套差异化 UI 设计方案</h1>
+    <p>面向远程 tmux / Claude·Grok TUI 的移动客户端。每套方案在导航、密度、色彩、信息架构上刻意拉开差异；每套含 5 个核心界面高保真线框（Claude TUI 会话、窗口列表、主机列表、设置、字体/主题预览）。</p>
+    <div class="meta">
+      <span class="chip"><strong>产品</strong> m-tmux</span>
+      <span class="chip"><strong>日期</strong> 2026-07-24</span>
+      <span class="chip"><strong>交付</strong> 交互 HTML · 点方案切换</span>
+      <span class="chip"><strong>研究</strong> Termius / Blink / Prompt 3 / Material 3 / Fluent / Warp·Moshi 范式</span>
+    </div>
+  </header>
+
+  <h2 style="font-size:16px;margin:0 0 10px">调研摘要 · 可参考产品</h2>
+  <div class="research">
+    <div class="r-card"><h3>Termius</h3><p>跨平台 SSH 标杆：卡片主机、底栏三 tab、主题/字号 per-host、手势特殊键。信息架构清晰，订阅驱动 polish。</p></div>
+    <div class="r-card"><h3>Blink Shell</h3><p>键盘优先、几乎无 chrome 的「手机上的 shell」。极简列表、Mosh 一等公民、字体/主题深度定制。</p></div>
+    <div class="r-card"><h3>Prompt 3 (Panic)</h3><p>设计驱动的 iOS SSH：暖色暗调、精致圆角与排版、细节打磨高于功能密度。</p></div>
+    <div class="r-card"><h3>Moshi / Warp 类 Agent</h3><p>为 Claude Code 等 agent 优化：状态条、审批、分屏预览。会话=工作流，不是纯 PTY。</p></div>
+    <div class="r-card"><h3>Material 3 / Now in Android</h3><p>大标题、色块 surface、FAB、圆角列表。Android 原生可识别度最高。</p></div>
+    <div class="r-card"><h3>Apple HIG · Glass</h3><p>毛玻璃、浮动底栏、深度与留白。适合「高级感」路线。</p></div>
+    <div class="r-card"><h3>Raycast / Linear</h3><p>命令面板 + 极简行列表；或浅色生产力。密度与键盘文化。</p></div>
+    <div class="r-card"><h3>Fluent / Termux 美学</h3><p>左侧导航（桌面感）或 CRT 绿字极客美学——两端分化的可识别身份。</p></div>
+  </div>
+
+  <div class="scheme-nav" id="schemeNav"></div>
+  <div id="schemes"></div>
+
+  <footer class="note">
+    <p>说明：界面为设计探索 mock，非最终实现。选型建议：默认推荐 <strong>方案 1（Termius 系）</strong> 作为增量改版成本最低路径；若强调 AI Coding 会话，优先评估 <strong>方案 6</strong>；若要强品牌差异，评估 <strong>5 Glass</strong> 或 <strong>8 CRT</strong>。</p>
+    <p>参考来源（公开产品/文档/对比文，非官方设计稿授权）：Termius Play Store 功能描述；Blink / Prompt 3 / Moshi 对比文；Android Material Settings 指南；Fluent UI Android 仓库；app-ui-craft 本地参考库（compose-samples / nowinandroid / material-components / fluentui-android）。</p>
+  </footer>
+</div>
+
+<script>
+const PAGES = [
+  { id: 'tui', name: 'Claude TUI 会话' },
+  { id: 'sessions', name: '窗口列表' },
+  { id: 'hosts', name: '主机列表' },
+  { id: 'settings', name: '设置' },
+  { id: 'theme', name: '字体·主题预览' },
+];
+
+const SCHEMES = [
+  {
+    id: 1, name: '01 · Termius 精工暗色',
+    tagline: '跨平台专业 SSH · 卡片 + 底栏',
+    desc: '以 Termius 为蓝本：深灰表面、蓝强调色、主机/会话分 tab、终端内特殊键条。信息架构最接近当前 m-tmux，改造成本最低，适合作为「可交付默认方向」。',
+    refs: ['Termius (iOS/Android/Desktop)', 'Google Play 终端手势与多会话描述', 'Material 暗色 surface'],
+    diff: '与现状最接近，但强化卡片层级、状态 pill、统一蓝强调。',
+  },
+  {
+    id: 2, name: '02 · Blink 键盘极简',
+    tagline: '几乎无 chrome · 黑底霓虹绿',
+    desc: 'Blink Shell 式：默认全黑、等宽字体贯穿列表与设置、特殊键条极瘦。导航弱化，一切为「尽快打字」。适合 power user，学习成本略高。',
+    refs: ['Blink Shell', 'iPad 终端对比中的 keyboard-first 定位', 'Termux 极简渲染文化'],
+    diff: '去掉圆角卡片与彩色 av；全站等宽；强调色改为终端绿。',
+  },
+  {
+    id: 3, name: '03 · Prompt / Panic 工艺',
+    tagline: '暖暗色 · 精致圆角 · 设计驱动',
+    desc: 'Panic Prompt 气质：咖啡暖灰背景、橙强调、圆形主机头像、大圆角键帽。列表行高更松，强调「好看且好用」。',
+    refs: ['Prompt 3 (Panic)', 'Apple HIG 暖色暗黑实践', 'emil-design-eng 细节 polish'],
+    diff: '冷蓝系 → 暖橙系；头像圆形；键帽胶囊感。',
+  },
+  {
+    id: 4, name: '04 · Material You 原生',
+    tagline: '大标题 · 色块 · FAB',
+    desc: '严格 Material 3：动态紫系 tonal、大 display 标题、列表项为独立 surface 卡片、主操作 FAB。Android 用户零学习成本。',
+    refs: ['Material 3', 'nowinandroid', 'material-components-android catalog', 'Android Settings 分组指南'],
+    diff: '标题字号跳变；FAB 新建会话；列表「浮块」而非分割线。',
+  },
+  {
+    id: 5, name: '05 · Glass Sequoia 玻璃',
+    tagline: '毛玻璃 · 浮动底栏 · 深度',
+    desc: '苹果新一代玻璃美学：渐变背景、半透明 top/bottom bar、终端画布内嵌圆角面板。强调空间与层次，适合品牌升级叙事。',
+    refs: ['Apple HIG / liquid glass 趋势', 'apple-design skill', 'iOS 控制中心半透明'],
+    diff: '真实模糊层 + 浮动胶囊导航；终端不贴边。',
+  },
+  {
+    id: 6, name: '06 · Agent 工作台',
+    tagline: '为 Claude Code / Grok CLI 而生',
+    desc: 'Moshi / Warp 方向：会话顶栏增加 Agent 状态芯片（Running / Waiting / Diff）、会话列表强调「任务」而非纯 PTY 名。设置里突出滚动/IME 与 TUI 相关项。',
+    refs: ['Moshi agent-first iPad 终端', 'Warp AI block UI', 'Claude Code fullscreen 文档中的会话滚动模型'],
+    diff: '多一层 agent-bar；紫强调；会话=任务流。',
+  },
+  {
+    id: 7, name: '07 · Raycast 命令中心',
+    tagline: '搜索条优先 · 红强调 · 极密列表',
+    desc: 'Raycast 范式：主机/窗口首页顶部是命令输入「跳转或执行…」，键盘快捷提示。列表极致扁平，适合键鼠外接与高频切换。',
+    refs: ['Raycast', 'Linear 快捷键文化', 'macOS Spotlight 密度'],
+    diff: '全局 command bar；无大标题；强调快捷键 kbd。',
+  },
+  {
+    id: 8, name: '08 · CRT 赛博极客',
+    tagline: '磷光绿 · 扫描线 · 直角',
+    desc: '刻意的「黑客终端」身份：全站等宽绿字、扫描线、虚线分割、零圆角。与大众 SaaS 应用彻底区隔，适合开源极客受众与营销截图。',
+    refs: ['经典 CRT / Phosphor', 'Termux 社区审美', '黑客电影 HUD'],
+    diff: '唯一全等宽+扫描线方案；拒绝 Material 圆角。',
+  },
+  {
+    id: 9, name: '09 · Linear 浅色生产力',
+    tagline: '浅灰底 · 紫强调 · 终端反差',
+    desc: '白天户外可用：整体浅色 UI，仅终端画布保持深色 Tokyo Night。设置与列表参考 Linear 的冷静间距与紫色品牌色。',
+    refs: ['Linear app', 'GitHub Mobile 浅色', '对比度无障碍实践'],
+    diff: '唯一默认浅色 chrome；终端「洞」式深色嵌入。',
+  },
+  {
+    id: 10, name: '10 · Fluent 侧栏混合',
+    tagline: '左侧 rail · 类桌面 · 青蓝强调',
+    desc: 'Microsoft Fluent：取消底栏，改为左侧图标 rail（会话/主机/设置），内容区 top bar + 列表。平板/横屏友好，竖屏略挤但辨识度强。',
+    refs: ['fluentui-android', 'Windows 11 导航/导航', '桌面 SSH 客户端侧栏'],
+    diff: '导航从底栏改为左 rail；无底部 tab。',
+  },
+];
+
+const TERM_CLAUDE = `<span class="c-dim">╭─ Claude Code ──────────────────────────────────╮</span>
+<span class="c-blue">│</span> <span class="c-grn">●</span> Running  <span class="c-dim">opus-4 · mosh · 142ms</span>
+<span class="c-blue">│</span>
+<span class="c-blue">│</span> <span class="c-yel">❯</span> refactor terminal scroll for TUI
+<span class="c-blue">│</span>
+<span class="c-blue">│</span> I'll inspect TerminalView.doScroll and
+<span class="c-blue">│</span> onScreenUpdated — local mTopRow was
+<span class="c-blue">│</span> snapping on every redraw…
+<span class="c-blue">│</span>
+<span class="c-blue">│</span> <span class="c-dim">Read</span> TerminalView.java
+<span class="c-blue">│</span> <span class="c-dim">Edit</span> doScroll + onScreenUpdated
+<span class="c-blue">│</span>
+<span class="c-blue">│</span> <span class="c-grn">✓</span> Scrollback keeps position while
+<span class="c-blue">│</span>   Claude streams tokens.
+<span class="c-dim">╰────────────────────────────────────────────────╯</span>
+<span class="c-dim">────────────────────────────────────────────────</span>
+<span class="c-yel">❯</span> <span class="c-dim">_</span>`;
+
+function phoneShell(s, page, inner, navOn) {
+  const isFluent = s === 10;
+  const status = `<div class="status"><span>9:41</span><span>5G · 86%</span></div>`;
+  const bottom = isFluent ? '' : `<div class="nav-bottom">
+    <span class="${navOn==='sessions'?'on':''}">会话</span>
+    <span class="${navOn==='hosts'?'on':''}">主机</span>
+    <span class="${navOn==='settings'?'on':''}">设置</span>
+  </div>`;
+
+  if (isFluent) {
+    const railOn = navOn === 'sessions' ? 0 : navOn === 'hosts' ? 1 : 2;
+    const icons = ['▣','⬡','⚙'];
+    return `<div class="phone" data-s="${s}">
+      ${status}
+      <div class="fluent-rail">
+        <div class="rail">${icons.map((ic,i)=>`<span class="${i===railOn?'on':''}">${ic}</span>`).join('')}</div>
+        <div class="fluent-main">${inner}</div>
+      </div>
+    </div>`;
+  }
+  return `<div class="phone" data-s="${s}">
+    ${status}
+    <div class="body">${inner}</div>
+    ${bottom}
+  </div>`;
+}
+
+function screenTui(s) {
+  const agent = s === 6 ? `<div class="agent-bar"><span class="a">● Claude</span><span>Streaming</span><span>PgUp scroll</span><span>mosh</span></div>` : '';
+  const top = s === 7
+    ? `<div class="cmd"><kbd>⌘K</kbd> Jump session / host…</div>`
+    : `<div class="topbar"><span>elli · main</span><span class="sub pill live">LIVE</span></div>`;
+  const keys = s === 2
+    ? `<div class="keybar"><b>esc</b><b>ctrl</b><b>tab</b><b>↑</b><b>↓</b><b>⋯</b></div>`
+    : `<div class="keybar"><b>Esc</b><b>Ctrl</b><b>Alt</b><b>Tab</b><b>↑</b><b>↓</b><b>⋯</b></div>`;
+  const fab = s === 4 ? '' : '';
+  return phoneShell(s, 'tui', `${top}${agent}<div class="term-canvas">${TERM_CLAUDE}</div>${keys}`, 'sessions');
+}
+
+function screenSessions(s) {
+  const top = s === 4
+    ? `<div class="topbar">会话</div>`
+    : s === 7
+    ? `<div class="cmd"><kbd>/</kbd> 过滤窗口…</div>`
+    : `<div class="topbar"><span>会话</span><span class="sub">3 活跃</span></div>`;
+  const items = [
+    {a:'m', t:'main · claude', s:'elli · 2 窗 · 刚刚', live:true},
+    {a:'g', t:'grok-tui', s:'lax · 1 窗 · 4 分钟前', live:true},
+    {a:'d', t:'deploy', s:'ecs · 已断开', live:false},
+  ].map(it => `<div class="row-item">
+    <div class="av">${it.a}</div>
+    <div class="meta"><div class="t">${it.t}</div><div class="s">${it.s}</div></div>
+    ${it.live?'<span class="pill live">●</span>':'<span class="badge">—</span>'}
+  </div>`).join('');
+  const fab = s === 4 ? `<div class="fab">+</div>` : '';
+  const sec = s === 1 || s === 9 ? `<div class="section">按主机</div>` : '';
+  return phoneShell(s, 'sessions', `${top}${sec}${items}${fab}`, 'sessions');
+}
+
+function screenHosts(s) {
+  const top = s === 4 ? `<div class="topbar">主机</div>`
+    : s === 7 ? `<div class="cmd"><kbd>@</kbd> 连接主机…</div>`
+    : `<div class="topbar"><span>主机</span><span class="sub">+</span></div>`;
+  const items = [
+    {a:'E', t:'elli', s:'100.64.0.28 · key · mosh'},
+    {a:'L', t:'lax-vps', s:'ssh · :22 · ed25519'},
+    {a:'C', t:'ecs', s:'203.0.113.177 · 备线'},
+  ].map(it => `<div class="row-item">
+    <div class="av">${it.a}</div>
+    <div class="meta"><div class="t">${it.t}</div><div class="s">${it.s}</div></div>
+    <span class="sub">›</span>
+  </div>`).join('');
+  return phoneShell(s, 'hosts', `${top}${items}`, 'hosts');
+}
+
+function screenSettings(s) {
+  const top = s === 4 ? `<div class="topbar">设置</div>` : `<div class="topbar">设置</div>`;
+  const rows = [
+    ['外观', '系统 / 暗色 / 主题'],
+    ['字体 · 配色 · 字号…', '16px · JetBrains Mono'],
+    ['保持屏幕点亮', 'toggle'],
+    ['启动进入最近会话', 'toggle'],
+    ['命令片段…', ''],
+    ['键盘布局…', ''],
+    ['加密导出配置…', ''],
+    ['隐私声明', '数据如何保存在本机'],
+    ['关于', 'm-tmux 0.1.66'],
+  ].map(([t,s2]) => {
+    if (s2 === 'toggle') return `<div class="switch-row"><span>${t}</span><div class="toggle on"></div></div>`;
+    return `<div class="switch-row"><div><div style="font-weight:600">${t}</div>${s2?`<div class="sub" style="font-size:11px;opacity:.6">${s2}</div>`:''}</div><span style="opacity:.4">›</span></div>`;
+  }).join('');
+  return phoneShell(s, 'settings', `${top}<div class="section">终端</div>${rows}`, 'settings');
+}
+
+function screenTheme(s) {
+  const top = `<div class="topbar"><span>‹ 终端外观</span></div>`;
+  const preview = `<div class="preview-block">Aa 预览 16px
+<span style="opacity:.7">function</span> <span style="color:inherit;font-weight:700">connect</span>() {
+  mosh · <span style="opacity:.8">tmux a -t main</span>
+}
+<span style="opacity:.55">// Claude · Grok · shell</span></div>`;
+  const fonts = ['JetBrains Mono','Source Code Pro','IBM Plex Mono','系统等宽']
+    .map((f,i)=>`<div class="switch-row"><span style="font-family:ui-monospace,monospace">${f}</span>${i===0?'<span class="pill live">✓</span>':''}</div>`).join('');
+  return phoneShell(s, 'theme', `${top}
+    <div class="section">字号</div>
+    <div style="padding:4px 14px;font-size:11px;opacity:.6">13 ────────●── 72</div>
+    <div class="font-slider"></div>
+    ${preview}
+    <div class="section">字体</div>${fonts}
+    <div class="section">配色方案</div>
+    <div class="switch-row"><span>Termius Dark</span><span class="pill live">✓</span></div>
+    <div class="switch-row"><span>Dracula</span></div>
+    <div class="switch-row"><span>Tokyo Night</span></div>
+  `, 'settings');
+}
+
+const RENDER = { tui: screenTui, sessions: screenSessions, hosts: screenHosts, settings: screenSettings, theme: screenTheme };
+
+function build() {
+  const nav = document.getElementById('schemeNav');
+  const root = document.getElementById('schemes');
+  SCHEMES.forEach((sc, idx) => {
+    const b = document.createElement('button');
+    b.textContent = sc.name;
+    b.dataset.id = sc.id;
+    if (idx === 0) b.classList.add('active');
+    b.onclick = () => selectScheme(sc.id);
+    nav.appendChild(b);
+
+    const sec = document.createElement('section');
+    sec.className = 'scheme' + (idx===0?' active':'');
+    sec.id = 'scheme-' + sc.id;
+    sec.innerHTML = `
+      <div class="scheme-head">
+        <div>
+          <div class="tagline">${sc.tagline}</div>
+          <h2>${sc.name}</h2>
+          <p class="desc">${sc.desc}</p>
+          <div class="refs">${sc.refs.map(r=>`<span class="ref">${r}</span>`).join('')}</div>
+          <p class="diff"><strong>差异点：</strong>${sc.diff}</p>
+        </div>
+      </div>
+      <div class="page-tabs" data-scheme="${sc.id}">
+        ${PAGES.map((p,i)=>`<button data-page="${p.id}" class="${i===0?'active':''}">${p.name}</button>`).join('')}
+      </div>
+      <div class="phones" id="phones-${sc.id}"></div>
+      <p class="mini-note">提示：点击上方 5 个页签切换该方案的界面；或一次查看全部 5 屏：
+        <button type="button" style="margin-left:6px;cursor:pointer" onclick="showAll(${sc.id})">展开全部 5 屏</button>
+      </p>
+    `;
+    root.appendChild(sec);
+    renderPages(sc.id, 'tui');
+  });
+}
+
+function renderPages(schemeId, pageId) {
+  const el = document.getElementById('phones-' + schemeId);
+  if (!el) return;
+  el.innerHTML = `<div class="phone-wrap"><div class="phone-label">${PAGES.find(p=>p.id===pageId).name}</div>${RENDER[pageId](schemeId)}</div>`;
+}
+
+function showAll(schemeId) {
+  const el = document.getElementById('phones-' + schemeId);
+  el.innerHTML = PAGES.map(p =>
+    `<div class="phone-wrap"><div class="phone-label">${p.name}</div>${RENDER[p.id](schemeId)}</div>`
+  ).join('');
+  document.querySelectorAll(`.page-tabs[data-scheme="${schemeId}"] button`).forEach(b => b.classList.remove('active'));
+}
+
+function selectScheme(id) {
+  document.querySelectorAll('.scheme-nav button').forEach(b => b.classList.toggle('active', +b.dataset.id === id));
+  document.querySelectorAll('.scheme').forEach(s => s.classList.toggle('active', s.id === 'scheme-'+id));
+}
+
+document.addEventListener('click', (e) => {
+  const btn = e.target.closest('.page-tabs button');
+  if (!btn) return;
+  const tabs = btn.parentElement;
+  const sid = +tabs.dataset.scheme;
+  tabs.querySelectorAll('button').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  renderPages(sid, btn.dataset.page);
+});
+
+build();
+</script>
+</body>
+</html>

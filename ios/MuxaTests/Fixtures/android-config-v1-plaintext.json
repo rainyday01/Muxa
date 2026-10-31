@@ -1,0 +1,1 @@
+{"version":1,"app":"muxa","hosts":[{"id":"host-1","alias":"Lab","hostname":"example.invalid","port":22,"username":"dev","transport":"AUTO"}],"snippets":[{"id":"snippet-1","name":"List","body":"ls -la","tags":"shell,files","runOnSelect":false}]}

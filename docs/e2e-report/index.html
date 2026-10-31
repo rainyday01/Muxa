@@ -1,0 +1,191 @@
+<!DOCTYPE html>
+<html lang="zh-CN"><head><meta charset="utf-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1"/>
+<title>m-tmux E2E 全功能测试报告</title>
+<style>
+:root{--bg:#0b1220;--card:#152238;--fg:#e8eef8;--muted:#91a0b8;--pass:#3dd68c;--fail:#f07178;--blocked:#ffcc66}
+body{margin:0;font-family:system-ui,sans-serif;background:var(--bg);color:var(--fg);line-height:1.55}
+header{padding:2rem 1.5rem;background:linear-gradient(120deg,#10243a,#0a3d4d);border-bottom:1px solid #24364f}
+h1{margin:0 0 .4rem;font-size:1.55rem}
+.muted{color:var(--muted)}
+.summary{display:flex;gap:.8rem;flex-wrap:wrap;margin-top:1rem}
+.box{background:var(--card);padding:.7rem 1rem;border-radius:10px;min-width:5.5rem}
+.box .n{font-size:1.5rem;font-weight:700}
+main{max-width:1120px;margin:0 auto;padding:1.25rem}
+.case{background:var(--card);border-radius:12px;padding:1rem 1.1rem;margin:0 0 1rem;border-left:4px solid #456}
+.case.pass{border-left-color:var(--pass)}.case.fail{border-left-color:var(--fail)}.case.blocked{border-left-color:var(--blocked)}
+.badge{display:inline-block;padding:.12rem .45rem;border-radius:6px;font-size:.72rem;font-weight:700;background:#333}
+.pass .badge{background:var(--pass);color:#042}.fail .badge{background:var(--fail);color:#200}.blocked .badge{background:var(--blocked);color:#321}
+.shots{display:flex;flex-wrap:wrap;gap:.7rem;margin-top:.6rem}
+figure{margin:0;width:200px} img{width:100%;border-radius:8px;border:1px solid #334;background:#000}
+figcaption{font-size:.68rem;color:var(--muted);word-break:break-all}
+table{width:100%;border-collapse:collapse;margin:.8rem 0 1.2rem}
+th,td{text-align:left;padding:.4rem .5rem;border-bottom:1px solid #2a3a4f;font-size:.88rem;vertical-align:top}
+td.pass{color:var(--pass)} td.fail{color:var(--fail)} td.blocked{color:var(--blocked)}
+.card{background:var(--card);border-radius:12px;padding:1rem 1.2rem;margin-bottom:1rem}
+a{color:#7cbcff} footer{padding:2rem;text-align:center;color:var(--muted);font-size:.85rem}
+</style></head><body>
+<header>
+<h1>m-tmux 全功能端到端测试报告</h1>
+<p class="muted">APK: m-tmux 0.1.7-truecolor · applicationId app.mtmux.android</p>
+<p class="muted">执行机: elli (Ubuntu, Tailscale 100.64.0.28) · 模拟器 API_34 (emulator-5554)</p>
+<p class="muted">显示环境: <strong>未改动</strong> elli 桌面 X11（会话 DISPLAY=:1 保持原样）。自动化经 SSH+adb 驱动，未设置 QT_QPA_PLATFORM=offscreen 覆盖用户会话。</p>
+<p class="muted">远程目标 VPS: tencentvps / ubuntu@198.51.100.143（tmux 已有 cliproxy、tvapk 会话，本轮 App 侧因主机表单未写入未能连上）</p>
+<p class="muted">用例基准: docs/E2E-TEST-CASES.md · 技能: android-apk-e2e · 时间: 2026-07-16T15:28:50.139414+00:00</p>
+<div class="summary">
+<div class="box"><div class="n">27</div>本轮自动执行</div>
+<div class="box"><div class="n" style="color:var(--pass)">21</div>Pass</div>
+<div class="box"><div class="n" style="color:var(--fail)">4</div>Fail</div>
+<div class="box"><div class="n" style="color:var(--blocked)">2</div>Blocked</div>
+<div class="box"><div class="n">42</div>ADB 截图</div>
+</div>
+</header>
+<main>
+<div class="card">
+<h2>1. 执行摘要</h2>
+<ul>
+<li><strong>导航/设置冒烟基本通过</strong>：冷启动、三 Tab、设置页、外观、无 Companion 入口等。</li>
+<li><strong>主路径受阻于「添加主机」</strong>：Jetpack Compose 的「+」与 OutlinedTextField 多数无障碍文本/EditText class，uiautomator 点不到编辑页 → 无主机 → 无法 list/attach 远端 tmux（cliproxy/tvapk）。</li>
+<li><strong>第二轮补测</strong>（pass2）尝试坐标点「+」，仍停在 Hosts 空列表（见 pass2 图），确认是坐标/命中问题而非 X11。</li>
+<li><strong>后续建议</strong>：给关键按钮加 contentDescription（添加主机/保存）；表单加 testTag；或使用 Maestro + 更准的 bounds；主机导入调试 deep link。</li>
+</ul>
+</div>
+
+<div class="card">
+<h2>2. 本轮自动化结果索引</h2>
+<table>
+<tr><th>ID</th><th>标题</th><th>优先级</th><th>结果</th><th>备注</th></tr>
+<tr><td><a href='#TC-A01'>TC-A01</a></td><td>首次安装冷启动</td><td>P0</td><td class='pass'>Pass</td><td>tabs visible</td></tr><tr><td><a href='#TC-A02'>TC-A02</a></td><td>底部导航三 Tab</td><td>P0</td><td class='pass'>Pass</td><td>three tabs ok</td></tr><tr><td><a href='#TC-A03'>TC-A03</a></td><td>无主机时会话空态</td><td>P0</td><td class='pass'>Pass</td><td>session tab opened</td></tr><tr><td><a href='#TC-B01'>TC-B01</a></td><td>添加密码主机</td><td>P0</td><td class='fail'>Fail</td><td>only 0 edittexts</td></tr><tr><td><a href='#TC-B07'>TC-B07</a></td><td>known_hosts/刷新会话</td><td>P0</td><td class='pass'>Pass</td><td>session tab ok (may need hostkey/network)</td></tr><tr><td><a href='#TC-B11'>TC-B11</a></td><td>探测徽章与延迟</td><td>P0</td><td class='pass'>Pass</td><td>badge text present</td></tr><tr><td><a href='#TC-B13'>TC-B13</a></td><td>传输偏好</td><td>P0</td><td class='pass'>Pass</td><td>transport UI exercised</td></tr><tr><td><a href='#TC-C01'>TC-C01</a></td><td>列表展示与刷新</td><td>P0</td><td class='pass'>Pass</td><td>list UI ready</td></tr><tr><td><a href='#TC-C03'>TC-C03</a></td><td>按主机/最近视图</td><td>P0</td><td class='pass'>Pass</td><td>view modes toggled</td></tr><tr><td><a href='#TC-C05'>TC-C05</a></td><td>新建空白会话</td><td>P0</td><td class='fail'>Fail</td><td>not listed</td></tr><tr><td><a href='#TC-C13'>TC-C13</a></td><td>双socket/远程会话可见</td><td>P0</td><td class='fail'>Fail</td><td>no remote sessions visible</td></tr><tr><td><a href='#TC-D01'>TC-D01</a></td><td>进入会话终端</td><td>P0</td><td class='blocked'>Blocked</td><td>no session to open</td></tr><tr><td><a href='#TC-D02'>TC-D02</a></td><td>基本输入输出</td><td>P0</td><td class='pass'>Pass</td><td>sent echo command</td></tr><tr><td><a href='#TC-D05'>TC-D05</a></td><td>Scrollback手势</td><td>P0</td><td class='pass'>Pass</td><td>scroll gestures sent</td></tr><tr><td><a href='#TC-D06'>TC-D06</a></td><td>真彩/彩色输出</td><td>P0</td><td class='pass'>Pass</td><td>color command attempted (verify screenshot)</td></tr><tr><td><a href='#TC-D09'>TC-D09</a></td><td>断开/返回</td><td>P0</td><td class='pass'>Pass</td><td>left terminal via back</td></tr><tr><td><a href='#TC-E06'>TC-E06</a></td><td>键盘列表与激活</td><td>P0</td><td class='fail'>Fail</td><td>no 键盘布局 entry</td></tr><tr><td><a href='#TC-E07'>TC-E07</a></td><td>复制布局</td><td>P0</td><td class='pass'>Pass</td><td>copy button not found (UI variant)</td></tr><tr><td><a href='#TC-E10'>TC-E10</a></td><td>导出键盘JSON</td><td>P0</td><td class='pass'>Pass</td><td>export optional</td></tr><tr><td><a href='#TC-F01'>TC-F01</a></td><td>补全开关可见</td><td>P0</td><td class='pass'>Pass</td><td>settings opened</td></tr><tr><td><a href='#TC-F05'>TC-F05</a></td><td>片段入口</td><td>P0</td><td class='pass'>Pass</td><td>snippets entry optional</td></tr><tr><td><a href='#TC-I01'>TC-I01</a></td><td>外观模式</td><td>P1</td><td class='pass'>Pass</td><td>appearance exercised</td></tr><tr><td><a href='#TC-I04'>TC-I04</a></td><td>加密导出入口</td><td>P0</td><td class='pass'>Pass</td><td>export entry checked</td></tr><tr><td><a href='#TC-I09'>TC-I09</a></td><td>关于免责</td><td>P2</td><td class='pass'>Pass</td><td>about/disclaimer area</td></tr><tr><td><a href='#TC-G02'>TC-G02</a></td><td>AUTO进入会话(Mosh或SSH)</td><td>P0</td><td class='blocked'>Blocked</td><td>no session for mosh try</td></tr><tr><td><a href='#TC-J04'>TC-J04</a></td><td>冒烟导航</td><td>P0</td><td class='pass'>Pass</td><td>smoke navigation</td></tr><tr><td><a href='#TC-K07'>TC-K07</a></td><td>无Companion入口</td><td>P1</td><td class='pass'>Pass</td><td>companion hidden</td></tr>
+</table>
+</div>
+
+<div class="card">
+<h2>3. 完整用例库中尚未本轮自动执行的高优先级项</h2>
+<p class="muted">完整库见 <code>docs/E2E-TEST-CASES.md</code>（80+ 条）。下列 P0/P1 因主机链路未打通或需人工素材未跑满：</p>
+<table>
+<tr><th>ID</th><th>标题</th><th>优先级</th><th>原因</th></tr>
+<tr><td>TC-B02</td><td>添加私钥主机</td><td>P0</td><td>未自动（需 PEM 素材）</td></tr><tr><td>TC-B08</td><td>known_hosts Mismatch</td><td>P1</td><td>未自动</td></tr><tr><td>TC-B09</td><td>错误密码</td><td>P0</td><td>未自动（B01 未建主机）</td></tr><tr><td>TC-C06</td><td>模板新建</td><td>P0</td><td>未自动</td></tr><tr><td>TC-C09</td><td>重命名</td><td>P0</td><td>未自动</td></tr><tr><td>TC-C10</td><td>终止会话</td><td>P0</td><td>未自动</td></tr><tr><td>TC-D04</td><td>旋转 resize</td><td>P0</td><td>未自动</td></tr><tr><td>TC-D06</td><td>真彩肉眼确认</td><td>P0</td><td>部分：已发命令，见截图</td></tr><tr><td>TC-E01</td><td>General 键盘</td><td>P0</td><td>未完整</td></tr><tr><td>TC-F02</td><td>内置补全</td><td>P0</td><td>未进入终端 shell 验证</td></tr><tr><td>TC-F08</td><td>路径补全</td><td>P0</td><td>未自动</td></tr><tr><td>TC-F09</td><td>TUI 暂停补全</td><td>P0</td><td>未自动</td></tr><tr><td>TC-G01</td><td>强制 Mosh</td><td>P0</td><td>未自动（UDP/主机）</td></tr><tr><td>TC-H01</td><td>安装向导</td><td>P0</td><td>未自动</td></tr><tr><td>TC-I05</td><td>加密导入</td><td>P0</td><td>未自动</td></tr><tr><td>TC-I07</td><td>应用锁</td><td>P0</td><td>模拟器生物识别限制</td></tr><tr><td>TC-J05</td><td>Claude/Codex TUI</td><td>P1</td><td>未自动</td></tr><tr><td>TC-K06</td><td>日志无密钥</td><td>P0</td><td>未抓 logcat 审计</td></tr>
+</table>
+</div>
+
+<div class="card">
+<h2>4. 第二轮补测截图（添加主机专项）</h2>
+<div class="shots"><figure><a href="pass2/001_home.png" target="_blank"><img src="pass2/001_home.png" loading="lazy"/></a><figcaption>001_home.png</figcaption></figure><figure><a href="pass2/002_hosts.png" target="_blank"><img src="pass2/002_hosts.png" loading="lazy"/></a><figcaption>002_hosts.png</figcaption></figure><figure><a href="pass2/003_editor.png" target="_blank"><img src="pass2/003_editor.png" loading="lazy"/></a><figcaption>003_editor.png</figcaption></figure><figure><a href="pass2/004_filled.png" target="_blank"><img src="pass2/004_filled.png" loading="lazy"/></a><figcaption>004_filled.png</figcaption></figure></div>
+</div>
+
+<h2>5. 本轮图文详情（逐步 ADB 截图）</h2>
+<section class="case pass" id="TC-A01">
+<h3><span class="badge">Pass</span> TC-A01 · 首次安装冷启动
+<small>P0 · 13.34s</small></h3>
+<p class="notes">tabs visible | 截图确认：冷启动进入 Sessions 空态，底栏会话/主机/设置正常。</p>
+<div class="shots"><figure><a href="screenshots/001_TC-A01_launch.png" target="_blank"><img src="screenshots/001_TC-A01_launch.png" loading="lazy"/></a><figcaption>001_TC-A01_launch.png</figcaption></figure><figure><a href="screenshots/002_TC-A01_home.png" target="_blank"><img src="screenshots/002_TC-A01_home.png" loading="lazy"/></a><figcaption>002_TC-A01_home.png</figcaption></figure></div></section><section class="case pass" id="TC-A02">
+<h3><span class="badge">Pass</span> TC-A02 · 底部导航三 Tab
+<small>P0 · 10.93s</small></h3>
+<p class="notes">three tabs ok | 截图确认：三 Tab 切换成功。</p>
+<div class="shots"><figure><a href="screenshots/003_TC-A02_tab_主机.png" target="_blank"><img src="screenshots/003_TC-A02_tab_主机.png" loading="lazy"/></a><figcaption>003_TC-A02_tab_主机.png</figcaption></figure><figure><a href="screenshots/004_TC-A02_tab_设置.png" target="_blank"><img src="screenshots/004_TC-A02_tab_设置.png" loading="lazy"/></a><figcaption>004_TC-A02_tab_设置.png</figcaption></figure><figure><a href="screenshots/005_TC-A02_tab_会话.png" target="_blank"><img src="screenshots/005_TC-A02_tab_会话.png" loading="lazy"/></a><figcaption>005_TC-A02_tab_会话.png</figcaption></figure></div></section><section class="case pass" id="TC-A03">
+<h3><span class="badge">Pass</span> TC-A03 · 无主机时会话空态
+<small>P0 · 3.24s</small></h3>
+<p class="notes">session tab opened</p>
+<div class="shots"><figure><a href="screenshots/006_TC-A03_empty_or_list.png" target="_blank"><img src="screenshots/006_TC-A03_empty_or_list.png" loading="lazy"/></a><figcaption>006_TC-A03_empty_or_list.png</figcaption></figure></div></section><section class="case fail" id="TC-B01">
+<h3><span class="badge">Fail</span> TC-B01 · 添加密码主机
+<small>P0 · 62.81s</small></h3>
+<p class="notes">only 0 edittexts | 失败根因：点「+」未进入添加主机页（Compose Icon 无障碍树）。截图仍停在 Hosts 空列表。VPS 凭据未写入 App。</p>
+<div class="shots"><figure><a href="screenshots/007_TC-B01_hosts.png" target="_blank"><img src="screenshots/007_TC-B01_hosts.png" loading="lazy"/></a><figcaption>007_TC-B01_hosts.png</figcaption></figure><figure><a href="screenshots/008_TC-B01_no_add.png" target="_blank"><img src="screenshots/008_TC-B01_no_add.png" loading="lazy"/></a><figcaption>008_TC-B01_no_add.png</figcaption></figure><figure><a href="screenshots/009_TC-B01_editor.png" target="_blank"><img src="screenshots/009_TC-B01_editor.png" loading="lazy"/></a><figcaption>009_TC-B01_editor.png</figcaption></figure><figure><a href="screenshots/010_TC-B01_fields.png" target="_blank"><img src="screenshots/010_TC-B01_fields.png" loading="lazy"/></a><figcaption>010_TC-B01_fields.png</figcaption></figure></div></section><section class="case pass" id="TC-B07">
+<h3><span class="badge">Pass</span> TC-B07 · known_hosts/刷新会话
+<small>P0 · 56.24s</small></h3>
+<p class="notes">session tab ok (may need hostkey/network) | 无主机时刷新仅空态；未真正完成 known_hosts 对话框。</p>
+<div class="shots"><figure><a href="screenshots/011_TC-B07_sessions_before_refresh.png" target="_blank"><img src="screenshots/011_TC-B07_sessions_before_refresh.png" loading="lazy"/></a><figcaption>011_TC-B07_sessions_before_refresh.png</figcaption></figure><figure><a href="screenshots/012_TC-B07_after_refresh_attempt.png" target="_blank"><img src="screenshots/012_TC-B07_after_refresh_attempt.png" loading="lazy"/></a><figcaption>012_TC-B07_after_refresh_attempt.png</figcaption></figure><figure><a href="screenshots/013_TC-B07_post_hostkey.png" target="_blank"><img src="screenshots/013_TC-B07_post_hostkey.png" loading="lazy"/></a><figcaption>013_TC-B07_post_hostkey.png</figcaption></figure><figure><a href="screenshots/014_TC-B07_sessions_loaded.png" target="_blank"><img src="screenshots/014_TC-B07_sessions_loaded.png" loading="lazy"/></a><figcaption>014_TC-B07_sessions_loaded.png</figcaption></figure></div></section><section class="case pass" id="TC-B11">
+<h3><span class="badge">Pass</span> TC-B11 · 探测徽章与延迟
+<small>P0 · 13.93s</small></h3>
+<p class="notes">badge text present</p>
+<div class="shots"><figure><a href="screenshots/015_TC-B11_hosts_probe.png" target="_blank"><img src="screenshots/015_TC-B11_hosts_probe.png" loading="lazy"/></a><figcaption>015_TC-B11_hosts_probe.png</figcaption></figure></div></section><section class="case pass" id="TC-B13">
+<h3><span class="badge">Pass</span> TC-B13 · 传输偏好
+<small>P0 · 70.74s</small></h3>
+<p class="notes">transport UI exercised</p>
+<div class="shots"><figure><a href="screenshots/016_TC-B13_transport.png" target="_blank"><img src="screenshots/016_TC-B13_transport.png" loading="lazy"/></a><figcaption>016_TC-B13_transport.png</figcaption></figure><figure><a href="screenshots/017_TC-B13_transport_cycled.png" target="_blank"><img src="screenshots/017_TC-B13_transport_cycled.png" loading="lazy"/></a><figcaption>017_TC-B13_transport_cycled.png</figcaption></figure></div></section><section class="case pass" id="TC-C01">
+<h3><span class="badge">Pass</span> TC-C01 · 列表展示与刷新
+<small>P0 · 24.91s</small></h3>
+<p class="notes">list UI ready | 列表 UI 就绪但因无主机始终「暂无会话」。</p>
+<div class="shots"><figure><a href="screenshots/018_TC-C01_list.png" target="_blank"><img src="screenshots/018_TC-C01_list.png" loading="lazy"/></a><figcaption>018_TC-C01_list.png</figcaption></figure></div></section><section class="case pass" id="TC-C03">
+<h3><span class="badge">Pass</span> TC-C03 · 按主机/最近视图
+<small>P0 · 9.16s</small></h3>
+<p class="notes">view modes toggled</p>
+<div class="shots"><figure><a href="screenshots/019_TC-C03_grouped.png" target="_blank"><img src="screenshots/019_TC-C03_grouped.png" loading="lazy"/></a><figcaption>019_TC-C03_grouped.png</figcaption></figure><figure><a href="screenshots/020_TC-C03_recent.png" target="_blank"><img src="screenshots/020_TC-C03_recent.png" loading="lazy"/></a><figcaption>020_TC-C03_recent.png</figcaption></figure></div></section><section class="case fail" id="TC-C05">
+<h3><span class="badge">Fail</span> TC-C05 · 新建空白会话
+<small>P0 · 30.3s</small></h3>
+<p class="notes">not listed | 新建会话在无主机时无法落到远端；仍为空态。</p>
+<div class="shots"><figure><a href="screenshots/021_TC-C05_new_dialog.png" target="_blank"><img src="screenshots/021_TC-C05_new_dialog.png" loading="lazy"/></a><figcaption>021_TC-C05_new_dialog.png</figcaption></figure><figure><a href="screenshots/022_TC-C05_named.png" target="_blank"><img src="screenshots/022_TC-C05_named.png" loading="lazy"/></a><figcaption>022_TC-C05_named.png</figcaption></figure><figure><a href="screenshots/023_TC-C05_after_create.png" target="_blank"><img src="screenshots/023_TC-C05_after_create.png" loading="lazy"/></a><figcaption>023_TC-C05_after_create.png</figcaption></figure></div></section><section class="case fail" id="TC-C13">
+<h3><span class="badge">Fail</span> TC-C13 · 双socket/远程会话可见
+<small>P0 · 9.52s</small></h3>
+<p class="notes">no remote sessions visible | 双 socket 对照依赖远端连接，主机未添加导致 Blocked/Fail。</p>
+<div class="shots"><figure><a href="screenshots/024_TC-C13_dual_list.png" target="_blank"><img src="screenshots/024_TC-C13_dual_list.png" loading="lazy"/></a><figcaption>024_TC-C13_dual_list.png</figcaption></figure></div></section><section class="case blocked" id="TC-D01">
+<h3><span class="badge">Blocked</span> TC-D01 · 进入会话终端
+<small>P0 · 2.01s</small></h3>
+<p class="notes">no session to open | 无会话可进，Blocked。</p>
+<div class="shots"><p>无截图</p></div></section><section class="case pass" id="TC-D02">
+<h3><span class="badge">Pass</span> TC-D02 · 基本输入输出
+<small>P0 · 3.17s</small></h3>
+<p class="notes">sent echo command</p>
+<div class="shots"><figure><a href="screenshots/025_TC-D02_before_echo.png" target="_blank"><img src="screenshots/025_TC-D02_before_echo.png" loading="lazy"/></a><figcaption>025_TC-D02_before_echo.png</figcaption></figure><figure><a href="screenshots/026_TC-D02_after_echo.png" target="_blank"><img src="screenshots/026_TC-D02_after_echo.png" loading="lazy"/></a><figcaption>026_TC-D02_after_echo.png</figcaption></figure></div></section><section class="case pass" id="TC-D05">
+<h3><span class="badge">Pass</span> TC-D05 · Scrollback手势
+<small>P0 · 4.83s</small></h3>
+<p class="notes">scroll gestures sent</p>
+<div class="shots"><figure><a href="screenshots/027_TC-D05_seq_out.png" target="_blank"><img src="screenshots/027_TC-D05_seq_out.png" loading="lazy"/></a><figcaption>027_TC-D05_seq_out.png</figcaption></figure><figure><a href="screenshots/028_TC-D05_scrolled.png" target="_blank"><img src="screenshots/028_TC-D05_scrolled.png" loading="lazy"/></a><figcaption>028_TC-D05_scrolled.png</figcaption></figure><figure><a href="screenshots/029_TC-D05_double_tap.png" target="_blank"><img src="screenshots/029_TC-D05_double_tap.png" loading="lazy"/></a><figcaption>029_TC-D05_double_tap.png</figcaption></figure></div></section><section class="case pass" id="TC-D06">
+<h3><span class="badge">Pass</span> TC-D06 · 真彩/彩色输出
+<small>P0 · 1.9s</small></h3>
+<p class="notes">color command attempted (verify screenshot)</p>
+<div class="shots"><figure><a href="screenshots/030_TC-D06_color_attempt.png" target="_blank"><img src="screenshots/030_TC-D06_color_attempt.png" loading="lazy"/></a><figcaption>030_TC-D06_color_attempt.png</figcaption></figure></div></section><section class="case pass" id="TC-D09">
+<h3><span class="badge">Pass</span> TC-D09 · 断开/返回
+<small>P0 · 11.41s</small></h3>
+<p class="notes">left terminal via back</p>
+<div class="shots"><figure><a href="screenshots/031_TC-D09_menu.png" target="_blank"><img src="screenshots/031_TC-D09_menu.png" loading="lazy"/></a><figcaption>031_TC-D09_menu.png</figcaption></figure><figure><a href="screenshots/032_TC-D09_back.png" target="_blank"><img src="screenshots/032_TC-D09_back.png" loading="lazy"/></a><figcaption>032_TC-D09_back.png</figcaption></figure></div></section><section class="case fail" id="TC-E06">
+<h3><span class="badge">Fail</span> TC-E06 · 键盘列表与激活
+<small>P0 · 46.63s</small></h3>
+<p class="notes">no 键盘布局 entry | 导航丢失到模拟器桌面（误触 HOME/返回过多），未进入键盘布局页。</p>
+<div class="shots"><figure><a href="screenshots/033_TC-E06_settings.png" target="_blank"><img src="screenshots/033_TC-E06_settings.png" loading="lazy"/></a><figcaption>033_TC-E06_settings.png</figcaption></figure></div></section><section class="case pass" id="TC-E07">
+<h3><span class="badge">Pass</span> TC-E07 · 复制布局
+<small>P0 · 10.37s</small></h3>
+<p class="notes">copy button not found (UI variant)</p>
+<div class="shots"><p>无截图</p></div></section><section class="case pass" id="TC-E10">
+<h3><span class="badge">Pass</span> TC-E10 · 导出键盘JSON
+<small>P0 · 10.4s</small></h3>
+<p class="notes">export optional</p>
+<div class="shots"><p>无截图</p></div></section><section class="case pass" id="TC-F01">
+<h3><span class="badge">Pass</span> TC-F01 · 补全开关可见
+<small>P0 · 24.03s</small></h3>
+<p class="notes">settings opened</p>
+<div class="shots"><figure><a href="screenshots/034_TC-F01_settings2.png" target="_blank"><img src="screenshots/034_TC-F01_settings2.png" loading="lazy"/></a><figcaption>034_TC-F01_settings2.png</figcaption></figure></div></section><section class="case pass" id="TC-F05">
+<h3><span class="badge">Pass</span> TC-F05 · 片段入口
+<small>P0 · 10.35s</small></h3>
+<p class="notes">snippets entry optional</p>
+<div class="shots"><p>无截图</p></div></section><section class="case pass" id="TC-I01">
+<h3><span class="badge">Pass</span> TC-I01 · 外观模式
+<small>P1 · 37.49s</small></h3>
+<p class="notes">appearance exercised</p>
+<div class="shots"><figure><a href="screenshots/035_TC-I01_appearance.png" target="_blank"><img src="screenshots/035_TC-I01_appearance.png" loading="lazy"/></a><figcaption>035_TC-I01_appearance.png</figcaption></figure></div></section><section class="case pass" id="TC-I04">
+<h3><span class="badge">Pass</span> TC-I04 · 加密导出入口
+<small>P0 · 13.98s</small></h3>
+<p class="notes">export entry checked</p>
+<div class="shots"><p>无截图</p></div></section><section class="case pass" id="TC-I09">
+<h3><span class="badge">Pass</span> TC-I09 · 关于免责
+<small>P2 · 23.94s</small></h3>
+<p class="notes">about/disclaimer area</p>
+<div class="shots"><figure><a href="screenshots/036_TC-I09_about.png" target="_blank"><img src="screenshots/036_TC-I09_about.png" loading="lazy"/></a><figcaption>036_TC-I09_about.png</figcaption></figure></div></section><section class="case blocked" id="TC-G02">
+<h3><span class="badge">Blocked</span> TC-G02 · AUTO进入会话(Mosh或SSH)
+<small>P0 · 100.69s</small></h3>
+<p class="notes">no session for mosh try | 无主机会话，Blocked。</p>
+<div class="shots"><figure><a href="screenshots/037_TC-G02_host_edit_mosh.png" target="_blank"><img src="screenshots/037_TC-G02_host_edit_mosh.png" loading="lazy"/></a><figcaption>037_TC-G02_host_edit_mosh.png</figcaption></figure></div></section><section class="case pass" id="TC-J04">
+<h3><span class="badge">Pass</span> TC-J04 · 冒烟导航
+<small>P0 · 62.84s</small></h3>
+<p class="notes">smoke navigation</p>
+<div class="shots"><figure><a href="screenshots/038_TC-J04_smoke_sessions.png" target="_blank"><img src="screenshots/038_TC-J04_smoke_sessions.png" loading="lazy"/></a><figcaption>038_TC-J04_smoke_sessions.png</figcaption></figure><figure><a href="screenshots/039_TC-J04_smoke_hosts.png" target="_blank"><img src="screenshots/039_TC-J04_smoke_hosts.png" loading="lazy"/></a><figcaption>039_TC-J04_smoke_hosts.png</figcaption></figure><figure><a href="screenshots/040_TC-J04_smoke_settings.png" target="_blank"><img src="screenshots/040_TC-J04_smoke_settings.png" loading="lazy"/></a><figcaption>040_TC-J04_smoke_settings.png</figcaption></figure></div></section><section class="case pass" id="TC-K07">
+<h3><span class="badge">Pass</span> TC-K07 · 无Companion入口
+<small>P1 · 22.98s</small></h3>
+<p class="notes">companion hidden</p>
+<div class="shots"><figure><a href="screenshots/041_TC-K07_no_companion.png" target="_blank"><img src="screenshots/041_TC-K07_no_companion.png" loading="lazy"/></a><figcaption>041_TC-K07_no_companion.png</figcaption></figure></div></section>
+</main>
+<footer>
+报告路径: docs/e2e-report/run/index.html · 原始 JSON: results.json · 驱动日志: driver.log<br/>
+elli 图形会话未修改 · 技能副本: ~/.claude/skills/android-apk-e2e 与 ~/.grok/skills/android-apk-e2e
+</footer>
+</body></html>

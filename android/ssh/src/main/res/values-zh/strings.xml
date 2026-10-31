@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="ssh_kex_unavailable">密钥交换算法不可用（X25519/curve25519）。已尝试兼容模式仍失败。\n%1$s</string>
+    <string name="ssh_auth_fail">认证失败：用户名/密码/私钥不正确，或服务器禁用了该密钥类型（Ed25519/RSA/ECDSA）。</string>
+    <string name="ssh_timeout">连接超时：请检查主机地址、端口与网络（含 Tailscale/VPN）。</string>
+    <string name="ssh_refused">连接被拒绝：端口错误或 sshd 未监听。</string>
+    <string name="ssh_unresolved">无法解析或到达主机：请确认主机栏只填 IP/域名（不要把密码贴进去）。\n详情: %1$s</string>
+    <string name="ssh_host_key">主机密钥校验失败。</string>
+    <string name="ssh_transport">SSH 传输错误：%1$s\n%2$s</string>
+    <string name="ssh_connect_fail">SSH 连接失败：%1$s</string>
+    <string name="ssh_empty_user">用户名为空</string>
+    <string name="ssh_no_auth">未提供认证信息：请填写密码或粘贴私钥</string>
+    <string name="ssh_auth_detail_title">认证失败（Exhausted available authentication methods）</string>
+    <string name="ssh_auth_user">用户: %1$s@%2$s:%3$d</string>
+    <string name="ssh_auth_tried">已尝试: %1$s</string>
+    <string name="ssh_auth_check">请逐项检查：</string>
+    <string name="ssh_auth_1">1. 用户名是否正确（常见 root / ubuntu / debian / ec2-user）</string>
+    <string name="ssh_auth_2">2. 私钥是否对应服务器 ~/.ssh/authorized_keys 中的公钥</string>
+    <string name="ssh_auth_3">3. 私钥是否完整（含 BEGIN/END），口令短语是否正确</string>
+    <string name="ssh_auth_4">4. 服务器是否允许该密钥类型（Ed25519 / RSA / ECDSA）</string>
+    <string name="ssh_auth_5">5. 密码是否正确；许多 VPS 默认关闭密码登录，只能用密钥</string>
+    <string name="ssh_auth_6">6. 已同时尝试密钥与密码；两者都未通过</string>
+    <string name="ssh_auth_hint_key_only">提示: 若服务器仅允许公钥，请改用私钥登录</string>
+    <string name="ssh_auth_hint_add_pass">提示: 若密钥不对，可再填密码（若服务器允许）作为备选</string>
+    <string name="ssh_auth_underlying">底层信息: %1$s</string>
+    <string name="ssh_reconnect">重连 %1$d/%2$d</string>
+
+    <string name="key_empty">私钥内容为空</string>
+    <string name="key_bad_passphrase">私钥口令短语不正确，或密钥损坏</string>
+    <string name="key_need_passphrase">该私钥已加密，请填写口令短语（passphrase）</string>
+    <string name="key_ed25519">Ed25519 密钥解析失败。请确认粘贴的是完整 OPENSSH PRIVATE KEY，且本机构建包含 eddsa 库。</string>
+    <string name="key_ecdsa">ECDSA 密钥不支持或格式不正确（支持 nistp256/384/521）</string>
+    <string name="key_dsa">DSA/ssh-dss 密钥过旧，许多服务器已禁用；建议改用 Ed25519 或 RSA</string>
+    <string name="key_rsa_short">RSA 密钥过短，服务器可能拒绝；建议 ≥2048 位</string>
+    <string name="key_unknown_format">无法识别私钥格式。请粘贴 OpenSSH/PKCS#8 PEM（含 BEGIN/END 行）</string>
+    <string name="key_missing_algo">设备密码学库缺少算法（%1$s）。已尝试自动修复 BC 提供者。</string>
+    <string name="key_load_fail">私钥加载失败（%1$s）：%2$s</string>
+</resources>

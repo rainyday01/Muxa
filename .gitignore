@@ -1,0 +1,64 @@
+# --- Local / secrets (never commit) ---
+AGENTS.md
+.env
+.env.*
+*.pem
+*.key
+*.jks
+*.keystore
+id_rsa*
+id_ed25519*
+known_hosts*
+local.properties
+**/local.properties
+secrets/
+*.secret
+
+# --- Android / Gradle ---
+.gradle/
+**/build/
+**/captures/
+.externalNativeBuild/
+.cxx/
+*.apk
+*.aab
+*.ap_
+*.dex
+*.class
+bin/
+gen/
+out/
+.navigation/
+*.hprof
+*.iml
+.idea/
+*.iws
+.DS_Store
+Thumbs.db
+
+# --- Kotlin / misc ---
+.kotlin/
+*.log
+*.swp
+*~
+
+# --- Tooling caches ---
+.claude/
+.grok/
+**/memtrace/
+
+# --- E2E report artifacts (binaries / large media) ---
+docs/e2e-report/**/*.apk
+docs/e2e-report/combined/
+docs/e2e-report/run/
+docs/e2e-report/run3/
+docs/e2e-report/run4/
+docs/e2e-report/screenshots/
+**/*.apk
+# iOS local build and generated project
+ios/.build/
+ios/*.xcworkspace/
+*.xcresult
+
+# Private credentials baseline (LogHub admin/upload/read). Local only.
+docs/loghub-baseline.md

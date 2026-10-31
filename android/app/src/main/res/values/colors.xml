@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- Muxa Remote Link icon: deep metal slate -->
+    <color name="ic_launcher_background">#12151C</color>
+    <color name="ic_launcher_phone">#1C1C1E</color>
+    <color name="ic_launcher_phone_stroke">#8E8E93</color>
+    <color name="ic_launcher_screen">#0A84FF</color>
+    <color name="ic_launcher_server">#2C2C2E</color>
+    <color name="ic_launcher_server_stroke">#AEAEB2</color>
+    <color name="ic_launcher_led">#30D158</color>
+    <color name="ic_launcher_rack">#636366</color>
+    <color name="ic_launcher_link">#0A84FF</color>
+</resources>

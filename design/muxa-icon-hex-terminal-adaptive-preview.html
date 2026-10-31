@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1"/>
+<title>Muxa · Hex Terminal adaptive preview</title>
+<style>
+  body { margin: 0; font-family: system-ui, sans-serif; background: #0a0a0c; color: #fafafa; padding: 24px; }
+  h1 { font-size: 18px; margin: 0 0 8px; }
+  p { color: #a1a1aa; font-size: 13px; max-width: 62ch; }
+  .row { display: flex; flex-wrap: wrap; gap: 28px; margin-top: 20px; }
+  .cell { text-align: center; }
+  .cell span { display: block; margin-top: 8px; font-size: 12px; color: #a1a1aa; }
+  .frame {
+    width: 180px; height: 180px; display: grid; place-items: center;
+    background: #111; border-radius: 12px;
+    background-image: linear-gradient(45deg,#222 25%,transparent 25%),linear-gradient(-45deg,#222 25%,transparent 25%),linear-gradient(45deg,transparent 75%,#222 75%),linear-gradient(-45deg,transparent 75%,#222 75%);
+    background-size: 16px 16px; background-position: 0 0,0 8px,8px -8px,-8px 0;
+  }
+  .layer { width: 160px; height: 160px; overflow: hidden; box-shadow: 0 12px 32px rgba(0,0,0,.5); }
+  .layer.sq { border-radius: 36px; }
+  .layer.ci { border-radius: 50%; }
+  .layer svg, .layer img { width: 100%; height: 100%; display: block; }
+  code { background: #222; padding: 2px 6px; border-radius: 4px; font-size: 12px; }
+</style>
+</head>
+<body>
+  <h1>Muxa · Hex Terminal（HTML #08）自适应预览</h1>
+  <p>左：第 1 轮 HTML 完整构图。中/右：与 APK 相同——底 <code>#101014</code> 铺满；双六边形 + 红提示符<strong>整组</strong> <code>scale(0.62)</code> 居中，内外六边形与 〉 比例与 HTML 一致。</p>
+  <div class="row">
+    <div class="cell">
+      <div class="frame"><div class="layer sq"><img src="muxa-icon-hex-terminal.svg" width="160" height="160" alt="full"/></div></div>
+      <span>HTML 原图 · 完整构图</span>
+    </div>
+    <div class="cell">
+      <div class="frame"><div class="layer sq" id="sq"></div></div>
+      <span>APK · 圆角 + 安全区虚线</span>
+    </div>
+    <div class="cell">
+      <div class="frame"><div class="layer ci" id="ci"></div></div>
+      <span>APK · 圆形蒙版</span>
+    </div>
+  </div>
+<script>
+const svg = `
+<svg viewBox="0 0 108 108" xmlns="http://www.w3.org/2000/svg">
+  <rect width="108" height="108" fill="#101014"/>
+  <g transform="translate(54,54) scale(0.62) translate(-54,-54)">
+    <polygon points="54,12 90,32 90,76 54,96 18,76 18,32" fill="#1c1c22" stroke="#aeaeb2" stroke-width="2" stroke-linejoin="round"/>
+    <polygon points="54,22 82,38 82,70 54,86 26,70 26,38" fill="#0a0a0c" stroke="#636366" stroke-width="1" stroke-linejoin="round"/>
+    <path d="M40 48 L50 58 L40 68" stroke="#ff6363" stroke-width="3.5" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
+    <line x1="52" y1="68" x2="68" y2="68" stroke="#ff6363" stroke-width="3.5" stroke-linecap="round"/>
+  </g>
+  <circle cx="54" cy="54" r="36" fill="none" stroke="rgba(255,80,80,0.5)" stroke-width="0.8" stroke-dasharray="2 2"/>
+</svg>`;
+document.getElementById('sq').innerHTML = svg;
+document.getElementById('ci').innerHTML = svg;
+</script>
+</body>
+</html>

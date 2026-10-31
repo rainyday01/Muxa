@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  Muxa · R5 #10 Ambient Coral Glow (production).
+  Match HTML card: mostly deep black, tiny coral pinprick, small hex.
+  Adaptive FG uses scale 0.42; this full SVG uses similar proportions.
+-->
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 108 108" width="1024" height="1024">
+  <defs>
+    <linearGradient id="plate" x1="0.15" y1="0.05" x2="0.9" y2="0.95">
+      <stop offset="0%" stop-color="#16151A"/>
+      <stop offset="100%" stop-color="#0A090C"/>
+    </linearGradient>
+    <!-- Tight core glow — NOT a full-canvas brown wash -->
+    <radialGradient id="glow" cx="0.5" cy="0.48" r="0.28">
+      <stop offset="0%" stop-color="#E16259" stop-opacity="0.42"/>
+      <stop offset="40%" stop-color="#E16259" stop-opacity="0.16"/>
+      <stop offset="75%" stop-color="#E16259" stop-opacity="0.04"/>
+      <stop offset="100%" stop-color="#E16259" stop-opacity="0"/>
+    </radialGradient>
+  </defs>
+  <rect width="108" height="108" fill="url(#plate)"/>
+  <circle cx="54" cy="52" r="30" fill="url(#glow)"/>
+  <!-- Small hex (same visual weight as adaptive FG scale≈0.42) -->
+  <g transform="translate(54,53) scale(0.42) translate(-54,-54)">
+    <polygon points="54,12 90,32 90,76 54,96 18,76 18,32" fill="none"
+             stroke="#F7F6F3" stroke-width="3.2" stroke-linejoin="round" opacity="0.94"/>
+    <polygon points="54,12 90,32 90,76 54,96 18,76 18,32" fill="none"
+             stroke="#E16259" stroke-width="1.4" stroke-linejoin="round" opacity="0.35"/>
+    <path d="M40 48 L50 58 L40 68" stroke="#F7F6F3" stroke-width="5" fill="none"
+          stroke-linecap="round" stroke-linejoin="round"/>
+    <line x1="52" y1="68" x2="68" y2="68" stroke="#F7F6F3" stroke-width="5" stroke-linecap="round"/>
+  </g>
+</svg>

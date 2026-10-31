@@ -1,0 +1,28 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://mtmux.app/schemas/snippet.schema.json",
+  "title": "m-tmux Snippet",
+  "type": "object",
+  "required": ["id", "name", "body"],
+  "properties": {
+    "id": { "type": "string" },
+    "name": { "type": "string" },
+    "body": { "type": "string" },
+    "tags": {
+      "type": "array",
+      "items": { "type": "string" }
+    },
+    "runOnSelect": {
+      "type": "boolean",
+      "default": false,
+      "description": "true = insert and send Enter; false = paste only"
+    },
+    "variables": {
+      "type": "array",
+      "items": {
+        "type": "string",
+        "enum": ["host", "user", "port", "session"]
+      }
+    }
+  }
+}

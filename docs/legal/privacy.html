@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Muxa Privacy Policy</title>
+  <style>
+    :root { color-scheme: light dark; }
+    body { font-family: system-ui, sans-serif; max-width: 42rem; margin: 2rem auto; padding: 0 1.25rem; line-height: 1.55; }
+    h1, h2 { line-height: 1.25; }
+    .meta { color: CanvasText; opacity: .7; }
+    hr { border: 0; border-top: 1px solid color-mix(in srgb, CanvasText 18%, transparent); }
+  </style>
+</head>
+<body>
+  <h1>Muxa Privacy Policy</h1>
+  <p class="meta">Effective 14 September 2026 · Product: Muxa (iOS) · Bundle ID: app.mtmux.ios</p>
+  <p>Muxa is a native SSH and tmux terminal. It does not require a Muxa account, does not include ads or analytics SDKs, and does not operate a central server for your sessions.</p>
+
+  <h2>Data stored on your device</h2>
+  <p>Host names, usernames, session lists, snippets, keyboard layouts, and preferences are stored locally. Passwords, private keys, and related secrets are stored in the iOS Keychain using This Device Only accessibility and without a shared Keychain access group.</p>
+
+  <h2>Network traffic</h2>
+  <p>When you connect, traffic goes only between your device and the SSH hosts you configure. Session content is not routed through Muxa-operated servers.</p>
+
+  <h2>Diagnostics</h2>
+  <p>Muxa does not upload logs to a Muxa server. You may export or share a locally redacted log using the system share sheet. Muxa receives that file only if you send it yourself.</p>
+
+  <h2>Device identifiers</h2>
+  <p>Muxa does not send Identifier for Vendor or other device identifiers to Muxa-operated servers.</p>
+
+  <h2>Deletion</h2>
+  <ul>
+    <li>Deleting a host removes that host’s Keychain secrets immediately.</li>
+    <li>Settings → Privacy → Delete all data on this device removes every Muxa Keychain item and saved host on the device.</li>
+    <li>Uninstalling Muxa removes those This-Device-Only Keychain items because they are not in a shared access group.</li>
+  </ul>
+
+  <h2>Children</h2>
+  <p>Muxa is a developer tool and is not directed at children.</p>
+
+  <h2>Contact</h2>
+  <p>Privacy questions: <a href="mailto:rainyday0312@outlook.com">rainyday0312@outlook.com</a></p>
+
+  <hr>
+  <h1 lang="zh-Hans">Muxa 隐私政策</h1>
+  <p lang="zh-Hans">Muxa 是原生 SSH / tmux 终端。无需 Muxa 账号，不含广告或分析 SDK，也不会把你的会话经过 Muxa 运营的中央服务器。</p>
+  <p lang="zh-Hans">主机、会话、片段和偏好保存在本机；密码与私钥保存在 iOS Keychain（仅本机、无 iCloud 共享组）。网络只到达你配置的 SSH 主机。诊断日志不会自动上传，仅在你导出或系统分享时离开本机。删除主机或使用「删除本机全部数据」会清除对应 Keychain 项；卸载应用也会清除这些仅本机 Keychain 项。</p>
+  <p lang="zh-Hans">联系：<a href="mailto:rainyday0312@outlook.com">rainyday0312@outlook.com</a></p>
+</body>
+</html>

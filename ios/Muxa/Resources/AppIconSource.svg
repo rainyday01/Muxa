@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  iOS App Icon · Ambient Coral Glow.
+  Android adaptive icons crop to the center ~66% and re-zoom the glyph
+  (FG scale 0.42). iOS shows the full 1024 canvas under the system mask,
+  so the hex is scaled 0.42 / 0.66 ≈ 0.64 to match on-device Android size.
+-->
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 108 108" width="1024" height="1024">
+  <defs>
+    <linearGradient id="plate" x1="0.15" y1="0.05" x2="0.9" y2="0.95">
+      <stop offset="0%" stop-color="#16151A"/>
+      <stop offset="100%" stop-color="#0A090C"/>
+    </linearGradient>
+    <radialGradient id="glow" cx="0.5" cy="0.48" r="0.36">
+      <stop offset="0%" stop-color="#E16259" stop-opacity="0.42"/>
+      <stop offset="40%" stop-color="#E16259" stop-opacity="0.16"/>
+      <stop offset="75%" stop-color="#E16259" stop-opacity="0.04"/>
+      <stop offset="100%" stop-color="#E16259" stop-opacity="0"/>
+    </radialGradient>
+  </defs>
+  <rect width="108" height="108" fill="url(#plate)"/>
+  <circle cx="54" cy="52" r="46" fill="url(#glow)"/>
+  <g transform="translate(54,53) scale(0.64) translate(-54,-54)">
+    <polygon points="54,12 90,32 90,76 54,96 18,76 18,32" fill="none"
+             stroke="#F7F6F3" stroke-width="3.2" stroke-linejoin="round" opacity="0.94"/>
+    <polygon points="54,12 90,32 90,76 54,96 18,76 18,32" fill="none"
+             stroke="#E16259" stroke-width="1.4" stroke-linejoin="round" opacity="0.35"/>
+    <path d="M40 48 L50 58 L40 68" stroke="#F7F6F3" stroke-width="5" fill="none"
+          stroke-linecap="round" stroke-linejoin="round"/>
+    <line x1="52" y1="68" x2="68" y2="68" stroke="#F7F6F3" stroke-width="5" stroke-linecap="round"/>
+  </g>
+</svg>

@@ -1,0 +1,16 @@
+{
+  "id": "sequoia",
+  "displayName": "Sequoia Glass",
+  "role": "system_dark",
+  "colors": {
+    "background": "#0F1014",
+    "surface": "#FFFFFF14",
+    "onSurface": "#F5F5F7",
+    "primary": "#0A84FF",
+    "onPrimary": "#FFFFFF",
+    "outline": "#FFFFFF1A",
+    "terminalBackground": "#0A0A0C",
+    "terminalForeground": "#A8E6A3"
+  },
+  "shapes": { "cardRadiusDp": 14 }
+}

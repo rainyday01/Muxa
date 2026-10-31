@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="ssh_kex_unavailable">Key exchange algorithm unavailable (X25519/curve25519). Compatibility mode also failed.\n%1$s</string>
+    <string name="ssh_auth_fail">Authentication failed: username, password, or private key is wrong, or the server disabled this key type (Ed25519/RSA/ECDSA).</string>
+    <string name="ssh_timeout">Connection timed out. Check the host, port, and network (including Tailscale/VPN).</string>
+    <string name="ssh_refused">Connection refused: wrong port or sshd is not listening.</string>
+    <string name="ssh_unresolved">Could not resolve or reach the host. The host field should be only an IP or domain (do not paste a password there).\nDetail: %1$s</string>
+    <string name="ssh_host_key">Host key verification failed.</string>
+    <string name="ssh_transport">SSH transport error: %1$s\n%2$s</string>
+    <string name="ssh_connect_fail">SSH connection failed: %1$s</string>
+    <string name="ssh_empty_user">Username is empty</string>
+    <string name="ssh_no_auth">No credentials: enter a password or paste a private key</string>
+    <string name="ssh_auth_detail_title">Authentication failed (exhausted available methods)</string>
+    <string name="ssh_auth_user">User: %1$s@%2$s:%3$d</string>
+    <string name="ssh_auth_tried">Tried: %1$s</string>
+    <string name="ssh_auth_check">Check each of these:</string>
+    <string name="ssh_auth_1">1. Username is correct (common: root / ubuntu / debian / ec2-user)</string>
+    <string name="ssh_auth_2">2. The private key matches a public key in ~/.ssh/authorized_keys</string>
+    <string name="ssh_auth_3">3. The key is complete (BEGIN/END) and the passphrase is correct</string>
+    <string name="ssh_auth_4">4. The server allows this key type (Ed25519 / RSA / ECDSA)</string>
+    <string name="ssh_auth_5">5. Password is correct; many VPS images disable password login</string>
+    <string name="ssh_auth_6">6. Both key and password were tried; neither succeeded</string>
+    <string name="ssh_auth_hint_key_only">Hint: if the server only allows public keys, use a private key</string>
+    <string name="ssh_auth_hint_add_pass">Hint: if the key is wrong, you can also fill in a password (if the server allows it)</string>
+    <string name="ssh_auth_underlying">Underlying error: %1$s</string>
+    <string name="ssh_reconnect">Reconnect %1$d/%2$d</string>
+
+    <string name="key_empty">Private key is empty</string>
+    <string name="key_bad_passphrase">Incorrect key passphrase, or the key is damaged</string>
+    <string name="key_need_passphrase">This private key is encrypted; enter the passphrase</string>
+    <string name="key_ed25519">Ed25519 key parse failed. Paste a complete OPENSSH PRIVATE KEY, and make sure the eddsa library is in this build.</string>
+    <string name="key_ecdsa">ECDSA key unsupported or invalid (nistp256/384/521)</string>
+    <string name="key_dsa">DSA/ssh-dss is too old; many servers disable it. Use Ed25519 or RSA.</string>
+    <string name="key_rsa_short">RSA key is too short; the server may reject it. Use ≥2048 bits.</string>
+    <string name="key_unknown_format">Unrecognized private key format. Paste OpenSSH/PKCS#8 PEM (with BEGIN/END lines).</string>
+    <string name="key_missing_algo">Device crypto library is missing an algorithm (%1$s). Tried to fix the BC provider.</string>
+    <string name="key_load_fail">Failed to load private key (%1$s): %2$s</string>
+</resources>

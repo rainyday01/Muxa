@@ -1,0 +1,1092 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1"/>
+<title>Muxa · 图标第 5 轮 · 质感加深 × 18</title>
+<style>
+  :root {
+    --bg: #0c0c0e;
+    --panel: #141416;
+    --border: #2a2a2e;
+    --text: #f4f4f5;
+    --muted: #a1a1aa;
+    --accent: #e16259;
+    --paper: #f7f6f3;
+  }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0;
+    font-family: ui-sans-serif, system-ui, "PingFang SC", "Noto Sans SC", sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    line-height: 1.5;
+  }
+  .wrap { max-width: 1180px; margin: 0 auto; padding: 28px 18px 96px; }
+  header {
+    border-bottom: 1px solid var(--border);
+    padding-bottom: 18px;
+    margin-bottom: 18px;
+  }
+  h1 { font-size: 22px; margin: 0 0 10px; letter-spacing: -0.02em; font-weight: 650; }
+  .lead { color: var(--muted); font-size: 14px; max-width: 78ch; margin: 0 0 14px; }
+  .lead strong { color: #e4e4e7; font-weight: 600; }
+  .chips { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 10px; }
+  .chip {
+    font-size: 11px; padding: 4px 10px; border-radius: 999px;
+    background: #1a1a1e; border: 1px solid var(--border); color: var(--muted);
+  }
+  .chip strong { color: var(--text); }
+  .brief {
+    background: #121214;
+    border: 1px solid var(--border);
+    border-radius: 14px;
+    padding: 14px 16px;
+    font-size: 13px;
+    color: var(--muted);
+  }
+  .brief h2 { margin: 0 0 8px; font-size: 13px; color: #e4e4e7; font-weight: 600; }
+  .brief ul { margin: 0; padding-left: 1.15em; }
+  .brief li { margin: 4px 0; }
+  .toolbar {
+    display: flex; flex-wrap: wrap; gap: 10px; align-items: center;
+    position: sticky; top: 0; z-index: 8;
+    background: rgba(12,12,14,.92);
+    backdrop-filter: blur(12px);
+    padding: 12px 0;
+    margin: 18px 0 14px;
+    border-bottom: 1px solid var(--border);
+  }
+  .toolbar label { font-size: 12px; color: var(--muted); }
+  .toolbar select, .toolbar input {
+    background: #1a1a1e; border: 1px solid var(--border); color: var(--text);
+    border-radius: 8px; padding: 6px 10px; font-size: 13px;
+  }
+  .hint { margin-left: auto; font-size: 12px; color: var(--muted); }
+  .grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+    gap: 16px;
+  }
+  .card {
+    background: var(--panel);
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    padding: 14px;
+    cursor: pointer;
+    transition: border-color .15s, transform .15s, box-shadow .15s;
+  }
+  .card:hover { border-color: #52525b; transform: translateY(-2px); }
+  .card.picked {
+    border-color: var(--accent);
+    box-shadow: 0 0 0 1px var(--accent), 0 12px 28px rgba(225,98,89,.12);
+  }
+  .icon-frame {
+    aspect-ratio: 1;
+    border-radius: 20px;
+    margin-bottom: 12px;
+    padding: 16px;
+    display: grid;
+    place-items: center;
+    background:
+      linear-gradient(45deg,#18181b 25%,transparent 25%),
+      linear-gradient(-45deg,#18181b 25%,transparent 25%),
+      linear-gradient(45deg,transparent 75%,#18181b 75%),
+      linear-gradient(-45deg,transparent 75%,#18181b 75%);
+    background-size: 14px 14px;
+    background-position: 0 0, 0 7px, 7px -7px, -7px 0;
+    background-color: #0a0a0c;
+  }
+  .icon-frame.black { background: #000; }
+  .icon-frame.white { background: #f4f4f5; }
+  .icon-frame.gray { background: #3f3f46; }
+  .icon-frame.home {
+    background: linear-gradient(160deg, #1e1e24 0%, #0e0e12 100%);
+  }
+  .icon-frame svg {
+    width: 112px;
+    height: 112px;
+    border-radius: 24.5%;
+    box-shadow:
+      0 1px 0 rgba(255,255,255,.06) inset,
+      0 14px 32px rgba(0,0,0,.45);
+  }
+  .num { font-size: 11px; color: var(--accent); font-weight: 700; letter-spacing: .02em; }
+  .meta h3 { margin: 4px 0 2px; font-size: 14.5px; font-weight: 600; }
+  .angle { margin: 0; font-size: 12px; color: var(--muted); }
+  .tags { margin: 6px 0 0; font-size: 11px; color: #71717a; }
+  .palette {
+    display: flex; gap: 4px; margin-top: 8px;
+  }
+  .sw {
+    width: 14px; height: 14px; border-radius: 4px;
+    border: 1px solid rgba(255,255,255,.12);
+  }
+  footer {
+    margin-top: 40px;
+    padding-top: 16px;
+    border-top: 1px solid var(--border);
+    font-size: 12px;
+    color: var(--muted);
+  }
+  .compare {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 12px;
+    margin: 18px 0 6px;
+  }
+  @media (max-width: 640px) { .compare { grid-template-columns: 1fr; } }
+  .compare .box {
+    background: var(--panel);
+    border: 1px solid var(--border);
+    border-radius: 14px;
+    padding: 12px;
+  }
+  .compare .box h3 { margin: 0 0 8px; font-size: 13px; }
+  .compare .row {
+    display: flex; align-items: center; gap: 12px;
+  }
+  .compare svg {
+    width: 72px; height: 72px; border-radius: 18px;
+    box-shadow: 0 8px 20px rgba(0,0,0,.35);
+    flex-shrink: 0;
+  }
+  .compare p { margin: 0; font-size: 12px; color: var(--muted); }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <h1>Muxa · 图标第 5 轮 · 质感加深 × 18</h1>
+    <p class="lead">
+      当前量产图标是 <strong>Hex Terminal + Notion-ish Light</strong> 平涂：纸色底 + 双层六边形 + 珊瑚 <code>&gt;_</code>。
+      结构清楚，但缺光影、缺材质、缺微对比——桌面上一眼偏「矢量草稿」。
+      本轮<strong>保留六边形 + 提示符语义与暖纸/珊瑚主调</strong>，主色可微调，专门补<strong>质感</strong>：
+      多层渐变、内外阴影、顶缘高光、柔边体积、磨砂玻璃、软黏土、陶瓷釉面等。
+      气质参考测试者社区常见上传包的共通做法：软体积、轻玻璃、干净但不廉价的渐变、有厚度的 glyph。
+    </p>
+    <div class="chips">
+      <span class="chip"><strong>Round</strong> 5 · Texture</span>
+      <span class="chip"><strong>数量</strong> 18</span>
+      <span class="chip"><strong>基线</strong> Hex Terminal · C25</span>
+      <span class="chip"><strong>主色</strong> 暖纸 #F7F6F3 · 珊瑚 #E16259 · 可微调</span>
+      <span class="chip"><strong>日期</strong> 2026-08-01</span>
+    </div>
+    <div class="brief">
+      <h2>为什么「缺质感」&amp; 本轮补什么</h2>
+      <ul>
+        <li><strong>缺</strong>：单色平面、硬描边、无受光面/背影、glyph 像贴纸贴在纸上。</li>
+        <li><strong>补</strong>：统一左上受光 → 右下收影；板面有微渐变；六边形有厚度；提示符带体积或柔光。</li>
+        <li><strong>约束</strong>：仍一眼是「终端 / 远程工作台」；不换成纯社交/相机风；小尺寸（48–64）可读。</li>
+        <li><strong>选法</strong>：点卡片 shortlist → 回飞书写 <strong>R5 #编号</strong>（可多选 2–3 个再细化）。</li>
+      </ul>
+    </div>
+  </header>
+
+  <div class="compare">
+    <div class="box">
+      <h3>现在 · 量产（平涂）</h3>
+      <div class="row">
+        <svg viewBox="0 0 108 108" xmlns="http://www.w3.org/2000/svg" aria-label="current">
+          <defs><clipPath id="curClip"><rect width="108" height="108" rx="24"/></clipPath></defs>
+          <g clip-path="url(#curClip)">
+            <rect width="108" height="108" fill="#F7F6F3"/>
+            <g transform="translate(54,54) scale(0.62) translate(-54,-54)">
+              <polygon points="54,12 90,32 90,76 54,96 18,76 18,32" fill="#FFFFFF" stroke="#37352F" stroke-width="2" stroke-linejoin="round"/>
+              <polygon points="54,22 82,38 82,70 54,86 26,70 26,38" fill="#EFEDE9" stroke="#787774" stroke-width="1" stroke-linejoin="round"/>
+              <path d="M40 48 L50 58 L40 68" stroke="#E16259" stroke-width="3.5" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
+              <line x1="52" y1="68" x2="68" y2="68" stroke="#E16259" stroke-width="3.5" stroke-linecap="round"/>
+            </g>
+          </g>
+        </svg>
+        <p>干净、Notion 友好，但无光影层级，桌面群里容易「薄」。</p>
+      </div>
+    </div>
+    <div class="box">
+      <h3>本轮目标 · 仍是它，但有厚度</h3>
+      <div class="row">
+        <svg viewBox="0 0 108 108" xmlns="http://www.w3.org/2000/svg" aria-label="target-sample">
+          <defs>
+            <clipPath id="tgtClip"><rect width="108" height="108" rx="24"/></clipPath>
+            <linearGradient id="tgtPlate" x1="0" y1="0" x2="1" y2="1">
+              <stop offset="0%" stop-color="#FFFCFA"/><stop offset="100%" stop-color="#EDE9E3"/>
+            </linearGradient>
+            <linearGradient id="tgtHex" x1="0.2" y1="0" x2="0.8" y2="1">
+              <stop offset="0%" stop-color="#FFFFFF"/><stop offset="100%" stop-color="#F0EDE8"/>
+            </linearGradient>
+            <filter id="tgtSoft" x="-20%" y="-20%" width="140%" height="140%">
+              <feDropShadow dx="0" dy="2.5" stdDeviation="2.2" flood-color="#37352F" flood-opacity=".14"/>
+            </filter>
+          </defs>
+          <g clip-path="url(#tgtClip)">
+            <rect width="108" height="108" fill="url(#tgtPlate)"/>
+            <ellipse cx="54" cy="78" rx="28" ry="6" fill="#37352F" opacity=".06"/>
+            <g transform="translate(54,54) scale(0.62) translate(-54,-54)" filter="url(#tgtSoft)">
+              <polygon points="54,12 90,32 90,76 54,96 18,76 18,32" fill="url(#tgtHex)" stroke="#2F2D28" stroke-width="1.6" stroke-linejoin="round"/>
+              <polygon points="54,14 88,33 88,34.2 54,15.2 20,34.2 20,33" fill="#FFFFFF" opacity=".55"/>
+              <polygon points="54,24 80,39 80,69 54,84 28,69 28,39" fill="#F7F4EF" stroke="#A8A49C" stroke-width=".9" stroke-linejoin="round" opacity=".95"/>
+              <path d="M40 48 L50 58 L40 68" stroke="#E16259" stroke-width="4" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
+              <path d="M40 48 L50 58 L40 68" stroke="#FF9A90" stroke-width="1.4" fill="none" stroke-linecap="round" stroke-linejoin="round" opacity=".55" transform="translate(0,-0.6)"/>
+              <line x1="52" y1="68" x2="68" y2="68" stroke="#E16259" stroke-width="4" stroke-linecap="round"/>
+            </g>
+          </g>
+        </svg>
+        <p>同样语义：暖纸底 + 六边形 + 珊瑚 prompt，但板面、阴影、顶缘高光齐了。</p>
+      </div>
+    </div>
+  </div>
+
+  <div class="toolbar">
+    <label>预览底</label>
+    <select id="bgPrev">
+      <option value="check">棋盘</option>
+      <option value="home">深色主屏</option>
+      <option value="black">纯黑</option>
+      <option value="white">浅白</option>
+      <option value="gray">中灰</option>
+    </select>
+    <label>筛选</label>
+    <input id="filter" type="search" placeholder="名称 / 材质 tags…"/>
+    <span class="hint">点击卡片 = shortlist · 回 R5 #号</span>
+  </div>
+
+  <div class="grid" id="grid">
+
+    <!-- ========== 01 Soft Paper Bevel ========== -->
+    <article class="card" data-id="1" data-tags="paper bevel soft current-like">
+      <div class="icon-frame">
+        <svg viewBox="0 0 108 108" xmlns="http://www.w3.org/2000/svg">
+          <defs>
+            <clipPath id="c1"><rect width="108" height="108" rx="24"/></clipPath>
+            <linearGradient id="p1" x1="0" y1="0" x2="1" y2="1">
+              <stop offset="0%" stop-color="#FFFCFA"/><stop offset="55%" stop-color="#F7F6F3"/><stop offset="100%" stop-color="#EBE6DF"/>
+            </linearGradient>
+            <linearGradient id="h1" x1="0.15" y1="0" x2="0.85" y2="1">
+              <stop offset="0%" stop-color="#FFFFFF"/><stop offset="100%" stop-color="#F2EFEA"/>
+            </linearGradient>
+            <linearGradient id="i1" x1="0.2" y1="0" x2="0.8" y2="1">
+              <stop offset="0%" stop-color="#FBFAF8"/><stop offset="100%" stop-color="#E8E4DD"/>
+            </linearGradient>
+            <filter id="s1" x="-25%" y="-25%" width="150%" height="150%">
+              <feDropShadow dx="0" dy="3" stdDeviation="2.4" flood-color="#2C2A26" flood-opacity=".16"/>
+            </filter>
+          </defs>
+          <g clip-path="url(#c1)">
+            <rect width="108" height="108" fill="url(#p1)"/>
+            <ellipse cx="54" cy="86" rx="30" ry="5" fill="#37352F" opacity=".05"/>
+            <g transform="translate(54,52) scale(0.60) translate(-54,-54)" filter="url(#s1)">
+              <polygon points="54,12 90,32 90,76 54,96 18,76 18,32" fill="url(#h1)" stroke="#37352F" stroke-width="1.7" stroke-linejoin="round"/>
+              <polygon points="54,13.5 88.5,33 88.5,34.5 54,15 19.5,34.5 19.5,33" fill="#fff" opacity=".5"/>
+              <polygon points="54,24 80,39 80,69 54,84 28,69 28,39" fill="url(#i1)" stroke="#9C9890" stroke-width=".85" stroke-linejoin="round"/>
+              <path d="M40 48 L50 58 L40 68" stroke="#E16259" stroke-width="4" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
+              <path d="M40 47.3 L50 57.3 L40 67.3" stroke="#FFB0A8" stroke-width="1.3" fill="none" stroke-linecap="round" stroke-linejoin="round" opacity=".45"/>
+              <line x1="52" y1="68" x2="68" y2="68" stroke="#E16259" stroke-width="4" stroke-linecap="round"/>
+            </g>
+          </g>
+        </svg>
+      </div>
+      <div class="meta">
+        <div class="num">R5 · #01</div>
+        <h3>Soft Paper Bevel</h3>
+        <p class="angle">暖纸浮雕 · 最接近量产，补厚度</p>
+        <p class="tags">paper · bevel · safe</p>
+        <div class="palette">
+          <span class="sw" style="background:#F7F6F3"></span>
+          <span class="sw" style="background:#FFFFFF"></span>
+          <span class="sw" style="background:#E16259"></span>
+          <span class="sw" style="background:#37352F"></span>
+        </div>
+      </div>
+    </article>
+
+    <!-- ========== 02 Frosted Glass Hex ========== -->
+    <article class="card" data-id="2" data-tags="glass frost liquid">
+      <div class="icon-frame">
+        <svg viewBox="0 0 108 108" xmlns="http://www.w3.org/2000/svg">
+          <defs>
+            <clipPath id="c2"><rect width="108" height="108" rx="24"/></clipPath>
+            <linearGradient id="p2" x1="0" y1="0" x2="1" y2="1">
+              <stop offset="0%" stop-color="#2A2830"/><stop offset="50%" stop-color="#1A1920"/><stop offset="100%" stop-color="#121118"/>
+            </linearGradient>
+            <linearGradient id="g2" x1="0.2" y1="0" x2="0.8" y2="1">
+              <stop offset="0%" stop-color="#FFFFFF" stop-opacity=".22"/>
+              <stop offset="45%" stop-color="#F7F6F3" stop-opacity=".12"/>
+              <stop offset="100%" stop-color="#FFFFFF" stop-opacity=".05"/>
+            </linearGradient>
+            <linearGradient id="rim2" x1="0" y1="0" x2="0" y2="1">
+              <stop offset="0%" stop-color="#FFFFFF" stop-opacity=".55"/>
+              <stop offset="100%" stop-color="#FFFFFF" stop-opacity=".08"/>
+            </linearGradient>
+            <filter id="blur2"><feGaussianBlur stdDeviation="1.2"/></filter>
+          </defs>
+          <g clip-path="url(#c2)">
+            <rect width="108" height="108" fill="url(#p2)"/>
+            <circle cx="28" cy="30" r="36" fill="#E16259" opacity=".18" filter="url(#blur2)"/>
+            <circle cx="80" cy="78" r="32" fill="#A78BFA" opacity=".12" filter="url(#blur2)"/>
+            <g transform="translate(54,54) scale(0.58) translate(-54,-54)">
+              <polygon points="54,12 90,32 90,76 54,96 18,76 18,32" fill="url(#g2)" stroke="url(#rim2)" stroke-width="2" stroke-linejoin="round"/>
+              <polygon points="54,22 82,38 82,70 54,86 26,70 26,38" fill="#FFFFFF" fill-opacity=".06" stroke="#FFFFFF" stroke-opacity=".2" stroke-width="1" stroke-linejoin="round"/>
+              <path d="M40 48 L50 58 L40 68" stroke="#FF8A80" stroke-width="4.2" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
+              <line x1="52" y1="68" x2="68" y2="68" stroke="#FF8A80" stroke-width="4.2" stroke-linecap="round"/>
+              <path d="M40 48 L50 58 L40 68" stroke="#FFFFFF" stroke-width="1.2" fill="none" stroke-linecap="round" stroke-linejoin="round" opacity=".35" transform="translate(0,-.7)"/>
+            </g>
+          </g>
+        </svg>
+      </div>
+      <div class="meta">
+        <div class="num">R5 · #02</div>
+        <h3>Frosted Glass Hex</h3>
+        <p class="angle">磨砂玻璃 · 深底光斑 · 测试包常见</p>
+        <p class="tags">glass · dark · premium</p>
+        <div class="palette">
+          <span class="sw" style="background:#1A1920"></span>
+          <span class="sw" style="background:#FFFFFF"></span>
+          <span class="sw" style="background:#FF8A80"></span>
+          <span class="sw" style="background:#A78BFA"></span>
+        </div>
+      </div>
+    </article>
+
+    <!-- ========== 03 Soft Clay Neumorph ========== -->
+    <article class="card" data-id="3" data-tags="neumorph clay soft">
+      <div class="icon-frame">
+        <svg viewBox="0 0 108 108" xmlns="http://www.w3.org/2000/svg">
+          <defs>
+            <clipPath id="c3"><rect width="108" height="108" rx="24"/></clipPath>
+            <linearGradient id="p3" x1="0" y1="0" x2="1" y2="1">
+              <stop offset="0%" stop-color="#F3F0EB"/><stop offset="100%" stop-color="#E4DFD7"/>
+            </linearGradient>
+            <filter id="neuOut" x="-40%" y="-40%" width="180%" height="180%">
+              <feDropShadow dx="4" dy="5" stdDeviation="4" flood-color="#C4BEB4" flood-opacity=".85"/>
+              <feDropShadow dx="-3" dy="-3" stdDeviation="3.5" flood-color="#FFFFFF" flood-opacity=".9"/>
+            </filter>
+            <filter id="neuIn" x="-20%" y="-20%" width="140%" height="140%">
+              <feDropShadow dx="2" dy="2" stdDeviation="2" flood-color="#C9C3B9" flood-opacity=".55"/>
+              <feDropShadow dx="-1.5" dy="-1.5" stdDeviation="1.8" flood-color="#FFFFFF" flood-opacity=".7"/>
+            </filter>
+          </defs>
+          <g clip-path="url(#c3)">
+            <rect width="108" height="108" fill="url(#p3)"/>
+            <g transform="translate(54,54) scale(0.58) translate(-54,-54)" filter="url(#neuOut)">
+              <polygon points="54,12 90,32 90,76 54,96 18,76 18,32" fill="#EDE9E3"/>
+            </g>
+            <g transform="translate(54,54) scale(0.58) translate(-54,-54)">
+              <polygon points="54,26 78,40 78,68 54,82 30,68 30,40" fill="#E8E4DD" filter="url(#neuIn)"/>
+              <path d="M41 49 L50 58 L41 67" stroke="#D4534A" stroke-width="4.2" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
+              <line x1="53" y1="67" x2="67" y2="67" stroke="#D4534A" stroke-width="4.2" stroke-linecap="round"/>
+            </g>
+          </g>
+        </svg>
+      </div>
+      <div class="meta">
+        <div class="num">R5 · #03</div>
+        <h3>Soft Clay Hex</h3>
+        <p class="angle">新拟态黏土 · 一体挤出感</p>
+        <p class="tags">neumorph · tactile</p>
+        <div class="palette">
+          <span class="sw" style="background:#EDE9E3"></span>
+          <span class="sw" style="background:#E4DFD7"></span>
+          <span class="sw" style="background:#D4534A"></span>
+        </div>
+      </div>
+    </article>
+
+    <!-- ========== 04 Ceramic Coral ========== -->
+    <article class="card" data-id="4" data-tags="ceramic gloss coral">
+      <div class="icon-frame">
+        <svg viewBox="0 0 108 108" xmlns="http://www.w3.org/2000/svg">
+          <defs>
+            <clipPath id="c4"><rect width="108" height="108" rx="24"/></clipPath>
+            <radialGradient id="p4" cx="0.35" cy="0.28" r="0.85">
+              <stop offset="0%" stop-color="#FFF8F6"/><stop offset="55%" stop-color="#F7F6F3"/><stop offset="100%" stop-color="#E8E0DA"/>
+            </radialGradient>
+            <linearGradient id="cer4" x1="0.2" y1="0" x2="0.85" y2="1">
+              <stop offset="0%" stop-color="#FFFFFF"/><stop offset="40%" stop-color="#FFF5F3"/><stop offset="100%" stop-color="#F0E6E2"/>
+            </linearGradient>
+            <linearGradient id="glaze4" x1="0.3" y1="0" x2="0.7" y2="1">
+              <stop offset="0%" stop-color="#FF8F84"/><stop offset="55%" stop-color="#E16259"/><stop offset="100%" stop-color="#C44A42"/>
+            </linearGradient>
+            <filter id="s4" x="-30%" y="-30%" width="160%" height="160%">
+              <feDropShadow dx="0" dy="4" stdDeviation="3" flood-color="#8B5A52" flood-opacity=".18"/>
+            </filter>
+          </defs>
+          <g clip-path="url(#c4)">
+            <rect width="108" height="108" fill="url(#p4)"/>
+            <g transform="translate(54,53) scale(0.60) translate(-54,-54)" filter="url(#s4)">
+              <polygon points="54,12 90,32 90,76 54,96 18,76 18,32" fill="url(#cer4)" stroke="#D4C4BE" stroke-width="1.2" stroke-linejoin="round"/>
+              <ellipse cx="42" cy="30" rx="14" ry="7" fill="#fff" opacity=".55" transform="rotate(-28 42 30)"/>
+              <path d="M40 48 L50 58 L40 68" stroke="url(#glaze4)" stroke-width="4.5" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
+              <line x1="52" y1="68" x2="68" y2="68" stroke="url(#glaze4)" stroke-width="4.5" stroke-linecap="round"/>
+              <path d="M40 47 L50 57 L40 67" stroke="#FFD0CB" stroke-width="1.4" fill="none" stroke-linecap="round" stroke-linejoin="round" opacity=".55"/>
+            </g>
+          </g>
+        </svg>
+      </div>
+      <div class="meta">
+        <div class="num">R5 · #04</div>
+        <h3>Ceramic Coral</h3>
+        <p class="angle">釉面陶瓷 · 珊瑚渐变笔触</p>
+        <p class="tags">ceramic · gloss · warm</p>
+        <div class="palette">
+          <span class="sw" style="background:#FFF8F6"></span>
+          <span class="sw" style="background:#E16259"></span>
+          <span class="sw" style="background:#C44A42"></span>
+        </div>
+      </div>
+    </article>
+
+    <!-- ========== 05 Matte Graphite Soft ========== -->
+    <article class="card" data-id="5" data-tags="dark matte graphite">
+      <div class="icon-frame">
+        <svg viewBox="0 0 108 108" xmlns="http://www.w3.org/2000/svg">
+          <defs>
+            <clipPath id="c5"><rect width="108" height="108" rx="24"/></clipPath>
+            <linearGradient id="p5" x1="0" y1="0" x2="1" y2="1">
+              <stop offset="0%" stop-color="#2C2B30"/><stop offset="100%" stop-color="#17161A"/>
+            </linearGradient>
+            <linearGradient id="h5" x1="0.2" y1="0" x2="0.8" y2="1">
+              <stop offset="0%" stop-color="#3A3940"/><stop offset="100%" stop-color="#222126"/>
+            </linearGradient>
+            <linearGradient id="i5" x1="0.3" y1="0" x2="0.7" y2="1">
+              <stop offset="0%" stop-color="#2A292E"/><stop offset="100%" stop-color="#1A191D"/>
+            </linearGradient>
+            <filter id="s5" x="-25%" y="-25%" width="150%" height="150%">
+              <feDropShadow dx="0" dy="3" stdDeviation="2.5" flood-color="#000" flood-opacity=".45"/>
+            </filter>
+          </defs>
+          <g clip-path="url(#c5)">
+            <rect width="108" height="108" fill="url(#p5)"/>
+            <rect width="108" height="108" fill="url(#p5)" opacity=".3"/>
+            <g transform="translate(54,53) scale(0.60) translate(-54,-54)" filter="url(#s5)">
+              <polygon points="54,12 90,32 90,76 54,96 18,76 18,32" fill="url(#h5)" stroke="#4A4850" stroke-width="1.4" stroke-linejoin="round"/>
+              <polygon points="54,13.5 88,33 88,34.2 54,14.8 20,34.2 20,33" fill="#6B6874" opacity=".35"/>
+              <polygon points="54,24 80,39 80,69 54,84 28,69 28,39" fill="url(#i5)" stroke="#55525C" stroke-width=".8" stroke-linejoin="round"/>
+              <path d="M40 48 L50 58 L40 68" stroke="#E87970" stroke-width="4" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
+              <line x1="52" y1="68" x2="68" y2="68" stroke="#E87970" stroke-width="4" stroke-linecap="round"/>
+            </g>
+          </g>
+        </svg>
+      </div>
+      <div class="meta">
+        <div class="num">R5 · #05</div>
+        <h3>Matte Graphite</h3>
+        <p class="angle">哑光石墨 · 深色主屏更吃香</p>
+        <p class="tags">dark · matte · tool</p>
+        <div class="palette">
+          <span class="sw" style="background:#222126"></span>
+          <span class="sw" style="background:#3A3940"></span>
+          <span class="sw" style="background:#E87970"></span>
+        </div>
+      </div>
+    </article>
+
+    <!-- ========== 06 Floating Soft Glyph ========== -->
+    <article class="card" data-id="6" data-tags="float shadow soft minimal">
+      <div class="icon-frame">
+        <svg viewBox="0 0 108 108" xmlns="http://www.w3.org/2000/svg">
+          <defs>
+            <clipPath id="c6"><rect width="108" height="108" rx="24"/></clipPath>
+            <linearGradient id="p6" x1="0" y1="0" x2="0" y2="1">
+              <stop offset="0%" stop-color="#FAF9F7"/><stop offset="100%" stop-color="#EFEBE4"/>
+            </linearGradient>
+            <filter id="blob6" x="-40%" y="-40%" width="180%" height="180%">
+              <feGaussianBlur stdDeviation="3.5"/>
+            </filter>
+            <filter id="glyph6" x="-30%" y="-30%" width="160%" height="160%">
+              <feDropShadow dx="0" dy="2" stdDeviation="1.5" flood-color="#E16259" flood-opacity=".35"/>
+            </filter>
+          </defs>
+          <g clip-path="url(#c6)">
+            <rect width="108" height="108" fill="url(#p6)"/>
+            <ellipse cx="54" cy="62" rx="26" ry="22" fill="#E16259" opacity=".08" filter="url(#blob6)"/>
+            <g transform="translate(54,50) scale(0.72) translate(-54,-54)">
+              <polygon points="54,18 84,35 84,71 54,88 24,71 24,35" fill="none" stroke="#37352F" stroke-width="2.2" stroke-linejoin="round" opacity=".18"/>
+              <g filter="url(#glyph6)">
+                <path d="M38 44 L52 58 L38 72" stroke="#E16259" stroke-width="5.2" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
+                <line x1="56" y1="72" x2="74" y2="72" stroke="#E16259" stroke-width="5.2" stroke-linecap="round"/>
+              </g>
+            </g>
+          </g>
+        </svg>
+      </div>
+      <div class="meta">
+        <div class="num">R5 · #06</div>
+        <h3>Floating Prompt</h3>
+        <p class="angle">轻浮起的 &gt;_ · 六边形退成淡轮廓</p>
+        <p class="tags">minimal · soft · focus</p>
+        <div class="palette">
+          <span class="sw" style="background:#FAF9F7"></span>
+          <span class="sw" style="background:#E16259"></span>
+          <span class="sw" style="background:#37352F"></span>
+        </div>
+      </div>
+    </article>
+
+    <!-- ========== 07 Layered Paper Cut ========== -->
+    <article class="card" data-id="7" data-tags="paper cut layer craft">
+      <div class="icon-frame">
+        <svg viewBox="0 0 108 108" xmlns="http://www.w3.org/2000/svg">
+          <defs>
+            <clipPath id="c7"><rect width="108" height="108" rx="24"/></clipPath>
+            <linearGradient id="p7" x1="0" y1="0" x2="1" y2="1">
+              <stop offset="0%" stop-color="#FFFDFB"/><stop offset="100%" stop-color="#F0EBE4"/>
+            </linearGradient>
+            <filter id="lay7" x="-20%" y="-20%" width="140%" height="140%">
+              <feDropShadow dx="0" dy="1.5" stdDeviation="1.2" flood-color="#37352F" flood-opacity=".12"/>
+            </filter>
+          </defs>
+          <g clip-path="url(#c7)">
+            <rect width="108" height="108" fill="url(#p7)"/>
+            <g transform="translate(56,56) scale(0.62) translate(-54,-54)" filter="url(#lay7)" opacity=".35">
+              <polygon points="54,12 90,32 90,76 54,96 18,76 18,32" fill="#D9D4CC"/>
+            </g>
+            <g transform="translate(53,51) scale(0.62) translate(-54,-54)" filter="url(#lay7)">
+              <polygon points="54,12 90,32 90,76 54,96 18,76 18,32" fill="#FFFFFF" stroke="#E8E4DD" stroke-width="1" stroke-linejoin="round"/>
+            </g>
+            <g transform="translate(54,52) scale(0.62) translate(-54,-54)">
+              <polygon points="54,26 78,40 78,68 54,82 30,68 30,40" fill="#F7F4EF" stroke="#DDD8D0" stroke-width=".8"/>
+              <path d="M40 48 L50 58 L40 68" stroke="#E16259" stroke-width="4" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
+              <line x1="52" y1="68" x2="68" y2="68" stroke="#E16259" stroke-width="4" stroke-linecap="round"/>
+            </g>
+          </g>
+        </svg>
+      </div>
+      <div class="meta">
+        <div class="num">R5 · #07</div>
+        <h3>Paper Cut Layers</h3>
+        <p class="angle">多层剪纸 · 错位阴影厚度</p>
+        <p class="tags">craft · layer · paper</p>
+        <div class="palette">
+          <span class="sw" style="background:#FFFDFB"></span>
+          <span class="sw" style="background:#FFFFFF"></span>
+          <span class="sw" style="background:#E16259"></span>
+        </div>
+      </div>
+    </article>
+
+    <!-- ========== 08 Soft Plastic Inject ========== -->
+    <article class="card" data-id="8" data-tags="plastic soft 3d">
+      <div class="icon-frame">
+        <svg viewBox="0 0 108 108" xmlns="http://www.w3.org/2000/svg">
+          <defs>
+            <clipPath id="c8"><rect width="108" height="108" rx="24"/></clipPath>
+            <linearGradient id="p8" x1="0" y1="0" x2="1" y2="1">
+              <stop offset="0%" stop-color="#FFF9F7"/><stop offset="100%" stop-color="#F2E8E4"/>
+            </linearGradient>
+            <linearGradient id="body8" x1="0.25" y1="0" x2="0.75" y2="1">
+              <stop offset="0%" stop-color="#FFB4AB"/><stop offset="40%" stop-color="#E16259"/><stop offset="100%" stop-color="#B8433C"/>
+            </linearGradient>
+            <linearGradient id="shine8" x1="0.3" y1="0" x2="0.6" y2="1">
+              <stop offset="0%" stop-color="#FFFFFF" stop-opacity=".55"/>
+              <stop offset="40%" stop-color="#FFFFFF" stop-opacity="0"/>
+            </linearGradient>
+            <filter id="s8" x="-30%" y="-30%" width="160%" height="160%">
+              <feDropShadow dx="0" dy="5" stdDeviation="3.5" flood-color="#9A3F38" flood-opacity=".28"/>
+            </filter>
+          </defs>
+          <g clip-path="url(#c8)">
+            <rect width="108" height="108" fill="url(#p8)"/>
+            <g transform="translate(54,52) scale(0.58) translate(-54,-54)" filter="url(#s8)">
+              <polygon points="54,12 90,32 90,76 54,96 18,76 18,32" fill="url(#body8)"/>
+              <polygon points="54,12 90,32 90,76 54,96 18,76 18,32" fill="url(#shine8)"/>
+              <polygon points="54,28 76,41 76,67 54,80 32,67 32,41" fill="#FFFFFF" fill-opacity=".14"/>
+              <path d="M41 49 L50 58 L41 67" stroke="#FFF5F3" stroke-width="4.2" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
+              <line x1="53" y1="67" x2="67" y2="67" stroke="#FFF5F3" stroke-width="4.2" stroke-linecap="round"/>
+            </g>
+          </g>
+        </svg>
+      </div>
+      <div class="meta">
+        <div class="num">R5 · #08</div>
+        <h3>Soft Plastic Coral</h3>
+        <p class="angle">注塑圆角体 · 珊瑚主块 + 白 prompt</p>
+        <p class="tags">plastic · solid · bold</p>
+        <div class="palette">
+          <span class="sw" style="background:#FFF9F7"></span>
+          <span class="sw" style="background:#E16259"></span>
+          <span class="sw" style="background:#B8433C"></span>
+        </div>
+      </div>
+    </article>
+
+    <!-- ========== 09 Satin Metal Rim ========== -->
+    <article class="card" data-id="9" data-tags="metal satin rim">
+      <div class="icon-frame">
+        <svg viewBox="0 0 108 108" xmlns="http://www.w3.org/2000/svg">
+          <defs>
+            <clipPath id="c9"><rect width="108" height="108" rx="24"/></clipPath>
+            <linearGradient id="p9" x1="0" y1="0" x2="1" y2="1">
+              <stop offset="0%" stop-color="#F8F7F4"/><stop offset="100%" stop-color="#E6E2DB"/>
+            </linearGradient>
+            <linearGradient id="metal9" x1="0" y1="0" x2="1" y2="1">
+              <stop offset="0%" stop-color="#F5F4F1"/><stop offset="25%" stop-color="#C8C4BC"/>
+              <stop offset="50%" stop-color="#EDEBE6"/><stop offset="75%" stop-color="#A8A49C"/>
+              <stop offset="100%" stop-color="#D8D4CC"/>
+            </linearGradient>
+            <linearGradient id="face9" x1="0.3" y1="0" x2="0.7" y2="1">
+              <stop offset="0%" stop-color="#FFFEFC"/><stop offset="100%" stop-color="#F0ECE6"/>
+            </linearGradient>
+            <filter id="s9" x="-25%" y="-25%" width="150%" height="150%">
+              <feDropShadow dx="0" dy="3" stdDeviation="2.2" flood-color="#37352F" flood-opacity=".14"/>
+            </filter>
+          </defs>
+          <g clip-path="url(#c9)">
+            <rect width="108" height="108" fill="url(#p9)"/>
+            <g transform="translate(54,53) scale(0.60) translate(-54,-54)" filter="url(#s9)">
+              <polygon points="54,10 92,32 92,76 54,98 16,76 16,32" fill="url(#metal9)"/>
+              <polygon points="54,16 86,34 86,74 54,92 22,74 22,34" fill="url(#face9)"/>
+              <path d="M40 48 L50 58 L40 68" stroke="#E16259" stroke-width="4" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
+              <line x1="52" y1="68" x2="68" y2="68" stroke="#E16259" stroke-width="4" stroke-linecap="round"/>
+            </g>
+          </g>
+        </svg>
+      </div>
+      <div class="meta">
+        <div class="num">R5 · #09</div>
+        <h3>Satin Metal Rim</h3>
+        <p class="angle">缎面金属边 · 工具感但不冷</p>
+        <p class="tags">metal · rim · tool</p>
+        <div class="palette">
+          <span class="sw" style="background:#C8C4BC"></span>
+          <span class="sw" style="background:#FFFEFC"></span>
+          <span class="sw" style="background:#E16259"></span>
+        </div>
+      </div>
+    </article>
+
+    <!-- ========== 10 Ambient Glow Soft ========== -->
+    <article class="card" data-id="10" data-tags="glow soft ambient">
+      <div class="icon-frame">
+        <svg viewBox="0 0 108 108" xmlns="http://www.w3.org/2000/svg">
+          <defs>
+            <clipPath id="c10"><rect width="108" height="108" rx="24"/></clipPath>
+            <linearGradient id="p10" x1="0" y1="0" x2="1" y2="1">
+              <stop offset="0%" stop-color="#1C1B20"/><stop offset="100%" stop-color="#0E0D12"/>
+            </linearGradient>
+            <radialGradient id="glow10" cx="0.5" cy="0.48" r="0.42">
+              <stop offset="0%" stop-color="#E16259" stop-opacity=".45"/>
+              <stop offset="55%" stop-color="#E16259" stop-opacity=".12"/>
+              <stop offset="100%" stop-color="#E16259" stop-opacity="0"/>
+            </radialGradient>
+            <filter id="soft10"><feGaussianBlur stdDeviation="0.8"/></filter>
+          </defs>
+          <g clip-path="url(#c10)">
+            <rect width="108" height="108" fill="url(#p10)"/>
+            <circle cx="54" cy="52" r="40" fill="url(#glow10)"/>
+            <g transform="translate(54,52) scale(0.56) translate(-54,-54)">
+              <polygon points="54,12 90,32 90,76 54,96 18,76 18,32" fill="none" stroke="#F7F6F3" stroke-width="2.2" stroke-linejoin="round" opacity=".9"/>
+              <polygon points="54,12 90,32 90,76 54,96 18,76 18,32" fill="none" stroke="#E16259" stroke-width="1" stroke-linejoin="round" opacity=".35" filter="url(#soft10)"/>
+              <path d="M40 48 L50 58 L40 68" stroke="#F7F6F3" stroke-width="4" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
+              <line x1="52" y1="68" x2="68" y2="68" stroke="#F7F6F3" stroke-width="4" stroke-linecap="round"/>
+            </g>
+          </g>
+        </svg>
+      </div>
+      <div class="meta">
+        <div class="num">R5 · #10</div>
+        <h3>Ambient Coral Glow</h3>
+        <p class="angle">深底柔光晕 · 夜间主屏很「亮」</p>
+        <p class="tags">glow · dark · night</p>
+        <div class="palette">
+          <span class="sw" style="background:#121118"></span>
+          <span class="sw" style="background:#F7F6F3"></span>
+          <span class="sw" style="background:#E16259"></span>
+        </div>
+      </div>
+    </article>
+
+    <!-- ========== 11 Peach Cream Gradient ========== -->
+    <article class="card" data-id="11" data-tags="peach cream warm gradient">
+      <div class="icon-frame">
+        <svg viewBox="0 0 108 108" xmlns="http://www.w3.org/2000/svg">
+          <defs>
+            <clipPath id="c11"><rect width="108" height="108" rx="24"/></clipPath>
+            <linearGradient id="p11" x1="0" y1="0" x2="1" y2="1">
+              <stop offset="0%" stop-color="#FFF5F0"/><stop offset="50%" stop-color="#FCE8E0"/><stop offset="100%" stop-color="#F0D8CE"/>
+            </linearGradient>
+            <linearGradient id="h11" x1="0.2" y1="0" x2="0.85" y2="1">
+              <stop offset="0%" stop-color="#FFFFFF"/><stop offset="100%" stop-color="#F8EDE8"/>
+            </linearGradient>
+            <filter id="s11" x="-25%" y="-25%" width="150%" height="150%">
+              <feDropShadow dx="0" dy="3" stdDeviation="2.5" flood-color="#B87A6A" flood-opacity=".18"/>
+            </filter>
+          </defs>
+          <g clip-path="url(#c11)">
+            <rect width="108" height="108" fill="url(#p11)"/>
+            <g transform="translate(54,53) scale(0.60) translate(-54,-54)" filter="url(#s11)">
+              <polygon points="54,12 90,32 90,76 54,96 18,76 18,32" fill="url(#h11)" stroke="#E8C8BC" stroke-width="1.4" stroke-linejoin="round"/>
+              <polygon points="54,14 87,33 87,34.5 54,15.5 21,34.5 21,33" fill="#fff" opacity=".6"/>
+              <path d="M40 48 L50 58 L40 68" stroke="#D4534A" stroke-width="4.2" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
+              <line x1="52" y1="68" x2="68" y2="68" stroke="#D4534A" stroke-width="4.2" stroke-linecap="round"/>
+            </g>
+          </g>
+        </svg>
+      </div>
+      <div class="meta">
+        <div class="num">R5 · #11</div>
+        <h3>Peach Cream</h3>
+        <p class="angle">蜜桃奶油底 · 主色略暖移</p>
+        <p class="tags">warm · cream · friendly</p>
+        <div class="palette">
+          <span class="sw" style="background:#FFF5F0"></span>
+          <span class="sw" style="background:#FCE8E0"></span>
+          <span class="sw" style="background:#D4534A"></span>
+        </div>
+      </div>
+    </article>
+
+    <!-- ========== 12 Soft Isometric Prism ========== -->
+    <article class="card" data-id="12" data-tags="isometric 3d prism">
+      <div class="icon-frame">
+        <svg viewBox="0 0 108 108" xmlns="http://www.w3.org/2000/svg">
+          <defs>
+            <clipPath id="c12"><rect width="108" height="108" rx="24"/></clipPath>
+            <linearGradient id="p12" x1="0" y1="0" x2="1" y2="1">
+              <stop offset="0%" stop-color="#F7F6F3"/><stop offset="100%" stop-color="#E5E1DA"/>
+            </linearGradient>
+            <linearGradient id="top12" x1="0" y1="0" x2="1" y2="1">
+              <stop offset="0%" stop-color="#FFFFFF"/><stop offset="100%" stop-color="#F2EEE8"/>
+            </linearGradient>
+            <linearGradient id="left12" x1="0" y1="0" x2="1" y2="1">
+              <stop offset="0%" stop-color="#E8E4DD"/><stop offset="100%" stop-color="#D4CFC6"/>
+            </linearGradient>
+            <linearGradient id="right12" x1="0" y1="0" x2="0" y2="1">
+              <stop offset="0%" stop-color="#DDD8D0"/><stop offset="100%" stop-color="#C4BEB4"/>
+            </linearGradient>
+            <filter id="s12" x="-25%" y="-25%" width="150%" height="150%">
+              <feDropShadow dx="0" dy="4" stdDeviation="3" flood-color="#37352F" flood-opacity=".12"/>
+            </filter>
+          </defs>
+          <g clip-path="url(#c12)">
+            <rect width="108" height="108" fill="url(#p12)"/>
+            <g transform="translate(54,50) scale(0.92)" filter="url(#s12)">
+              <!-- soft hex prism-ish faces -->
+              <polygon points="0,-30 26,-15 26,12 0,27 -26,12 -26,-15" fill="url(#top12)" stroke="#D8D3CB" stroke-width="0.8" stroke-linejoin="round"/>
+              <polygon points="-26,-15 0,0 0,27 -26,12" fill="url(#left12)" opacity=".9"/>
+              <polygon points="26,-15 0,0 0,27 26,12" fill="url(#right12)" opacity=".85"/>
+              <path d="M-12 -4 L0 8 L-12 20" stroke="#E16259" stroke-width="3.4" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
+              <line x1="2" y1="20" x2="14" y2="20" stroke="#E16259" stroke-width="3.4" stroke-linecap="round"/>
+            </g>
+          </g>
+        </svg>
+      </div>
+      <div class="meta">
+        <div class="num">R5 · #12</div>
+        <h3>Soft Hex Prism</h3>
+        <p class="angle">软等距六棱柱 · 轻 3D</p>
+        <p class="tags">isometric · depth</p>
+        <div class="palette">
+          <span class="sw" style="background:#F7F6F3"></span>
+          <span class="sw" style="background:#D4CFC6"></span>
+          <span class="sw" style="background:#E16259"></span>
+        </div>
+      </div>
+    </article>
+
+    <!-- ========== 13 Ink Wash Soft ========== -->
+    <article class="card" data-id="13" data-tags="ink wash editorial">
+      <div class="icon-frame">
+        <svg viewBox="0 0 108 108" xmlns="http://www.w3.org/2000/svg">
+          <defs>
+            <clipPath id="c13"><rect width="108" height="108" rx="24"/></clipPath>
+            <linearGradient id="p13" x1="0" y1="0" x2="0" y2="1">
+              <stop offset="0%" stop-color="#FAF8F4"/><stop offset="100%" stop-color="#EFEAE2"/>
+            </linearGradient>
+            <filter id="ink13"><feGaussianBlur stdDeviation="0.6"/></filter>
+            <filter id="s13" x="-30%" y="-30%" width="160%" height="160%">
+              <feDropShadow dx="0" dy="2" stdDeviation="2" flood-color="#37352F" flood-opacity=".1"/>
+            </filter>
+          </defs>
+          <g clip-path="url(#c13)">
+            <rect width="108" height="108" fill="url(#p13)"/>
+            <circle cx="70" cy="36" r="22" fill="#E16259" opacity=".06" filter="url(#ink13)"/>
+            <g transform="translate(54,54) scale(0.58) translate(-54,-54)" filter="url(#s13)">
+              <polygon points="54,12 90,32 90,76 54,96 18,76 18,32" fill="#FFFEFB" stroke="#2F2D28" stroke-width="2.4" stroke-linejoin="round"/>
+              <polygon points="54,12 90,32 90,76 54,96 18,76 18,32" fill="none" stroke="#37352F" stroke-width="4" stroke-linejoin="round" opacity=".06" filter="url(#ink13)"/>
+              <path d="M40 48 L50 58 L40 68" stroke="#E16259" stroke-width="4.5" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
+              <line x1="52" y1="68" x2="68" y2="68" stroke="#E16259" stroke-width="4.5" stroke-linecap="round"/>
+            </g>
+          </g>
+        </svg>
+      </div>
+      <div class="meta">
+        <div class="num">R5 · #13</div>
+        <h3>Ink Wash Terminal</h3>
+        <p class="angle">墨迹晕边 · 编辑气质纸感</p>
+        <p class="tags">editorial · ink · paper</p>
+        <div class="palette">
+          <span class="sw" style="background:#FAF8F4"></span>
+          <span class="sw" style="background:#2F2D28"></span>
+          <span class="sw" style="background:#E16259"></span>
+        </div>
+      </div>
+    </article>
+
+    <!-- ========== 14 Dual Tone Soft Shell ========== -->
+    <article class="card" data-id="14" data-tags="dual tone shell">
+      <div class="icon-frame">
+        <svg viewBox="0 0 108 108" xmlns="http://www.w3.org/2000/svg">
+          <defs>
+            <clipPath id="c14"><rect width="108" height="108" rx="24"/></clipPath>
+            <linearGradient id="p14" x1="0" y1="0" x2="1" y2="1">
+              <stop offset="0%" stop-color="#FFFCF9"/><stop offset="100%" stop-color="#EDE8E1"/>
+            </linearGradient>
+            <linearGradient id="shell14" x1="0" y1="0" x2="0" y2="1">
+              <stop offset="0%" stop-color="#FFFFFF"/><stop offset="100%" stop-color="#F4F0EA"/>
+            </linearGradient>
+            <linearGradient id="core14" x1="0.3" y1="0" x2="0.7" y2="1">
+              <stop offset="0%" stop-color="#FF8A80"/><stop offset="100%" stop-color="#D4534A"/>
+            </linearGradient>
+            <filter id="s14" x="-30%" y="-30%" width="160%" height="160%">
+              <feDropShadow dx="0" dy="3.5" stdDeviation="2.8" flood-color="#37352F" flood-opacity=".12"/>
+            </filter>
+          </defs>
+          <g clip-path="url(#c14)">
+            <rect width="108" height="108" fill="url(#p14)"/>
+            <g transform="translate(54,53) scale(0.60) translate(-54,-54)" filter="url(#s14)">
+              <polygon points="54,10 92,32 92,76 54,98 16,76 16,32" fill="url(#shell14)" stroke="#E4DFD7" stroke-width="1" stroke-linejoin="round"/>
+              <polygon points="54,26 78,40 78,68 54,82 30,68 30,40" fill="url(#core14)"/>
+              <polygon points="54,28 74,40 74,66 54,78 34,66 34,40" fill="#FFFFFF" fill-opacity=".12"/>
+              <path d="M42 49 L50 57 L42 65" stroke="#FFFFFF" stroke-width="3.6" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
+              <line x1="53" y1="65" x2="64" y2="65" stroke="#FFFFFF" stroke-width="3.6" stroke-linecap="round"/>
+            </g>
+          </g>
+        </svg>
+      </div>
+      <div class="meta">
+        <div class="num">R5 · #14</div>
+        <h3>Dual-Tone Shell</h3>
+        <p class="angle">白壳 + 珊瑚芯 · 双层胶囊感</p>
+        <p class="tags">dual · shell · bold</p>
+        <div class="palette">
+          <span class="sw" style="background:#FFFFFF"></span>
+          <span class="sw" style="background:#E16259"></span>
+          <span class="sw" style="background:#D4534A"></span>
+        </div>
+      </div>
+    </article>
+
+    <!-- ========== 15 Velvet Night Coral ========== -->
+    <article class="card" data-id="15" data-tags="velvet night dark coral">
+      <div class="icon-frame">
+        <svg viewBox="0 0 108 108" xmlns="http://www.w3.org/2000/svg">
+          <defs>
+            <clipPath id="c15"><rect width="108" height="108" rx="24"/></clipPath>
+            <radialGradient id="p15" cx="0.4" cy="0.3" r="0.9">
+              <stop offset="0%" stop-color="#2A2228"/><stop offset="100%" stop-color="#120E12"/>
+            </radialGradient>
+            <linearGradient id="h15" x1="0.2" y1="0" x2="0.8" y2="1">
+              <stop offset="0%" stop-color="#3D3238"/><stop offset="100%" stop-color="#1E171C"/>
+            </linearGradient>
+            <filter id="s15" x="-30%" y="-30%" width="160%" height="160%">
+              <feDropShadow dx="0" dy="3" stdDeviation="2.5" flood-color="#000" flood-opacity=".5"/>
+            </filter>
+          </defs>
+          <g clip-path="url(#c15)">
+            <rect width="108" height="108" fill="url(#p15)"/>
+            <g transform="translate(54,53) scale(0.58) translate(-54,-54)" filter="url(#s15)">
+              <polygon points="54,12 90,32 90,76 54,96 18,76 18,32" fill="url(#h15)" stroke="#5A4A50" stroke-width="1.3" stroke-linejoin="round"/>
+              <polygon points="54,14 87,33 87,34.5 54,15.5 21,34.5 21,33" fill="#E8A0A0" opacity=".12"/>
+              <path d="M40 48 L50 58 L40 68" stroke="#F07167" stroke-width="4.2" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
+              <line x1="52" y1="68" x2="68" y2="68" stroke="#F07167" stroke-width="4.2" stroke-linecap="round"/>
+            </g>
+          </g>
+        </svg>
+      </div>
+      <div class="meta">
+        <div class="num">R5 · #15</div>
+        <h3>Velvet Night</h3>
+        <p class="angle">丝绒夜色 · 珊瑚提亮一点</p>
+        <p class="tags">velvet · dark · rich</p>
+        <div class="palette">
+          <span class="sw" style="background:#1A1418"></span>
+          <span class="sw" style="background:#3D3238"></span>
+          <span class="sw" style="background:#F07167"></span>
+        </div>
+      </div>
+    </article>
+
+    <!-- ========== 16 Soft Glass on Paper ========== -->
+    <article class="card" data-id="16" data-tags="glass paper hybrid">
+      <div class="icon-frame">
+        <svg viewBox="0 0 108 108" xmlns="http://www.w3.org/2000/svg">
+          <defs>
+            <clipPath id="c16"><rect width="108" height="108" rx="24"/></clipPath>
+            <linearGradient id="p16" x1="0" y1="0" x2="1" y2="1">
+              <stop offset="0%" stop-color="#FBF9F6"/><stop offset="100%" stop-color="#EBE6DF"/>
+            </linearGradient>
+            <linearGradient id="gl16" x1="0.2" y1="0" x2="0.8" y2="1">
+              <stop offset="0%" stop-color="#FFFFFF" stop-opacity=".85"/>
+              <stop offset="50%" stop-color="#F7F6F3" stop-opacity=".55"/>
+              <stop offset="100%" stop-color="#FFFFFF" stop-opacity=".35"/>
+            </linearGradient>
+            <filter id="s16" x="-30%" y="-30%" width="160%" height="160%">
+              <feDropShadow dx="0" dy="4" stdDeviation="3" flood-color="#37352F" flood-opacity=".1"/>
+            </filter>
+          </defs>
+          <g clip-path="url(#c16)">
+            <rect width="108" height="108" fill="url(#p16)"/>
+            <!-- subtle paper grain via dots -->
+            <circle cx="20" cy="24" r="0.8" fill="#37352F" opacity=".04"/>
+            <circle cx="88" cy="30" r="0.7" fill="#37352F" opacity=".04"/>
+            <circle cx="30" cy="80" r="0.7" fill="#37352F" opacity=".04"/>
+            <circle cx="76" cy="84" r="0.8" fill="#37352F" opacity=".04"/>
+            <g transform="translate(54,53) scale(0.60) translate(-54,-54)" filter="url(#s16)">
+              <polygon points="54,12 90,32 90,76 54,96 18,76 18,32" fill="url(#gl16)" stroke="#FFFFFF" stroke-width="1.8" stroke-linejoin="round"/>
+              <polygon points="54,12 90,32 90,76 54,96 18,76 18,32" fill="none" stroke="#D8D3CB" stroke-width="1" stroke-linejoin="round" opacity=".7"/>
+              <path d="M40 48 L50 58 L40 68" stroke="#E16259" stroke-width="4" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
+              <line x1="52" y1="68" x2="68" y2="68" stroke="#E16259" stroke-width="4" stroke-linecap="round"/>
+            </g>
+          </g>
+        </svg>
+      </div>
+      <div class="meta">
+        <div class="num">R5 · #16</div>
+        <h3>Glass on Paper</h3>
+        <p class="angle">纸底 + 玻璃六边形 · 混合材质</p>
+        <p class="tags">hybrid · glass · paper</p>
+        <div class="palette">
+          <span class="sw" style="background:#FBF9F6"></span>
+          <span class="sw" style="background:#FFFFFF"></span>
+          <span class="sw" style="background:#E16259"></span>
+        </div>
+      </div>
+    </article>
+
+    <!-- ========== 17 Soft Rounded Tile ========== -->
+    <article class="card" data-id="17" data-tags="tile rounded soft ios">
+      <div class="icon-frame">
+        <svg viewBox="0 0 108 108" xmlns="http://www.w3.org/2000/svg">
+          <defs>
+            <clipPath id="c17"><rect width="108" height="108" rx="24"/></clipPath>
+            <linearGradient id="p17" x1="0" y1="0" x2="0" y2="1">
+              <stop offset="0%" stop-color="#FFFFFF"/><stop offset="100%" stop-color="#F0EBE5"/>
+            </linearGradient>
+            <linearGradient id="tile17" x1="0.3" y1="0" x2="0.7" y2="1">
+              <stop offset="0%" stop-color="#FFFDFB"/><stop offset="100%" stop-color="#F3EEE8"/>
+            </linearGradient>
+            <filter id="s17" x="-35%" y="-35%" width="170%" height="170%">
+              <feDropShadow dx="0" dy="5" stdDeviation="4" flood-color="#B0A89E" flood-opacity=".35"/>
+              <feDropShadow dx="0" dy="-1" stdDeviation="1.5" flood-color="#FFFFFF" flood-opacity=".8"/>
+            </filter>
+          </defs>
+          <g clip-path="url(#c17)">
+            <rect width="108" height="108" fill="url(#p17)"/>
+            <g filter="url(#s17)">
+              <rect x="22" y="22" width="64" height="64" rx="18" fill="url(#tile17)"/>
+            </g>
+            <path d="M40 46 L50 56 L40 66" stroke="#E16259" stroke-width="4.2" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
+            <line x1="53" y1="66" x2="68" y2="66" stroke="#E16259" stroke-width="4.2" stroke-linecap="round"/>
+            <!-- tiny hex watermark -->
+            <polygon points="54,30 62,34.5 62,43.5 54,48 46,43.5 46,34.5" fill="none" stroke="#37352F" stroke-width="1" opacity=".12"/>
+          </g>
+        </svg>
+      </div>
+      <div class="meta">
+        <div class="num">R5 · #17</div>
+        <h3>Soft Tile Prompt</h3>
+        <p class="angle">圆角磁贴浮起 · iOS 工具风</p>
+        <p class="tags">tile · ios · soft</p>
+        <div class="palette">
+          <span class="sw" style="background:#FFFFFF"></span>
+          <span class="sw" style="background:#F3EEE8"></span>
+          <span class="sw" style="background:#E16259"></span>
+        </div>
+      </div>
+    </article>
+
+    <!-- ========== 18 Signature Lifted Hex ========== -->
+    <article class="card" data-id="18" data-tags="signature lifted recommended">
+      <div class="icon-frame">
+        <svg viewBox="0 0 108 108" xmlns="http://www.w3.org/2000/svg">
+          <defs>
+            <clipPath id="c18"><rect width="108" height="108" rx="24"/></clipPath>
+            <linearGradient id="p18" x1="0.15" y1="0" x2="0.9" y2="1">
+              <stop offset="0%" stop-color="#FFFCFA"/>
+              <stop offset="45%" stop-color="#F7F6F3"/>
+              <stop offset="100%" stop-color="#E8E3DB"/>
+            </linearGradient>
+            <linearGradient id="hex18" x1="0.2" y1="0" x2="0.85" y2="1">
+              <stop offset="0%" stop-color="#FFFFFF"/>
+              <stop offset="55%" stop-color="#FBF9F6"/>
+              <stop offset="100%" stop-color="#EEE9E2"/>
+            </linearGradient>
+            <linearGradient id="inner18" x1="0.25" y1="0" x2="0.8" y2="1">
+              <stop offset="0%" stop-color="#FFFEFC"/>
+              <stop offset="100%" stop-color="#E9E4DC"/>
+            </linearGradient>
+            <linearGradient id="coral18" x1="0" y1="0" x2="0" y2="1">
+              <stop offset="0%" stop-color="#F07A70"/>
+              <stop offset="100%" stop-color="#D4534A"/>
+            </linearGradient>
+            <filter id="s18" x="-30%" y="-30%" width="160%" height="160%">
+              <feDropShadow dx="0" dy="3.5" stdDeviation="2.8" flood-color="#2C2A26" flood-opacity=".16"/>
+            </filter>
+          </defs>
+          <g clip-path="url(#c18)">
+            <rect width="108" height="108" fill="url(#p18)"/>
+            <!-- soft ground contact -->
+            <ellipse cx="54" cy="84" rx="26" ry="5" fill="#37352F" opacity=".06"/>
+            <g transform="translate(54,51) scale(0.60) translate(-54,-54)" filter="url(#s18)">
+              <polygon points="54,12 90,32 90,76 54,96 18,76 18,32" fill="url(#hex18)" stroke="#3A3732" stroke-width="1.55" stroke-linejoin="round"/>
+              <!-- top rim light -->
+              <polygon points="54,13.2 88.2,32.8 88.2,34.2 54,14.6 19.8,34.2 19.8,32.8" fill="#FFFFFF" opacity=".65"/>
+              <!-- inner well -->
+              <polygon points="54,24 80,39 80,69 54,84 28,69 28,39" fill="url(#inner18)" stroke="#B0AAA0" stroke-width=".85" stroke-linejoin="round"/>
+              <!-- prompt with volume -->
+              <path d="M40 48 L50 58 L40 68" stroke="url(#coral18)" stroke-width="4.3" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
+              <line x1="52" y1="68" x2="68" y2="68" stroke="url(#coral18)" stroke-width="4.3" stroke-linecap="round"/>
+              <path d="M40 47.2 L50 57.2 L40 67.2" stroke="#FFC4BE" stroke-width="1.35" fill="none" stroke-linecap="round" stroke-linejoin="round" opacity=".5"/>
+              <line x1="52" y1="67.2" x2="68" y2="67.2" stroke="#FFC4BE" stroke-width="1.2" stroke-linecap="round" opacity=".35"/>
+            </g>
+          </g>
+        </svg>
+      </div>
+      <div class="meta">
+        <div class="num">R5 · #18 · 推荐基线</div>
+        <h3>Signature Lifted Hex</h3>
+        <p class="angle">量产语义完整升级 · 建议默认候选</p>
+        <p class="tags">recommended · signature · balanced</p>
+        <div class="palette">
+          <span class="sw" style="background:#F7F6F3"></span>
+          <span class="sw" style="background:#FFFFFF"></span>
+          <span class="sw" style="background:#E16259"></span>
+          <span class="sw" style="background:#3A3732"></span>
+        </div>
+      </div>
+    </article>
+
+  </div>
+
+  <footer>
+    <p>
+      <strong>Muxa Icon Round 5 · Texture</strong> · 保留 Hex Terminal 语义与 Notion 暖纸/珊瑚主调，主色可微调。
+      质感手段：多层渐变、内外阴影、顶缘高光、柔边体积、玻璃/陶瓷/黏土/金属/丝绒。
+      点选后回飞书 <strong>R5 #01–#18</strong>（可多选）。落地会转 Android adaptive + iOS 1024。
+    </p>
+  </footer>
+</div>
+<script>
+  const frames = () => document.querySelectorAll('.icon-frame');
+  document.getElementById('bgPrev').addEventListener('change', (e) => {
+    const v = e.target.value;
+    frames().forEach((el) => {
+      el.classList.remove('black', 'white', 'gray', 'home');
+      if (v !== 'check') el.classList.add(v);
+    });
+  });
+  document.getElementById('filter').addEventListener('input', (e) => {
+    const q = e.target.value.trim().toLowerCase();
+    document.querySelectorAll('.card').forEach((card) => {
+      const hay = (card.dataset.tags + ' ' + card.innerText).toLowerCase();
+      card.style.display = !q || hay.includes(q) ? '' : 'none';
+    });
+  });
+  document.getElementById('grid').addEventListener('click', (e) => {
+    const card = e.target.closest('.card');
+    if (!card) return;
+    card.classList.toggle('picked');
+  });
+</script>
+</body>
+</html>

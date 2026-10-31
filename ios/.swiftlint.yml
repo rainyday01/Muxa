@@ -1,0 +1,31 @@
+included:
+  - Muxa
+  - MuxaTests
+  - MuxaUITests
+
+excluded:
+  - Muxa/Resources
+
+opt_in_rules:
+  - array_init
+  - closure_spacing
+  - empty_count
+  - empty_string
+  - first_where
+  - force_unwrapping
+  - modifier_order
+  - sorted_imports
+
+line_length:
+  warning: 120
+  error: 160
+
+type_body_length:
+  warning: 300
+  error: 450
+
+file_length:
+  warning: 500
+  error: 700
+
+reporter: xcode

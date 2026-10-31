@@ -1,0 +1,2055 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1"/>
+<title>m-tmux · 30 候选应用图标</title>
+<style>
+  :root {
+    --bg: #0a0a0c;
+    --panel: #121216;
+    --border: #27272a;
+    --text: #fafafa;
+    --muted: #a1a1aa;
+    --accent: #a78bfa;
+  }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0; font-family: "SF Pro Text", "Segoe UI", system-ui, "PingFang SC", "Noto Sans SC", sans-serif;
+    background: var(--bg); color: var(--text); line-height: 1.45;
+  }
+  .wrap { max-width: 1200px; margin: 0 auto; padding: 28px 20px 80px; }
+  header {
+    border-bottom: 1px solid var(--border); padding-bottom: 20px; margin-bottom: 24px;
+  }
+  h1 { font-size: 26px; margin: 0 0 8px; letter-spacing: -0.02em; }
+  .lead { color: var(--muted); max-width: 70ch; margin: 0 0 12px; font-size: 14px; }
+  .chips { display: flex; flex-wrap: wrap; gap: 8px; }
+  .chip {
+    font-size: 11px; padding: 4px 10px; border-radius: 999px;
+    background: #18181b; border: 1px solid var(--border); color: var(--muted);
+  }
+  .chip strong { color: var(--text); }
+  .toolbar {
+    display: flex; flex-wrap: wrap; gap: 10px; align-items: center;
+    margin-bottom: 20px; position: sticky; top: 0; z-index: 5;
+    background: rgba(10,10,12,0.9); backdrop-filter: blur(10px);
+    padding: 10px 0; border-bottom: 1px solid var(--border);
+  }
+  .toolbar label { font-size: 12px; color: var(--muted); }
+  .toolbar select, .toolbar input {
+    background: #18181b; border: 1px solid var(--border); color: var(--text);
+    border-radius: 8px; padding: 6px 10px; font-size: 13px;
+  }
+  .grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+    gap: 18px;
+  }
+  .card {
+    background: var(--panel); border: 1px solid var(--border); border-radius: 16px;
+    padding: 16px; transition: border-color .15s, transform .15s;
+  }
+  .card:hover { border-color: #52525b; transform: translateY(-2px); }
+  .card.picked { border-color: var(--accent); box-shadow: 0 0 0 1px var(--accent); }
+  .icon-frame {
+    width: 100%; aspect-ratio: 1; display: grid; place-items: center;
+    background:
+      linear-gradient(45deg, #1c1c1e 25%, transparent 25%),
+      linear-gradient(-45deg, #1c1c1e 25%, transparent 25%),
+      linear-gradient(45deg, transparent 75%, #1c1c1e 75%),
+      linear-gradient(-45deg, transparent 75%, #1c1c1e 75%);
+    background-size: 16px 16px;
+    background-position: 0 0, 0 8px, 8px -8px, -8px 0;
+    background-color: #0c0c0e;
+    border-radius: 20px; margin-bottom: 12px; padding: 12px;
+  }
+  .icon-frame svg {
+    width: 108px; height: 108px; border-radius: 24px;
+    box-shadow: 0 12px 28px rgba(0,0,0,.45);
+  }
+  .meta .num { font-size: 11px; color: var(--accent); font-weight: 700; letter-spacing: .06em; }
+  .meta h3 { margin: 4px 0 4px; font-size: 15px; font-weight: 600; }
+  .angle { margin: 0; font-size: 12px; color: var(--muted); }
+  .tags { margin: 6px 0 0; font-size: 11px; color: #71717a; }
+  footer {
+    margin-top: 40px; padding-top: 16px; border-top: 1px solid var(--border);
+    font-size: 12px; color: var(--muted);
+  }
+  .hint { font-size: 12px; color: var(--muted); margin-left: auto; }
+  @media print {
+    .toolbar { display: none; }
+    .card { break-inside: avoid; }
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <h1>m-tmux · 30 个可上架候选应用图标</h1>
+    <p class="lead">
+      定位：移动端远程 tmux / SSH·Mosh 终端客户端（非官方 tmux）。图标避免「单独一个 M」的廉价感，
+      强调<strong>终端窗格、远程链路、会话分层、工程质感</strong>，适用于 App Store / Play 列表与自适应图标蒙版。
+      全部为矢量 SVG，可导出 1024² PNG。点击卡片可标记候选。
+    </p>
+    <div class="chips">
+      <span class="chip"><strong>数量</strong> 30</span>
+      <span class="chip"><strong>格式</strong> SVG · 108 viewBox · 圆角 24</span>
+      <span class="chip"><strong>日期</strong> 2026-07-26</span>
+      <span class="chip"><strong>产品</strong> m-tmux</span>
+    </div>
+  </header>
+
+  <div class="toolbar">
+    <label>底色预览</label>
+    <select id="bgPrev">
+      <option value="check">棋盘（默认）</option>
+      <option value="black">纯黑</option>
+      <option value="white">纯白</option>
+      <option value="purple">Material 紫</option>
+    </select>
+    <label>筛选</label>
+    <input id="filter" type="search" placeholder="名称 / 标签…"/>
+    <span class="hint">点击图标卡片 = 标记 shortlist</span>
+  </div>
+
+  <div class="grid" id="grid">
+    
+    <article class="card" data-id="1">
+      <div class="icon-frame">
+        <svg viewBox="0 0 108 108" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Pane Window Pro">
+          
+    <defs>
+      <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
+        <stop offset="0%" stop-color="#1a1b26"/>
+        <stop offset="100%" stop-color="#0d0e14"/>
+      </linearGradient>
+      <linearGradient id="purp" x1="0" y1="0" x2="1" y2="1">
+        <stop offset="0%" stop-color="#7c5cff"/>
+        <stop offset="100%" stop-color="#4f378b"/>
+      </linearGradient>
+      <linearGradient id="cyan" x1="0" y1="0" x2="1" y2="1">
+        <stop offset="0%" stop-color="#5ce1e6"/>
+        <stop offset="100%" stop-color="#2b6cb0"/>
+      </linearGradient>
+      <linearGradient id="green" x1="0" y1="0" x2="0" y2="1">
+        <stop offset="0%" stop-color="#3dd68c"/>
+        <stop offset="100%" stop-color="#0d9488"/>
+      </linearGradient>
+      <linearGradient id="orange" x1="0" y1="0" x2="1" y2="1">
+        <stop offset="0%" stop-color="#ffb86c"/>
+        <stop offset="100%" stop-color="#e85d04"/>
+      </linearGradient>
+      <linearGradient id="metal" x1="0" y1="0" x2="0" y2="1">
+        <stop offset="0%" stop-color="#3a3f4b"/>
+        <stop offset="50%" stop-color="#1e222b"/>
+        <stop offset="100%" stop-color="#0f1218"/>
+      </linearGradient>
+      <filter id="soft" x="-20%" y="-20%" width="140%" height="140%">
+        <feGaussianBlur in="SourceAlpha" stdDeviation="2" result="b"/>
+        <feOffset dy="1"/>
+        <feMerge><feMergeNode/><feMergeNode in="SourceGraphic"/></feMerge>
+      </filter>
+      <filter id="glow">
+        <feGaussianBlur stdDeviation="1.5" result="b"/>
+        <feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge>
+      </filter>
+      <clipPath id="squircle">
+        <rect x="4" y="4" width="100" height="100" rx="24"/>
+      </clipPath>
+    </defs>
+    <g clip-path="url(#squircle)">
+      
+  <rect width="108" height="108" fill="url(#purp)"/>
+  <rect x="18" y="26" width="72" height="56" rx="8" fill="#0e0e14" opacity="0.92"/>
+  <rect x="18" y="26" width="72" height="14" rx="8" fill="#2a2438"/>
+  <circle cx="28" cy="33" r="2.5" fill="#ff6b6b"/><circle cx="36" cy="33" r="2.5" fill="#ffd93d"/><circle cx="44" cy="33" r="2.5" fill="#6bcb77"/>
+  <path d="M28 52 L36 58 L28 64" stroke="#d0bcff" stroke-width="2.5" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
+  <line x1="42" y1="64" x2="58" y2="64" stroke="#d0bcff" stroke-width="2.5" stroke-linecap="round" opacity="0.7"/>
+  <rect x="64" y="48" width="18" height="22" rx="3" fill="#4f378b" opacity="0.5"/>
+  <rect x="68" y="52" width="10" height="2" rx="1" fill="#eaddff"/><rect x="68" y="58" width="14" height="2" rx="1" fill="#eaddff" opacity="0.6"/>
+
+    </g>
+    
+        </svg>
+      </div>
+      <div class="meta">
+        <div class="num">#01</div>
+        <h3>Pane Window Pro</h3>
+        <p class="angle">Material 终端窗 + 状态灯</p>
+        <p class="tags">M3, store</p>
+      </div>
+    </article>
+    <article class="card" data-id="2">
+      <div class="icon-frame">
+        <svg viewBox="0 0 108 108" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Quad Split">
+          
+    <defs>
+      <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
+        <stop offset="0%" stop-color="#1a1b26"/>
+        <stop offset="100%" stop-color="#0d0e14"/>
+      </linearGradient>
+      <linearGradient id="purp" x1="0" y1="0" x2="1" y2="1">
+        <stop offset="0%" stop-color="#7c5cff"/>
+        <stop offset="100%" stop-color="#4f378b"/>
+      </linearGradient>
+      <linearGradient id="cyan" x1="0" y1="0" x2="1" y2="1">
+        <stop offset="0%" stop-color="#5ce1e6"/>
+        <stop offset="100%" stop-color="#2b6cb0"/>
+      </linearGradient>
+      <linearGradient id="green" x1="0" y1="0" x2="0" y2="1">
+        <stop offset="0%" stop-color="#3dd68c"/>
+        <stop offset="100%" stop-color="#0d9488"/>
+      </linearGradient>
+      <linearGradient id="orange" x1="0" y1="0" x2="1" y2="1">
+        <stop offset="0%" stop-color="#ffb86c"/>
+        <stop offset="100%" stop-color="#e85d04"/>
+      </linearGradient>
+      <linearGradient id="metal" x1="0" y1="0" x2="0" y2="1">
+        <stop offset="0%" stop-color="#3a3f4b"/>
+        <stop offset="50%" stop-color="#1e222b"/>
+        <stop offset="100%" stop-color="#0f1218"/>
+      </linearGradient>
+      <filter id="soft" x="-20%" y="-20%" width="140%" height="140%">
+        <feGaussianBlur in="SourceAlpha" stdDeviation="2" result="b"/>
+        <feOffset dy="1"/>
+        <feMerge><feMergeNode/><feMergeNode in="SourceGraphic"/></feMerge>
+      </filter>
+      <filter id="glow">
+        <feGaussianBlur stdDeviation="1.5" result="b"/>
+        <feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge>
+      </filter>
+      <clipPath id="squircle">
+        <rect x="4" y="4" width="100" height="100" rx="24"/>
+      </clipPath>
+    </defs>
+    <g clip-path="url(#squircle)">
+      
+  <rect width="108" height="108" fill="#0f1419"/>
+  <rect x="16" y="16" width="34" height="34" rx="6" fill="#1a2332" stroke="#3d8bfd" stroke-width="1.5"/>
+  <rect x="58" y="16" width="34" height="34" rx="6" fill="#1a2332" stroke="#3dd68c" stroke-width="1.5"/>
+  <rect x="16" y="58" width="34" height="34" rx="6" fill="#1a2332" stroke="#f0a060" stroke-width="1.5"/>
+  <rect x="58" y="58" width="34" height="34" rx="6" fill="#1a2332" stroke="#c4b5fd" stroke-width="1.5"/>
+  <path d="M24 28h18M24 34h12" stroke="#3d8bfd" stroke-width="2" stroke-linecap="round"/>
+  <path d="M66 28h18M66 34h10" stroke="#3dd68c" stroke-width="2" stroke-linecap="round"/>
+  <circle cx="33" cy="75" r="3" fill="#f0a060"/><circle cx="75" cy="75" r="3" fill="#c4b5fd"/>
+
+    </g>
+    
+        </svg>
+      </div>
+      <div class="meta">
+        <div class="num">#02</div>
+        <h3>Quad Split</h3>
+        <p class="angle">四窗格 tmux 隐喻</p>
+        <p class="tags">tmux, panes</p>
+      </div>
+    </article>
+    <article class="card" data-id="3">
+      <div class="icon-frame">
+        <svg viewBox="0 0 108 108" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Remote Link">
+          
+    <defs>
+      <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
+        <stop offset="0%" stop-color="#1a1b26"/>
+        <stop offset="100%" stop-color="#0d0e14"/>
+      </linearGradient>
+      <linearGradient id="purp" x1="0" y1="0" x2="1" y2="1">
+        <stop offset="0%" stop-color="#7c5cff"/>
+        <stop offset="100%" stop-color="#4f378b"/>
+      </linearGradient>
+      <linearGradient id="cyan" x1="0" y1="0" x2="1" y2="1">
+        <stop offset="0%" stop-color="#5ce1e6"/>
+        <stop offset="100%" stop-color="#2b6cb0"/>
+      </linearGradient>
+      <linearGradient id="green" x1="0" y1="0" x2="0" y2="1">
+        <stop offset="0%" stop-color="#3dd68c"/>
+        <stop offset="100%" stop-color="#0d9488"/>
+      </linearGradient>
+      <linearGradient id="orange" x1="0" y1="0" x2="1" y2="1">
+        <stop offset="0%" stop-color="#ffb86c"/>
+        <stop offset="100%" stop-color="#e85d04"/>
+      </linearGradient>
+      <linearGradient id="metal" x1="0" y1="0" x2="0" y2="1">
+        <stop offset="0%" stop-color="#3a3f4b"/>
+        <stop offset="50%" stop-color="#1e222b"/>
+        <stop offset="100%" stop-color="#0f1218"/>
+      </linearGradient>
+      <filter id="soft" x="-20%" y="-20%" width="140%" height="140%">
+        <feGaussianBlur in="SourceAlpha" stdDeviation="2" result="b"/>
+        <feOffset dy="1"/>
+        <feMerge><feMergeNode/><feMergeNode in="SourceGraphic"/></feMerge>
+      </filter>
+      <filter id="glow">
+        <feGaussianBlur stdDeviation="1.5" result="b"/>
+        <feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge>
+      </filter>
+      <clipPath id="squircle">
+        <rect x="4" y="4" width="100" height="100" rx="24"/>
+      </clipPath>
+    </defs>
+    <g clip-path="url(#squircle)">
+      
+  <rect width="108" height="108" fill="url(#metal)"/>
+  <rect x="14" y="38" width="28" height="44" rx="5" fill="#1c1c1e" stroke="#8e8e93" stroke-width="1.5"/>
+  <rect x="18" y="44" width="20" height="28" rx="2" fill="#0a84ff" opacity="0.35"/>
+  <rect x="66" y="28" width="28" height="52" rx="4" fill="#2c2c2e" stroke="#aeaeb2" stroke-width="1.5"/>
+  <rect x="70" y="34" width="20" height="6" rx="1" fill="#30d158"/>
+  <rect x="70" y="44" width="20" height="3" rx="1" fill="#636366"/><rect x="70" y="50" width="16" height="3" rx="1" fill="#636366"/>
+  <path d="M42 58 C52 48, 56 68, 66 54" stroke="#0a84ff" stroke-width="2.5" fill="none" stroke-linecap="round"/>
+  <circle cx="54" cy="56" r="3" fill="#0a84ff"/>
+
+    </g>
+    
+        </svg>
+      </div>
+      <div class="meta">
+        <div class="num">#03</div>
+        <h3>Remote Link</h3>
+        <p class="angle">手机↔服务器链路</p>
+        <p class="tags">remote, SSH</p>
+      </div>
+    </article>
+    <article class="card" data-id="4">
+      <div class="icon-frame">
+        <svg viewBox="0 0 108 108" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Phosphor CRT">
+          
+    <defs>
+      <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
+        <stop offset="0%" stop-color="#1a1b26"/>
+        <stop offset="100%" stop-color="#0d0e14"/>
+      </linearGradient>
+      <linearGradient id="purp" x1="0" y1="0" x2="1" y2="1">
+        <stop offset="0%" stop-color="#7c5cff"/>
+        <stop offset="100%" stop-color="#4f378b"/>
+      </linearGradient>
+      <linearGradient id="cyan" x1="0" y1="0" x2="1" y2="1">
+        <stop offset="0%" stop-color="#5ce1e6"/>
+        <stop offset="100%" stop-color="#2b6cb0"/>
+      </linearGradient>
+      <linearGradient id="green" x1="0" y1="0" x2="0" y2="1">
+        <stop offset="0%" stop-color="#3dd68c"/>
+        <stop offset="100%" stop-color="#0d9488"/>
+      </linearGradient>
+      <linearGradient id="orange" x1="0" y1="0" x2="1" y2="1">
+        <stop offset="0%" stop-color="#ffb86c"/>
+        <stop offset="100%" stop-color="#e85d04"/>
+      </linearGradient>
+      <linearGradient id="metal" x1="0" y1="0" x2="0" y2="1">
+        <stop offset="0%" stop-color="#3a3f4b"/>
+        <stop offset="50%" stop-color="#1e222b"/>
+        <stop offset="100%" stop-color="#0f1218"/>
+      </linearGradient>
+      <filter id="soft" x="-20%" y="-20%" width="140%" height="140%">
+        <feGaussianBlur in="SourceAlpha" stdDeviation="2" result="b"/>
+        <feOffset dy="1"/>
+        <feMerge><feMergeNode/><feMergeNode in="SourceGraphic"/></feMerge>
+      </filter>
+      <filter id="glow">
+        <feGaussianBlur stdDeviation="1.5" result="b"/>
+        <feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge>
+      </filter>
+      <clipPath id="squircle">
+        <rect x="4" y="4" width="100" height="100" rx="24"/>
+      </clipPath>
+    </defs>
+    <g clip-path="url(#squircle)">
+      
+  <rect width="108" height="108" fill="#050805"/>
+  <ellipse cx="54" cy="54" rx="40" ry="36" fill="#0a120a" stroke="#1a5a1a" stroke-width="2"/>
+  <ellipse cx="54" cy="54" rx="32" ry="28" fill="#020402"/>
+  <text x="30" y="50" font-family="ui-monospace,monospace" font-size="11" fill="#39ff14" filter="url(#glow)">~/tmux</text>
+  <text x="30" y="64" font-family="ui-monospace,monospace" font-size="11" fill="#39ff14">$ ▍</text>
+  <rect x="28" y="38" width="52" height="1" fill="#39ff14" opacity="0.15"/>
+  <rect x="28" y="42" width="52" height="1" fill="#39ff14" opacity="0.1"/>
+
+    </g>
+    
+        </svg>
+      </div>
+      <div class="meta">
+        <div class="num">#04</div>
+        <h3>Phosphor CRT</h3>
+        <p class="angle">磷光绿 CRT 终端</p>
+        <p class="tags">retro, geek</p>
+      </div>
+    </article>
+    <article class="card" data-id="5">
+      <div class="icon-frame">
+        <svg viewBox="0 0 108 108" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Chevron Prompt">
+          
+    <defs>
+      <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
+        <stop offset="0%" stop-color="#1a1b26"/>
+        <stop offset="100%" stop-color="#0d0e14"/>
+      </linearGradient>
+      <linearGradient id="purp" x1="0" y1="0" x2="1" y2="1">
+        <stop offset="0%" stop-color="#7c5cff"/>
+        <stop offset="100%" stop-color="#4f378b"/>
+      </linearGradient>
+      <linearGradient id="cyan" x1="0" y1="0" x2="1" y2="1">
+        <stop offset="0%" stop-color="#5ce1e6"/>
+        <stop offset="100%" stop-color="#2b6cb0"/>
+      </linearGradient>
+      <linearGradient id="green" x1="0" y1="0" x2="0" y2="1">
+        <stop offset="0%" stop-color="#3dd68c"/>
+        <stop offset="100%" stop-color="#0d9488"/>
+      </linearGradient>
+      <linearGradient id="orange" x1="0" y1="0" x2="1" y2="1">
+        <stop offset="0%" stop-color="#ffb86c"/>
+        <stop offset="100%" stop-color="#e85d04"/>
+      </linearGradient>
+      <linearGradient id="metal" x1="0" y1="0" x2="0" y2="1">
+        <stop offset="0%" stop-color="#3a3f4b"/>
+        <stop offset="50%" stop-color="#1e222b"/>
+        <stop offset="100%" stop-color="#0f1218"/>
+      </linearGradient>
+      <filter id="soft" x="-20%" y="-20%" width="140%" height="140%">
+        <feGaussianBlur in="SourceAlpha" stdDeviation="2" result="b"/>
+        <feOffset dy="1"/>
+        <feMerge><feMergeNode/><feMergeNode in="SourceGraphic"/></feMerge>
+      </filter>
+      <filter id="glow">
+        <feGaussianBlur stdDeviation="1.5" result="b"/>
+        <feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge>
+      </filter>
+      <clipPath id="squircle">
+        <rect x="4" y="4" width="100" height="100" rx="24"/>
+      </clipPath>
+    </defs>
+    <g clip-path="url(#squircle)">
+      
+  <rect width="108" height="108" fill="#131318"/>
+  <circle cx="54" cy="54" r="36" fill="#1d1b20" stroke="#4f378b" stroke-width="2"/>
+  <path d="M38 36 L58 54 L38 72" stroke="#d0bcff" stroke-width="7" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
+  <line x1="58" y1="72" x2="74" y2="72" stroke="#d0bcff" stroke-width="7" stroke-linecap="round"/>
+
+    </g>
+    
+        </svg>
+      </div>
+      <div class="meta">
+        <div class="num">#05</div>
+        <h3>Chevron Prompt</h3>
+        <p class="angle">❯ 提示符徽章</p>
+        <p class="tags">brand mark</p>
+      </div>
+    </article>
+    <article class="card" data-id="6">
+      <div class="icon-frame">
+        <svg viewBox="0 0 108 108" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Depth Layers">
+          
+    <defs>
+      <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
+        <stop offset="0%" stop-color="#1a1b26"/>
+        <stop offset="100%" stop-color="#0d0e14"/>
+      </linearGradient>
+      <linearGradient id="purp" x1="0" y1="0" x2="1" y2="1">
+        <stop offset="0%" stop-color="#7c5cff"/>
+        <stop offset="100%" stop-color="#4f378b"/>
+      </linearGradient>
+      <linearGradient id="cyan" x1="0" y1="0" x2="1" y2="1">
+        <stop offset="0%" stop-color="#5ce1e6"/>
+        <stop offset="100%" stop-color="#2b6cb0"/>
+      </linearGradient>
+      <linearGradient id="green" x1="0" y1="0" x2="0" y2="1">
+        <stop offset="0%" stop-color="#3dd68c"/>
+        <stop offset="100%" stop-color="#0d9488"/>
+      </linearGradient>
+      <linearGradient id="orange" x1="0" y1="0" x2="1" y2="1">
+        <stop offset="0%" stop-color="#ffb86c"/>
+        <stop offset="100%" stop-color="#e85d04"/>
+      </linearGradient>
+      <linearGradient id="metal" x1="0" y1="0" x2="0" y2="1">
+        <stop offset="0%" stop-color="#3a3f4b"/>
+        <stop offset="50%" stop-color="#1e222b"/>
+        <stop offset="100%" stop-color="#0f1218"/>
+      </linearGradient>
+      <filter id="soft" x="-20%" y="-20%" width="140%" height="140%">
+        <feGaussianBlur in="SourceAlpha" stdDeviation="2" result="b"/>
+        <feOffset dy="1"/>
+        <feMerge><feMergeNode/><feMergeNode in="SourceGraphic"/></feMerge>
+      </filter>
+      <filter id="glow">
+        <feGaussianBlur stdDeviation="1.5" result="b"/>
+        <feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge>
+      </filter>
+      <clipPath id="squircle">
+        <rect x="4" y="4" width="100" height="100" rx="24"/>
+      </clipPath>
+    </defs>
+    <g clip-path="url(#squircle)">
+      
+  <rect width="108" height="108" fill="#0a0a12"/>
+  <rect x="28" y="22" width="56" height="42" rx="8" fill="#1a1a2e" stroke="#78a0ff" stroke-width="1" opacity="0.45" transform="rotate(-6 56 43)"/>
+  <rect x="24" y="30" width="56" height="42" rx="8" fill="#16162a" stroke="#78a0ff" stroke-width="1" opacity="0.7" transform="rotate(-3 52 51)"/>
+  <rect x="22" y="38" width="58" height="44" rx="8" fill="#12122a" stroke="#a8c4ff" stroke-width="1.5"/>
+  <path d="M34 56 L42 62 L34 68" stroke="#b8f0ff" stroke-width="2.2" fill="none" stroke-linecap="round"/>
+  <line x1="48" y1="68" x2="64" y2="68" stroke="#b8f0ff" stroke-width="2.2" stroke-linecap="round" opacity="0.8"/>
+
+    </g>
+    
+        </svg>
+      </div>
+      <div class="meta">
+        <div class="num">#06</div>
+        <h3>Depth Layers</h3>
+        <p class="angle">多层会话卡片</p>
+        <p class="tags">sessions, depth</p>
+      </div>
+    </article>
+    <article class="card" data-id="7">
+      <div class="icon-frame">
+        <svg viewBox="0 0 108 108" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Mosh Wave">
+          
+    <defs>
+      <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
+        <stop offset="0%" stop-color="#1a1b26"/>
+        <stop offset="100%" stop-color="#0d0e14"/>
+      </linearGradient>
+      <linearGradient id="purp" x1="0" y1="0" x2="1" y2="1">
+        <stop offset="0%" stop-color="#7c5cff"/>
+        <stop offset="100%" stop-color="#4f378b"/>
+      </linearGradient>
+      <linearGradient id="cyan" x1="0" y1="0" x2="1" y2="1">
+        <stop offset="0%" stop-color="#5ce1e6"/>
+        <stop offset="100%" stop-color="#2b6cb0"/>
+      </linearGradient>
+      <linearGradient id="green" x1="0" y1="0" x2="0" y2="1">
+        <stop offset="0%" stop-color="#3dd68c"/>
+        <stop offset="100%" stop-color="#0d9488"/>
+      </linearGradient>
+      <linearGradient id="orange" x1="0" y1="0" x2="1" y2="1">
+        <stop offset="0%" stop-color="#ffb86c"/>
+        <stop offset="100%" stop-color="#e85d04"/>
+      </linearGradient>
+      <linearGradient id="metal" x1="0" y1="0" x2="0" y2="1">
+        <stop offset="0%" stop-color="#3a3f4b"/>
+        <stop offset="50%" stop-color="#1e222b"/>
+        <stop offset="100%" stop-color="#0f1218"/>
+      </linearGradient>
+      <filter id="soft" x="-20%" y="-20%" width="140%" height="140%">
+        <feGaussianBlur in="SourceAlpha" stdDeviation="2" result="b"/>
+        <feOffset dy="1"/>
+        <feMerge><feMergeNode/><feMergeNode in="SourceGraphic"/></feMerge>
+      </filter>
+      <filter id="glow">
+        <feGaussianBlur stdDeviation="1.5" result="b"/>
+        <feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge>
+      </filter>
+      <clipPath id="squircle">
+        <rect x="4" y="4" width="100" height="100" rx="24"/>
+      </clipPath>
+    </defs>
+    <g clip-path="url(#squircle)">
+      
+  <rect width="108" height="108" fill="#0c1220"/>
+  <path d="M14 70 Q27 40 40 70 T66 70 T92 70" stroke="#5ce1e6" stroke-width="3" fill="none" stroke-linecap="round" opacity="0.9"/>
+  <path d="M14 78 Q27 55 40 78 T66 78 T92 78" stroke="#2b6cb0" stroke-width="2.5" fill="none" opacity="0.5"/>
+  <rect x="30" y="22" width="48" height="36" rx="6" fill="#0e1628" stroke="#5ce1e6" stroke-width="1.5"/>
+  <text x="38" y="44" font-family="ui-monospace,monospace" font-size="12" fill="#5ce1e6" font-weight="700">m~</text>
+
+    </g>
+    
+        </svg>
+      </div>
+      <div class="meta">
+        <div class="num">#07</div>
+        <h3>Mosh Wave</h3>
+        <p class="angle">Mosh 波形 + 终端</p>
+        <p class="tags">mosh, mobile</p>
+      </div>
+    </article>
+    <article class="card" data-id="8">
+      <div class="icon-frame">
+        <svg viewBox="0 0 108 108" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Hex Terminal">
+          
+    <defs>
+      <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
+        <stop offset="0%" stop-color="#1a1b26"/>
+        <stop offset="100%" stop-color="#0d0e14"/>
+      </linearGradient>
+      <linearGradient id="purp" x1="0" y1="0" x2="1" y2="1">
+        <stop offset="0%" stop-color="#7c5cff"/>
+        <stop offset="100%" stop-color="#4f378b"/>
+      </linearGradient>
+      <linearGradient id="cyan" x1="0" y1="0" x2="1" y2="1">
+        <stop offset="0%" stop-color="#5ce1e6"/>
+        <stop offset="100%" stop-color="#2b6cb0"/>
+      </linearGradient>
+      <linearGradient id="green" x1="0" y1="0" x2="0" y2="1">
+        <stop offset="0%" stop-color="#3dd68c"/>
+        <stop offset="100%" stop-color="#0d9488"/>
+      </linearGradient>
+      <linearGradient id="orange" x1="0" y1="0" x2="1" y2="1">
+        <stop offset="0%" stop-color="#ffb86c"/>
+        <stop offset="100%" stop-color="#e85d04"/>
+      </linearGradient>
+      <linearGradient id="metal" x1="0" y1="0" x2="0" y2="1">
+        <stop offset="0%" stop-color="#3a3f4b"/>
+        <stop offset="50%" stop-color="#1e222b"/>
+        <stop offset="100%" stop-color="#0f1218"/>
+      </linearGradient>
+      <filter id="soft" x="-20%" y="-20%" width="140%" height="140%">
+        <feGaussianBlur in="SourceAlpha" stdDeviation="2" result="b"/>
+        <feOffset dy="1"/>
+        <feMerge><feMergeNode/><feMergeNode in="SourceGraphic"/></feMerge>
+      </filter>
+      <filter id="glow">
+        <feGaussianBlur stdDeviation="1.5" result="b"/>
+        <feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge>
+      </filter>
+      <clipPath id="squircle">
+        <rect x="4" y="4" width="100" height="100" rx="24"/>
+      </clipPath>
+    </defs>
+    <g clip-path="url(#squircle)">
+      
+  <rect width="108" height="108" fill="#101014"/>
+  <polygon points="54,12 90,32 90,76 54,96 18,76 18,32" fill="#1c1c22" stroke="#aeaeb2" stroke-width="2"/>
+  <polygon points="54,22 82,38 82,70 54,86 26,70 26,38" fill="#0a0a0c" stroke="#636366" stroke-width="1"/>
+  <path d="M40 48 L50 58 L40 68" stroke="#ff6363" stroke-width="3.5" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
+  <line x1="52" y1="68" x2="68" y2="68" stroke="#ff6363" stroke-width="3.5" stroke-linecap="round"/>
+
+    </g>
+    
+        </svg>
+      </div>
+      <div class="meta">
+        <div class="num">#08</div>
+        <h3>Hex Terminal</h3>
+        <p class="angle">六边形工程徽章</p>
+        <p class="tags">badge, pro</p>
+      </div>
+    </article>
+    <article class="card" data-id="9">
+      <div class="icon-frame">
+        <svg viewBox="0 0 108 108" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Key Dock">
+          
+    <defs>
+      <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
+        <stop offset="0%" stop-color="#1a1b26"/>
+        <stop offset="100%" stop-color="#0d0e14"/>
+      </linearGradient>
+      <linearGradient id="purp" x1="0" y1="0" x2="1" y2="1">
+        <stop offset="0%" stop-color="#7c5cff"/>
+        <stop offset="100%" stop-color="#4f378b"/>
+      </linearGradient>
+      <linearGradient id="cyan" x1="0" y1="0" x2="1" y2="1">
+        <stop offset="0%" stop-color="#5ce1e6"/>
+        <stop offset="100%" stop-color="#2b6cb0"/>
+      </linearGradient>
+      <linearGradient id="green" x1="0" y1="0" x2="0" y2="1">
+        <stop offset="0%" stop-color="#3dd68c"/>
+        <stop offset="100%" stop-color="#0d9488"/>
+      </linearGradient>
+      <linearGradient id="orange" x1="0" y1="0" x2="1" y2="1">
+        <stop offset="0%" stop-color="#ffb86c"/>
+        <stop offset="100%" stop-color="#e85d04"/>
+      </linearGradient>
+      <linearGradient id="metal" x1="0" y1="0" x2="0" y2="1">
+        <stop offset="0%" stop-color="#3a3f4b"/>
+        <stop offset="50%" stop-color="#1e222b"/>
+        <stop offset="100%" stop-color="#0f1218"/>
+      </linearGradient>
+      <filter id="soft" x="-20%" y="-20%" width="140%" height="140%">
+        <feGaussianBlur in="SourceAlpha" stdDeviation="2" result="b"/>
+        <feOffset dy="1"/>
+        <feMerge><feMergeNode/><feMergeNode in="SourceGraphic"/></feMerge>
+      </filter>
+      <filter id="glow">
+        <feGaussianBlur stdDeviation="1.5" result="b"/>
+        <feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge>
+      </filter>
+      <clipPath id="squircle">
+        <rect x="4" y="4" width="100" height="100" rx="24"/>
+      </clipPath>
+    </defs>
+    <g clip-path="url(#squircle)">
+      
+  <rect width="108" height="108" fill="#1c1a17"/>
+  <rect x="16" y="18" width="76" height="48" rx="8" fill="#141210"/>
+  <path d="M28 36 L36 42 L28 48" stroke="#f0a060" stroke-width="2.5" fill="none" stroke-linecap="round"/>
+  <line x1="42" y1="48" x2="56" y2="48" stroke="#e8dcc8" stroke-width="2" stroke-linecap="round" opacity="0.5"/>
+  <g fill="#3a342b">
+    <rect x="18" y="74" width="14" height="12" rx="3"/><rect x="36" y="74" width="14" height="12" rx="3"/>
+    <rect x="54" y="74" width="14" height="12" rx="3"/><rect x="72" y="74" width="18" height="12" rx="3"/>
+  </g>
+  <g fill="#f0a060" font-family="system-ui" font-size="7" font-weight="700">
+    <text x="21" y="83">esc</text><text x="39" y="83">⌃</text><text x="57" y="83">⌥</text><text x="76" y="83">⋯</text>
+  </g>
+
+    </g>
+    
+        </svg>
+      </div>
+      <div class="meta">
+        <div class="num">#09</div>
+        <h3>Key Dock</h3>
+        <p class="angle">快捷键条 + 屏</p>
+        <p class="tags">keyboard, UX</p>
+      </div>
+    </article>
+    <article class="card" data-id="10">
+      <div class="icon-frame">
+        <svg viewBox="0 0 108 108" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Glass Sequoia">
+          
+    <defs>
+      <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
+        <stop offset="0%" stop-color="#1a1b26"/>
+        <stop offset="100%" stop-color="#0d0e14"/>
+      </linearGradient>
+      <linearGradient id="purp" x1="0" y1="0" x2="1" y2="1">
+        <stop offset="0%" stop-color="#7c5cff"/>
+        <stop offset="100%" stop-color="#4f378b"/>
+      </linearGradient>
+      <linearGradient id="cyan" x1="0" y1="0" x2="1" y2="1">
+        <stop offset="0%" stop-color="#5ce1e6"/>
+        <stop offset="100%" stop-color="#2b6cb0"/>
+      </linearGradient>
+      <linearGradient id="green" x1="0" y1="0" x2="0" y2="1">
+        <stop offset="0%" stop-color="#3dd68c"/>
+        <stop offset="100%" stop-color="#0d9488"/>
+      </linearGradient>
+      <linearGradient id="orange" x1="0" y1="0" x2="1" y2="1">
+        <stop offset="0%" stop-color="#ffb86c"/>
+        <stop offset="100%" stop-color="#e85d04"/>
+      </linearGradient>
+      <linearGradient id="metal" x1="0" y1="0" x2="0" y2="1">
+        <stop offset="0%" stop-color="#3a3f4b"/>
+        <stop offset="50%" stop-color="#1e222b"/>
+        <stop offset="100%" stop-color="#0f1218"/>
+      </linearGradient>
+      <filter id="soft" x="-20%" y="-20%" width="140%" height="140%">
+        <feGaussianBlur in="SourceAlpha" stdDeviation="2" result="b"/>
+        <feOffset dy="1"/>
+        <feMerge><feMergeNode/><feMergeNode in="SourceGraphic"/></feMerge>
+      </filter>
+      <filter id="glow">
+        <feGaussianBlur stdDeviation="1.5" result="b"/>
+        <feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge>
+      </filter>
+      <clipPath id="squircle">
+        <rect x="4" y="4" width="100" height="100" rx="24"/>
+      </clipPath>
+    </defs>
+    <g clip-path="url(#squircle)">
+      
+  <defs>
+    <linearGradient id="sky" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#1a2744"/><stop offset="50%" stop-color="#0d1526"/><stop offset="100%" stop-color="#1a1530"/>
+    </linearGradient>
+  </defs>
+  <rect width="108" height="108" fill="url(#sky)"/>
+  <rect x="18" y="28" width="72" height="52" rx="14" fill="rgba(255,255,255,0.12)" stroke="rgba(255,255,255,0.25)" stroke-width="1.5"/>
+  <path d="M32 48 L40 54 L32 60" stroke="#7ec8ff" stroke-width="2.5" fill="none" stroke-linecap="round"/>
+  <line x1="46" y1="60" x2="62" y2="60" stroke="#7ec8ff" stroke-width="2.5" stroke-linecap="round" opacity="0.85"/>
+  <circle cx="78" cy="40" r="4" fill="#6ef0b0" opacity="0.9"/>
+
+    </g>
+    
+        </svg>
+      </div>
+      <div class="meta">
+        <div class="num">#10</div>
+        <h3>Glass Sequoia</h3>
+        <p class="angle">毛玻璃终端岛</p>
+        <p class="tags">glass, iOS</p>
+      </div>
+    </article>
+    <article class="card" data-id="11">
+      <div class="icon-frame">
+        <svg viewBox="0 0 108 108" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Agent Node">
+          
+    <defs>
+      <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
+        <stop offset="0%" stop-color="#1a1b26"/>
+        <stop offset="100%" stop-color="#0d0e14"/>
+      </linearGradient>
+      <linearGradient id="purp" x1="0" y1="0" x2="1" y2="1">
+        <stop offset="0%" stop-color="#7c5cff"/>
+        <stop offset="100%" stop-color="#4f378b"/>
+      </linearGradient>
+      <linearGradient id="cyan" x1="0" y1="0" x2="1" y2="1">
+        <stop offset="0%" stop-color="#5ce1e6"/>
+        <stop offset="100%" stop-color="#2b6cb0"/>
+      </linearGradient>
+      <linearGradient id="green" x1="0" y1="0" x2="0" y2="1">
+        <stop offset="0%" stop-color="#3dd68c"/>
+        <stop offset="100%" stop-color="#0d9488"/>
+      </linearGradient>
+      <linearGradient id="orange" x1="0" y1="0" x2="1" y2="1">
+        <stop offset="0%" stop-color="#ffb86c"/>
+        <stop offset="100%" stop-color="#e85d04"/>
+      </linearGradient>
+      <linearGradient id="metal" x1="0" y1="0" x2="0" y2="1">
+        <stop offset="0%" stop-color="#3a3f4b"/>
+        <stop offset="50%" stop-color="#1e222b"/>
+        <stop offset="100%" stop-color="#0f1218"/>
+      </linearGradient>
+      <filter id="soft" x="-20%" y="-20%" width="140%" height="140%">
+        <feGaussianBlur in="SourceAlpha" stdDeviation="2" result="b"/>
+        <feOffset dy="1"/>
+        <feMerge><feMergeNode/><feMergeNode in="SourceGraphic"/></feMerge>
+      </filter>
+      <filter id="glow">
+        <feGaussianBlur stdDeviation="1.5" result="b"/>
+        <feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge>
+      </filter>
+      <clipPath id="squircle">
+        <rect x="4" y="4" width="100" height="100" rx="24"/>
+      </clipPath>
+    </defs>
+    <g clip-path="url(#squircle)">
+      
+  <rect width="108" height="108" fill="#0c0e12"/>
+  <circle cx="54" cy="40" r="16" fill="none" stroke="#a78bfa" stroke-width="2.5"/>
+  <circle cx="54" cy="40" r="6" fill="#a78bfa"/>
+  <circle cx="28" cy="72" r="10" fill="none" stroke="#60a5fa" stroke-width="2"/>
+  <circle cx="80" cy="72" r="10" fill="none" stroke="#34d399" stroke-width="2"/>
+  <line x1="46" y1="52" x2="34" y2="64" stroke="#6b7385" stroke-width="1.5"/>
+  <line x1="62" y1="52" x2="74" y2="64" stroke="#6b7385" stroke-width="1.5"/>
+  <path d="M24 78 L28 82 L36 74" stroke="#60a5fa" stroke-width="1.5" fill="none"/>
+  <rect x="74" y="68" width="12" height="8" rx="1" fill="#34d399" opacity="0.4"/>
+
+    </g>
+    
+        </svg>
+      </div>
+      <div class="meta">
+        <div class="num">#11</div>
+        <h3>Agent Node</h3>
+        <p class="angle">AI 会话节点</p>
+        <p class="tags">Claude, agent</p>
+      </div>
+    </article>
+    <article class="card" data-id="12">
+      <div class="icon-frame">
+        <svg viewBox="0 0 108 108" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Orbit Host">
+          
+    <defs>
+      <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
+        <stop offset="0%" stop-color="#1a1b26"/>
+        <stop offset="100%" stop-color="#0d0e14"/>
+      </linearGradient>
+      <linearGradient id="purp" x1="0" y1="0" x2="1" y2="1">
+        <stop offset="0%" stop-color="#7c5cff"/>
+        <stop offset="100%" stop-color="#4f378b"/>
+      </linearGradient>
+      <linearGradient id="cyan" x1="0" y1="0" x2="1" y2="1">
+        <stop offset="0%" stop-color="#5ce1e6"/>
+        <stop offset="100%" stop-color="#2b6cb0"/>
+      </linearGradient>
+      <linearGradient id="green" x1="0" y1="0" x2="0" y2="1">
+        <stop offset="0%" stop-color="#3dd68c"/>
+        <stop offset="100%" stop-color="#0d9488"/>
+      </linearGradient>
+      <linearGradient id="orange" x1="0" y1="0" x2="1" y2="1">
+        <stop offset="0%" stop-color="#ffb86c"/>
+        <stop offset="100%" stop-color="#e85d04"/>
+      </linearGradient>
+      <linearGradient id="metal" x1="0" y1="0" x2="0" y2="1">
+        <stop offset="0%" stop-color="#3a3f4b"/>
+        <stop offset="50%" stop-color="#1e222b"/>
+        <stop offset="100%" stop-color="#0f1218"/>
+      </linearGradient>
+      <filter id="soft" x="-20%" y="-20%" width="140%" height="140%">
+        <feGaussianBlur in="SourceAlpha" stdDeviation="2" result="b"/>
+        <feOffset dy="1"/>
+        <feMerge><feMergeNode/><feMergeNode in="SourceGraphic"/></feMerge>
+      </filter>
+      <filter id="glow">
+        <feGaussianBlur stdDeviation="1.5" result="b"/>
+        <feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge>
+      </filter>
+      <clipPath id="squircle">
+        <rect x="4" y="4" width="100" height="100" rx="24"/>
+      </clipPath>
+    </defs>
+    <g clip-path="url(#squircle)">
+      
+  <rect width="108" height="108" fill="#0b1020"/>
+  <ellipse cx="54" cy="54" rx="38" ry="18" fill="none" stroke="#3b82f6" stroke-width="1.5" opacity="0.5" transform="rotate(-20 54 54)"/>
+  <ellipse cx="54" cy="54" rx="38" ry="18" fill="none" stroke="#8b5cf6" stroke-width="1.5" opacity="0.4" transform="rotate(40 54 54)"/>
+  <circle cx="54" cy="54" r="12" fill="#1e293b" stroke="#93c5fd" stroke-width="2"/>
+  <rect x="48" y="48" width="12" height="12" rx="2" fill="#3b82f6"/>
+  <circle cx="86" cy="40" r="5" fill="#22d3ee"/><circle cx="24" cy="62" r="4" fill="#a78bfa"/>
+
+    </g>
+    
+        </svg>
+      </div>
+      <div class="meta">
+        <div class="num">#12</div>
+        <h3>Orbit Host</h3>
+        <p class="angle">轨道主机连接</p>
+        <p class="tags">hosts, network</p>
+      </div>
+    </article>
+    <article class="card" data-id="13">
+      <div class="icon-frame">
+        <svg viewBox="0 0 108 108" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Duotone Glyph">
+          
+    <defs>
+      <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
+        <stop offset="0%" stop-color="#1a1b26"/>
+        <stop offset="100%" stop-color="#0d0e14"/>
+      </linearGradient>
+      <linearGradient id="purp" x1="0" y1="0" x2="1" y2="1">
+        <stop offset="0%" stop-color="#7c5cff"/>
+        <stop offset="100%" stop-color="#4f378b"/>
+      </linearGradient>
+      <linearGradient id="cyan" x1="0" y1="0" x2="1" y2="1">
+        <stop offset="0%" stop-color="#5ce1e6"/>
+        <stop offset="100%" stop-color="#2b6cb0"/>
+      </linearGradient>
+      <linearGradient id="green" x1="0" y1="0" x2="0" y2="1">
+        <stop offset="0%" stop-color="#3dd68c"/>
+        <stop offset="100%" stop-color="#0d9488"/>
+      </linearGradient>
+      <linearGradient id="orange" x1="0" y1="0" x2="1" y2="1">
+        <stop offset="0%" stop-color="#ffb86c"/>
+        <stop offset="100%" stop-color="#e85d04"/>
+      </linearGradient>
+      <linearGradient id="metal" x1="0" y1="0" x2="0" y2="1">
+        <stop offset="0%" stop-color="#3a3f4b"/>
+        <stop offset="50%" stop-color="#1e222b"/>
+        <stop offset="100%" stop-color="#0f1218"/>
+      </linearGradient>
+      <filter id="soft" x="-20%" y="-20%" width="140%" height="140%">
+        <feGaussianBlur in="SourceAlpha" stdDeviation="2" result="b"/>
+        <feOffset dy="1"/>
+        <feMerge><feMergeNode/><feMergeNode in="SourceGraphic"/></feMerge>
+      </filter>
+      <filter id="glow">
+        <feGaussianBlur stdDeviation="1.5" result="b"/>
+        <feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge>
+      </filter>
+      <clipPath id="squircle">
+        <rect x="4" y="4" width="100" height="100" rx="24"/>
+      </clipPath>
+    </defs>
+    <g clip-path="url(#squircle)">
+      
+  <rect width="108" height="108" fill="#fef7ff"/>
+  <path d="M22 72 V40 C22 32 30 28 38 34 L48 44 L48 72" fill="none" stroke="#6750a4" stroke-width="8" stroke-linecap="round" stroke-linejoin="round"/>
+  <path d="M48 44 L58 34 C66 28 74 32 74 40 V72" fill="none" stroke="#6750a4" stroke-width="8" stroke-linecap="round" stroke-linejoin="round" opacity="0.85"/>
+  <line x1="78" y1="36" x2="78" y2="72" stroke="#d0bcff" stroke-width="8" stroke-linecap="round"/>
+  <line x1="70" y1="44" x2="90" y2="44" stroke="#d0bcff" stroke-width="7" stroke-linecap="round"/>
+
+    </g>
+    
+        </svg>
+      </div>
+      <div class="meta">
+        <div class="num">#13</div>
+        <h3>Duotone Glyph</h3>
+        <p class="angle">双色 m/t 构成</p>
+        <p class="tags">wordmark abstract</p>
+      </div>
+    </article>
+    <article class="card" data-id="14">
+      <div class="icon-frame">
+        <svg viewBox="0 0 108 108" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Rack Glow">
+          
+    <defs>
+      <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
+        <stop offset="0%" stop-color="#1a1b26"/>
+        <stop offset="100%" stop-color="#0d0e14"/>
+      </linearGradient>
+      <linearGradient id="purp" x1="0" y1="0" x2="1" y2="1">
+        <stop offset="0%" stop-color="#7c5cff"/>
+        <stop offset="100%" stop-color="#4f378b"/>
+      </linearGradient>
+      <linearGradient id="cyan" x1="0" y1="0" x2="1" y2="1">
+        <stop offset="0%" stop-color="#5ce1e6"/>
+        <stop offset="100%" stop-color="#2b6cb0"/>
+      </linearGradient>
+      <linearGradient id="green" x1="0" y1="0" x2="0" y2="1">
+        <stop offset="0%" stop-color="#3dd68c"/>
+        <stop offset="100%" stop-color="#0d9488"/>
+      </linearGradient>
+      <linearGradient id="orange" x1="0" y1="0" x2="1" y2="1">
+        <stop offset="0%" stop-color="#ffb86c"/>
+        <stop offset="100%" stop-color="#e85d04"/>
+      </linearGradient>
+      <linearGradient id="metal" x1="0" y1="0" x2="0" y2="1">
+        <stop offset="0%" stop-color="#3a3f4b"/>
+        <stop offset="50%" stop-color="#1e222b"/>
+        <stop offset="100%" stop-color="#0f1218"/>
+      </linearGradient>
+      <filter id="soft" x="-20%" y="-20%" width="140%" height="140%">
+        <feGaussianBlur in="SourceAlpha" stdDeviation="2" result="b"/>
+        <feOffset dy="1"/>
+        <feMerge><feMergeNode/><feMergeNode in="SourceGraphic"/></feMerge>
+      </filter>
+      <filter id="glow">
+        <feGaussianBlur stdDeviation="1.5" result="b"/>
+        <feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge>
+      </filter>
+      <clipPath id="squircle">
+        <rect x="4" y="4" width="100" height="100" rx="24"/>
+      </clipPath>
+    </defs>
+    <g clip-path="url(#squircle)">
+      
+  <rect width="108" height="108" fill="#12141a"/>
+  <rect x="30" y="20" width="48" height="68" rx="6" fill="#1a1d26" stroke="#3a3f4b" stroke-width="2"/>
+  <rect x="36" y="28" width="36" height="10" rx="2" fill="#0e1016"/>
+  <circle cx="42" cy="33" r="2" fill="#3dd68c"/><circle cx="50" cy="33" r="2" fill="#3dd68c" opacity="0.5"/>
+  <rect x="36" y="44" width="36" height="10" rx="2" fill="#0e1016"/>
+  <circle cx="42" cy="49" r="2" fill="#f5a524"/>
+  <rect x="36" y="60" width="36" height="10" rx="2" fill="#0e1016"/>
+  <circle cx="42" cy="65" r="2" fill="#6c9eff"/>
+  <path d="M54 78 L54 92" stroke="#4a5568" stroke-width="3"/><path d="M44 92 H64" stroke="#4a5568" stroke-width="3" stroke-linecap="round"/>
+
+    </g>
+    
+        </svg>
+      </div>
+      <div class="meta">
+        <div class="num">#14</div>
+        <h3>Rack Glow</h3>
+        <p class="angle">机架服务器灯</p>
+        <p class="tags">infra, server</p>
+      </div>
+    </article>
+    <article class="card" data-id="15">
+      <div class="icon-frame">
+        <svg viewBox="0 0 108 108" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Angle Brackets">
+          
+    <defs>
+      <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
+        <stop offset="0%" stop-color="#1a1b26"/>
+        <stop offset="100%" stop-color="#0d0e14"/>
+      </linearGradient>
+      <linearGradient id="purp" x1="0" y1="0" x2="1" y2="1">
+        <stop offset="0%" stop-color="#7c5cff"/>
+        <stop offset="100%" stop-color="#4f378b"/>
+      </linearGradient>
+      <linearGradient id="cyan" x1="0" y1="0" x2="1" y2="1">
+        <stop offset="0%" stop-color="#5ce1e6"/>
+        <stop offset="100%" stop-color="#2b6cb0"/>
+      </linearGradient>
+      <linearGradient id="green" x1="0" y1="0" x2="0" y2="1">
+        <stop offset="0%" stop-color="#3dd68c"/>
+        <stop offset="100%" stop-color="#0d9488"/>
+      </linearGradient>
+      <linearGradient id="orange" x1="0" y1="0" x2="1" y2="1">
+        <stop offset="0%" stop-color="#ffb86c"/>
+        <stop offset="100%" stop-color="#e85d04"/>
+      </linearGradient>
+      <linearGradient id="metal" x1="0" y1="0" x2="0" y2="1">
+        <stop offset="0%" stop-color="#3a3f4b"/>
+        <stop offset="50%" stop-color="#1e222b"/>
+        <stop offset="100%" stop-color="#0f1218"/>
+      </linearGradient>
+      <filter id="soft" x="-20%" y="-20%" width="140%" height="140%">
+        <feGaussianBlur in="SourceAlpha" stdDeviation="2" result="b"/>
+        <feOffset dy="1"/>
+        <feMerge><feMergeNode/><feMergeNode in="SourceGraphic"/></feMerge>
+      </filter>
+      <filter id="glow">
+        <feGaussianBlur stdDeviation="1.5" result="b"/>
+        <feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge>
+      </filter>
+      <clipPath id="squircle">
+        <rect x="4" y="4" width="100" height="100" rx="24"/>
+      </clipPath>
+    </defs>
+    <g clip-path="url(#squircle)">
+      
+  <rect width="108" height="108" fill="#0d1117"/>
+  <path d="M36 32 L22 54 L36 76" stroke="#3fb950" stroke-width="6" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
+  <path d="M72 32 L86 54 L72 76" stroke="#3fb950" stroke-width="6" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
+  <rect x="48" y="46" width="5" height="18" rx="1.5" fill="#e6edf3">
+  </rect>
+
+    </g>
+    
+        </svg>
+      </div>
+      <div class="meta">
+        <div class="num">#15</div>
+        <h3>Angle Brackets</h3>
+        <p class="angle">尖括号 + 光标</p>
+        <p class="tags">dev, code</p>
+      </div>
+    </article>
+    <article class="card" data-id="16">
+      <div class="icon-frame">
+        <svg viewBox="0 0 108 108" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Soft Clay">
+          
+    <defs>
+      <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
+        <stop offset="0%" stop-color="#1a1b26"/>
+        <stop offset="100%" stop-color="#0d0e14"/>
+      </linearGradient>
+      <linearGradient id="purp" x1="0" y1="0" x2="1" y2="1">
+        <stop offset="0%" stop-color="#7c5cff"/>
+        <stop offset="100%" stop-color="#4f378b"/>
+      </linearGradient>
+      <linearGradient id="cyan" x1="0" y1="0" x2="1" y2="1">
+        <stop offset="0%" stop-color="#5ce1e6"/>
+        <stop offset="100%" stop-color="#2b6cb0"/>
+      </linearGradient>
+      <linearGradient id="green" x1="0" y1="0" x2="0" y2="1">
+        <stop offset="0%" stop-color="#3dd68c"/>
+        <stop offset="100%" stop-color="#0d9488"/>
+      </linearGradient>
+      <linearGradient id="orange" x1="0" y1="0" x2="1" y2="1">
+        <stop offset="0%" stop-color="#ffb86c"/>
+        <stop offset="100%" stop-color="#e85d04"/>
+      </linearGradient>
+      <linearGradient id="metal" x1="0" y1="0" x2="0" y2="1">
+        <stop offset="0%" stop-color="#3a3f4b"/>
+        <stop offset="50%" stop-color="#1e222b"/>
+        <stop offset="100%" stop-color="#0f1218"/>
+      </linearGradient>
+      <filter id="soft" x="-20%" y="-20%" width="140%" height="140%">
+        <feGaussianBlur in="SourceAlpha" stdDeviation="2" result="b"/>
+        <feOffset dy="1"/>
+        <feMerge><feMergeNode/><feMergeNode in="SourceGraphic"/></feMerge>
+      </filter>
+      <filter id="glow">
+        <feGaussianBlur stdDeviation="1.5" result="b"/>
+        <feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge>
+      </filter>
+      <clipPath id="squircle">
+        <rect x="4" y="4" width="100" height="100" rx="24"/>
+      </clipPath>
+    </defs>
+    <g clip-path="url(#squircle)">
+      
+  <rect width="108" height="108" fill="#e8e4f0"/>
+  <rect x="22" y="28" width="64" height="52" rx="16" fill="#d4cce8"/>
+  <rect x="28" y="34" width="52" height="40" rx="12" fill="#f5f2fa"/>
+  <path d="M40 48 L48 55 L40 62" stroke="#6750a4" stroke-width="4" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
+  <line x1="52" y1="62" x2="68" y2="62" stroke="#6750a4" stroke-width="4" stroke-linecap="round"/>
+
+    </g>
+    
+        </svg>
+      </div>
+      <div class="meta">
+        <div class="num">#16</div>
+        <h3>Soft Clay</h3>
+        <p class="angle">黏土质感浮雕</p>
+        <p class="tags">tactile, 3d</p>
+      </div>
+    </article>
+    <article class="card" data-id="17">
+      <div class="icon-frame">
+        <svg viewBox="0 0 108 108" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Midnight Indigo">
+          
+    <defs>
+      <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
+        <stop offset="0%" stop-color="#1a1b26"/>
+        <stop offset="100%" stop-color="#0d0e14"/>
+      </linearGradient>
+      <linearGradient id="purp" x1="0" y1="0" x2="1" y2="1">
+        <stop offset="0%" stop-color="#7c5cff"/>
+        <stop offset="100%" stop-color="#4f378b"/>
+      </linearGradient>
+      <linearGradient id="cyan" x1="0" y1="0" x2="1" y2="1">
+        <stop offset="0%" stop-color="#5ce1e6"/>
+        <stop offset="100%" stop-color="#2b6cb0"/>
+      </linearGradient>
+      <linearGradient id="green" x1="0" y1="0" x2="0" y2="1">
+        <stop offset="0%" stop-color="#3dd68c"/>
+        <stop offset="100%" stop-color="#0d9488"/>
+      </linearGradient>
+      <linearGradient id="orange" x1="0" y1="0" x2="1" y2="1">
+        <stop offset="0%" stop-color="#ffb86c"/>
+        <stop offset="100%" stop-color="#e85d04"/>
+      </linearGradient>
+      <linearGradient id="metal" x1="0" y1="0" x2="0" y2="1">
+        <stop offset="0%" stop-color="#3a3f4b"/>
+        <stop offset="50%" stop-color="#1e222b"/>
+        <stop offset="100%" stop-color="#0f1218"/>
+      </linearGradient>
+      <filter id="soft" x="-20%" y="-20%" width="140%" height="140%">
+        <feGaussianBlur in="SourceAlpha" stdDeviation="2" result="b"/>
+        <feOffset dy="1"/>
+        <feMerge><feMergeNode/><feMergeNode in="SourceGraphic"/></feMerge>
+      </filter>
+      <filter id="glow">
+        <feGaussianBlur stdDeviation="1.5" result="b"/>
+        <feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge>
+      </filter>
+      <clipPath id="squircle">
+        <rect x="4" y="4" width="100" height="100" rx="24"/>
+      </clipPath>
+    </defs>
+    <g clip-path="url(#squircle)">
+      
+  <rect width="108" height="108" fill="#0b0a1a"/>
+  <rect x="20" y="24" width="68" height="60" rx="12" fill="#15132b" stroke="#4c1d95" stroke-width="1.5"/>
+  <rect x="20" y="24" width="68" height="16" rx="12" fill="#2e1065"/>
+  <rect x="20" y="32" width="68" height="8" fill="#2e1065"/>
+  <circle cx="32" cy="32" r="2.2" fill="#f472b6"/><circle cx="40" cy="32" r="2.2" fill="#c084fc"/><circle cx="48" cy="32" r="2.2" fill="#818cf8"/>
+  <text x="30" y="62" font-family="ui-monospace,monospace" font-size="13" fill="#e9d5ff" font-weight="600">tmux</text>
+  <line x1="30" y1="70" x2="52" y2="70" stroke="#a78bfa" stroke-width="2" stroke-linecap="round"/>
+
+    </g>
+    
+        </svg>
+      </div>
+      <div class="meta">
+        <div class="num">#17</div>
+        <h3>Midnight Indigo</h3>
+        <p class="angle">午夜靛蓝窗</p>
+        <p class="tags">dark luxury</p>
+      </div>
+    </article>
+    <article class="card" data-id="18">
+      <div class="icon-frame">
+        <svg viewBox="0 0 108 108" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Signal Bars">
+          
+    <defs>
+      <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
+        <stop offset="0%" stop-color="#1a1b26"/>
+        <stop offset="100%" stop-color="#0d0e14"/>
+      </linearGradient>
+      <linearGradient id="purp" x1="0" y1="0" x2="1" y2="1">
+        <stop offset="0%" stop-color="#7c5cff"/>
+        <stop offset="100%" stop-color="#4f378b"/>
+      </linearGradient>
+      <linearGradient id="cyan" x1="0" y1="0" x2="1" y2="1">
+        <stop offset="0%" stop-color="#5ce1e6"/>
+        <stop offset="100%" stop-color="#2b6cb0"/>
+      </linearGradient>
+      <linearGradient id="green" x1="0" y1="0" x2="0" y2="1">
+        <stop offset="0%" stop-color="#3dd68c"/>
+        <stop offset="100%" stop-color="#0d9488"/>
+      </linearGradient>
+      <linearGradient id="orange" x1="0" y1="0" x2="1" y2="1">
+        <stop offset="0%" stop-color="#ffb86c"/>
+        <stop offset="100%" stop-color="#e85d04"/>
+      </linearGradient>
+      <linearGradient id="metal" x1="0" y1="0" x2="0" y2="1">
+        <stop offset="0%" stop-color="#3a3f4b"/>
+        <stop offset="50%" stop-color="#1e222b"/>
+        <stop offset="100%" stop-color="#0f1218"/>
+      </linearGradient>
+      <filter id="soft" x="-20%" y="-20%" width="140%" height="140%">
+        <feGaussianBlur in="SourceAlpha" stdDeviation="2" result="b"/>
+        <feOffset dy="1"/>
+        <feMerge><feMergeNode/><feMergeNode in="SourceGraphic"/></feMerge>
+      </filter>
+      <filter id="glow">
+        <feGaussianBlur stdDeviation="1.5" result="b"/>
+        <feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge>
+      </filter>
+      <clipPath id="squircle">
+        <rect x="4" y="4" width="100" height="100" rx="24"/>
+      </clipPath>
+    </defs>
+    <g clip-path="url(#squircle)">
+      
+  <rect width="108" height="108" fill="#111827"/>
+  <rect x="24" y="58" width="10" height="22" rx="2" fill="#34d399"/>
+  <rect x="40" y="46" width="10" height="34" rx="2" fill="#34d399"/>
+  <rect x="56" y="34" width="10" height="46" rx="2" fill="#6ee7b7"/>
+  <rect x="72" y="24" width="10" height="56" rx="2" fill="#a7f3d0"/>
+  <path d="M22 28 C40 18 68 18 86 28" stroke="#60a5fa" stroke-width="2.5" fill="none" stroke-linecap="round" opacity="0.7"/>
+
+    </g>
+    
+        </svg>
+      </div>
+      <div class="meta">
+        <div class="num">#18</div>
+        <h3>Signal Bars</h3>
+        <p class="angle">信号强度远程</p>
+        <p class="tags">connectivity</p>
+      </div>
+    </article>
+    <article class="card" data-id="19">
+      <div class="icon-frame">
+        <svg viewBox="0 0 108 108" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Paper Fold">
+          
+    <defs>
+      <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
+        <stop offset="0%" stop-color="#1a1b26"/>
+        <stop offset="100%" stop-color="#0d0e14"/>
+      </linearGradient>
+      <linearGradient id="purp" x1="0" y1="0" x2="1" y2="1">
+        <stop offset="0%" stop-color="#7c5cff"/>
+        <stop offset="100%" stop-color="#4f378b"/>
+      </linearGradient>
+      <linearGradient id="cyan" x1="0" y1="0" x2="1" y2="1">
+        <stop offset="0%" stop-color="#5ce1e6"/>
+        <stop offset="100%" stop-color="#2b6cb0"/>
+      </linearGradient>
+      <linearGradient id="green" x1="0" y1="0" x2="0" y2="1">
+        <stop offset="0%" stop-color="#3dd68c"/>
+        <stop offset="100%" stop-color="#0d9488"/>
+      </linearGradient>
+      <linearGradient id="orange" x1="0" y1="0" x2="1" y2="1">
+        <stop offset="0%" stop-color="#ffb86c"/>
+        <stop offset="100%" stop-color="#e85d04"/>
+      </linearGradient>
+      <linearGradient id="metal" x1="0" y1="0" x2="0" y2="1">
+        <stop offset="0%" stop-color="#3a3f4b"/>
+        <stop offset="50%" stop-color="#1e222b"/>
+        <stop offset="100%" stop-color="#0f1218"/>
+      </linearGradient>
+      <filter id="soft" x="-20%" y="-20%" width="140%" height="140%">
+        <feGaussianBlur in="SourceAlpha" stdDeviation="2" result="b"/>
+        <feOffset dy="1"/>
+        <feMerge><feMergeNode/><feMergeNode in="SourceGraphic"/></feMerge>
+      </filter>
+      <filter id="glow">
+        <feGaussianBlur stdDeviation="1.5" result="b"/>
+        <feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge>
+      </filter>
+      <clipPath id="squircle">
+        <rect x="4" y="4" width="100" height="100" rx="24"/>
+      </clipPath>
+    </defs>
+    <g clip-path="url(#squircle)">
+      
+  <rect width="108" height="108" fill="#f7f4ef"/>
+  <path d="M24 26 L72 26 L84 40 L84 82 L24 82 Z" fill="#fff" stroke="#1a1a1a" stroke-width="2"/>
+  <path d="M72 26 L72 40 L84 40" fill="#e5ddd0" stroke="#1a1a1a" stroke-width="2"/>
+  <path d="M36 52 L44 58 L36 64" stroke="#1a1a1a" stroke-width="2.5" fill="none" stroke-linecap="round"/>
+  <line x1="50" y1="64" x2="68" y2="64" stroke="#1a1a1a" stroke-width="2.5" stroke-linecap="round"/>
+  <line x1="36" y1="72" x2="60" y2="72" stroke="#8a8278" stroke-width="2" stroke-linecap="round"/>
+
+    </g>
+    
+        </svg>
+      </div>
+      <div class="meta">
+        <div class="num">#19</div>
+        <h3>Paper Fold</h3>
+        <p class="angle">折纸终端</p>
+        <p class="tags">editorial light</p>
+      </div>
+    </article>
+    <article class="card" data-id="20">
+      <div class="icon-frame">
+        <svg viewBox="0 0 108 108" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Neon Outline">
+          
+    <defs>
+      <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
+        <stop offset="0%" stop-color="#1a1b26"/>
+        <stop offset="100%" stop-color="#0d0e14"/>
+      </linearGradient>
+      <linearGradient id="purp" x1="0" y1="0" x2="1" y2="1">
+        <stop offset="0%" stop-color="#7c5cff"/>
+        <stop offset="100%" stop-color="#4f378b"/>
+      </linearGradient>
+      <linearGradient id="cyan" x1="0" y1="0" x2="1" y2="1">
+        <stop offset="0%" stop-color="#5ce1e6"/>
+        <stop offset="100%" stop-color="#2b6cb0"/>
+      </linearGradient>
+      <linearGradient id="green" x1="0" y1="0" x2="0" y2="1">
+        <stop offset="0%" stop-color="#3dd68c"/>
+        <stop offset="100%" stop-color="#0d9488"/>
+      </linearGradient>
+      <linearGradient id="orange" x1="0" y1="0" x2="1" y2="1">
+        <stop offset="0%" stop-color="#ffb86c"/>
+        <stop offset="100%" stop-color="#e85d04"/>
+      </linearGradient>
+      <linearGradient id="metal" x1="0" y1="0" x2="0" y2="1">
+        <stop offset="0%" stop-color="#3a3f4b"/>
+        <stop offset="50%" stop-color="#1e222b"/>
+        <stop offset="100%" stop-color="#0f1218"/>
+      </linearGradient>
+      <filter id="soft" x="-20%" y="-20%" width="140%" height="140%">
+        <feGaussianBlur in="SourceAlpha" stdDeviation="2" result="b"/>
+        <feOffset dy="1"/>
+        <feMerge><feMergeNode/><feMergeNode in="SourceGraphic"/></feMerge>
+      </filter>
+      <filter id="glow">
+        <feGaussianBlur stdDeviation="1.5" result="b"/>
+        <feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge>
+      </filter>
+      <clipPath id="squircle">
+        <rect x="4" y="4" width="100" height="100" rx="24"/>
+      </clipPath>
+    </defs>
+    <g clip-path="url(#squircle)">
+      
+  <rect width="108" height="108" fill="#05050a"/>
+  <rect x="20" y="28" width="68" height="52" rx="10" fill="none" stroke="#22d3ee" stroke-width="2.5" filter="url(#glow)"/>
+  <path d="M34 48 L44 56 L34 64" stroke="#f472b6" stroke-width="3" fill="none" stroke-linecap="round" filter="url(#glow)"/>
+  <line x1="50" y1="64" x2="72" y2="64" stroke="#a78bfa" stroke-width="3" stroke-linecap="round" filter="url(#glow)"/>
+
+    </g>
+    
+        </svg>
+      </div>
+      <div class="meta">
+        <div class="num">#20</div>
+        <h3>Neon Outline</h3>
+        <p class="angle">霓虹描边窗</p>
+        <p class="tags">neon night</p>
+      </div>
+    </article>
+    <article class="card" data-id="21">
+      <div class="icon-frame">
+        <svg viewBox="0 0 108 108" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Vault Shield">
+          
+    <defs>
+      <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
+        <stop offset="0%" stop-color="#1a1b26"/>
+        <stop offset="100%" stop-color="#0d0e14"/>
+      </linearGradient>
+      <linearGradient id="purp" x1="0" y1="0" x2="1" y2="1">
+        <stop offset="0%" stop-color="#7c5cff"/>
+        <stop offset="100%" stop-color="#4f378b"/>
+      </linearGradient>
+      <linearGradient id="cyan" x1="0" y1="0" x2="1" y2="1">
+        <stop offset="0%" stop-color="#5ce1e6"/>
+        <stop offset="100%" stop-color="#2b6cb0"/>
+      </linearGradient>
+      <linearGradient id="green" x1="0" y1="0" x2="0" y2="1">
+        <stop offset="0%" stop-color="#3dd68c"/>
+        <stop offset="100%" stop-color="#0d9488"/>
+      </linearGradient>
+      <linearGradient id="orange" x1="0" y1="0" x2="1" y2="1">
+        <stop offset="0%" stop-color="#ffb86c"/>
+        <stop offset="100%" stop-color="#e85d04"/>
+      </linearGradient>
+      <linearGradient id="metal" x1="0" y1="0" x2="0" y2="1">
+        <stop offset="0%" stop-color="#3a3f4b"/>
+        <stop offset="50%" stop-color="#1e222b"/>
+        <stop offset="100%" stop-color="#0f1218"/>
+      </linearGradient>
+      <filter id="soft" x="-20%" y="-20%" width="140%" height="140%">
+        <feGaussianBlur in="SourceAlpha" stdDeviation="2" result="b"/>
+        <feOffset dy="1"/>
+        <feMerge><feMergeNode/><feMergeNode in="SourceGraphic"/></feMerge>
+      </filter>
+      <filter id="glow">
+        <feGaussianBlur stdDeviation="1.5" result="b"/>
+        <feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge>
+      </filter>
+      <clipPath id="squircle">
+        <rect x="4" y="4" width="100" height="100" rx="24"/>
+      </clipPath>
+    </defs>
+    <g clip-path="url(#squircle)">
+      
+  <rect width="108" height="108" fill="#0f172a"/>
+  <path d="M54 16 L86 30 L86 54 C86 74 70 88 54 94 C38 88 22 74 22 54 L22 30 Z" fill="#1e293b" stroke="#38bdf8" stroke-width="2"/>
+  <rect x="42" y="44" width="24" height="20" rx="4" fill="#0ea5e9" opacity="0.3" stroke="#7dd3fc" stroke-width="1.5"/>
+  <path d="M48 52 L52 56 L60 46" stroke="#7dd3fc" stroke-width="2.5" fill="none" stroke-linecap="round"/>
+
+    </g>
+    
+        </svg>
+      </div>
+      <div class="meta">
+        <div class="num">#21</div>
+        <h3>Vault Shield</h3>
+        <p class="angle">密钥库盾牌</p>
+        <p class="tags">security, keystore</p>
+      </div>
+    </article>
+    <article class="card" data-id="22">
+      <div class="icon-frame">
+        <svg viewBox="0 0 108 108" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Warp Streak">
+          
+    <defs>
+      <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
+        <stop offset="0%" stop-color="#1a1b26"/>
+        <stop offset="100%" stop-color="#0d0e14"/>
+      </linearGradient>
+      <linearGradient id="purp" x1="0" y1="0" x2="1" y2="1">
+        <stop offset="0%" stop-color="#7c5cff"/>
+        <stop offset="100%" stop-color="#4f378b"/>
+      </linearGradient>
+      <linearGradient id="cyan" x1="0" y1="0" x2="1" y2="1">
+        <stop offset="0%" stop-color="#5ce1e6"/>
+        <stop offset="100%" stop-color="#2b6cb0"/>
+      </linearGradient>
+      <linearGradient id="green" x1="0" y1="0" x2="0" y2="1">
+        <stop offset="0%" stop-color="#3dd68c"/>
+        <stop offset="100%" stop-color="#0d9488"/>
+      </linearGradient>
+      <linearGradient id="orange" x1="0" y1="0" x2="1" y2="1">
+        <stop offset="0%" stop-color="#ffb86c"/>
+        <stop offset="100%" stop-color="#e85d04"/>
+      </linearGradient>
+      <linearGradient id="metal" x1="0" y1="0" x2="0" y2="1">
+        <stop offset="0%" stop-color="#3a3f4b"/>
+        <stop offset="50%" stop-color="#1e222b"/>
+        <stop offset="100%" stop-color="#0f1218"/>
+      </linearGradient>
+      <filter id="soft" x="-20%" y="-20%" width="140%" height="140%">
+        <feGaussianBlur in="SourceAlpha" stdDeviation="2" result="b"/>
+        <feOffset dy="1"/>
+        <feMerge><feMergeNode/><feMergeNode in="SourceGraphic"/></feMerge>
+      </filter>
+      <filter id="glow">
+        <feGaussianBlur stdDeviation="1.5" result="b"/>
+        <feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge>
+      </filter>
+      <clipPath id="squircle">
+        <rect x="4" y="4" width="100" height="100" rx="24"/>
+      </clipPath>
+    </defs>
+    <g clip-path="url(#squircle)">
+      
+  <rect width="108" height="108" fill="#09090b"/>
+  <path d="M18 54 L48 40 L48 50 L90 50 L90 58 L48 58 L48 68 Z" fill="url(#cyan)"/>
+  <circle cx="36" cy="54" r="14" fill="#0c1220" stroke="#5ce1e6" stroke-width="2"/>
+  <path d="M30 54 L35 58 L44 48" stroke="#5ce1e6" stroke-width="2" fill="none" stroke-linecap="round"/>
+
+    </g>
+    
+        </svg>
+      </div>
+      <div class="meta">
+        <div class="num">#22</div>
+        <h3>Warp Streak</h3>
+        <p class="angle">速度拖尾</p>
+        <p class="tags">performance</p>
+      </div>
+    </article>
+    <article class="card" data-id="23">
+      <div class="icon-frame">
+        <svg viewBox="0 0 108 108" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Grid Matrix">
+          
+    <defs>
+      <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
+        <stop offset="0%" stop-color="#1a1b26"/>
+        <stop offset="100%" stop-color="#0d0e14"/>
+      </linearGradient>
+      <linearGradient id="purp" x1="0" y1="0" x2="1" y2="1">
+        <stop offset="0%" stop-color="#7c5cff"/>
+        <stop offset="100%" stop-color="#4f378b"/>
+      </linearGradient>
+      <linearGradient id="cyan" x1="0" y1="0" x2="1" y2="1">
+        <stop offset="0%" stop-color="#5ce1e6"/>
+        <stop offset="100%" stop-color="#2b6cb0"/>
+      </linearGradient>
+      <linearGradient id="green" x1="0" y1="0" x2="0" y2="1">
+        <stop offset="0%" stop-color="#3dd68c"/>
+        <stop offset="100%" stop-color="#0d9488"/>
+      </linearGradient>
+      <linearGradient id="orange" x1="0" y1="0" x2="1" y2="1">
+        <stop offset="0%" stop-color="#ffb86c"/>
+        <stop offset="100%" stop-color="#e85d04"/>
+      </linearGradient>
+      <linearGradient id="metal" x1="0" y1="0" x2="0" y2="1">
+        <stop offset="0%" stop-color="#3a3f4b"/>
+        <stop offset="50%" stop-color="#1e222b"/>
+        <stop offset="100%" stop-color="#0f1218"/>
+      </linearGradient>
+      <filter id="soft" x="-20%" y="-20%" width="140%" height="140%">
+        <feGaussianBlur in="SourceAlpha" stdDeviation="2" result="b"/>
+        <feOffset dy="1"/>
+        <feMerge><feMergeNode/><feMergeNode in="SourceGraphic"/></feMerge>
+      </filter>
+      <filter id="glow">
+        <feGaussianBlur stdDeviation="1.5" result="b"/>
+        <feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge>
+      </filter>
+      <clipPath id="squircle">
+        <rect x="4" y="4" width="100" height="100" rx="24"/>
+      </clipPath>
+    </defs>
+    <g clip-path="url(#squircle)">
+      
+  <rect width="108" height="108" fill="#020617"/>
+  <g fill="#1e3a5f">
+    <circle cx="18" cy="18" r="1.6"/><circle cx="18" cy="28" r="1.6"/><circle cx="18" cy="38" r="1.6"/><circle cx="18" cy="48" r="1.6"/><circle cx="18" cy="58" r="1.6"/><circle cx="18" cy="68" r="1.6"/><circle cx="18" cy="78" r="1.6"/><circle cx="18" cy="88" r="1.6"/><circle cx="28" cy="18" r="1.6"/><circle cx="28" cy="28" r="1.6"/><circle cx="28" cy="38" r="1.6"/><circle cx="28" cy="48" r="1.6"/><circle cx="28" cy="58" r="1.6"/><circle cx="28" cy="68" r="1.6"/><circle cx="28" cy="78" r="1.6"/><circle cx="28" cy="88" r="1.6"/><circle cx="38" cy="18" r="1.6"/><circle cx="38" cy="28" r="1.6"/><circle cx="38" cy="38" r="1.6"/><circle cx="38" cy="48" r="1.6"/><circle cx="38" cy="58" r="1.6"/><circle cx="38" cy="68" r="1.6"/><circle cx="38" cy="78" r="1.6"/><circle cx="38" cy="88" r="1.6"/><circle cx="48" cy="18" r="1.6"/><circle cx="48" cy="28" r="1.6"/><circle cx="48" cy="38" r="1.6"/><circle cx="48" cy="48" r="1.6"/><circle cx="48" cy="58" r="1.6"/><circle cx="48" cy="68" r="1.6"/><circle cx="48" cy="78" r="1.6"/><circle cx="48" cy="88" r="1.6"/><circle cx="58" cy="18" r="1.6"/><circle cx="58" cy="28" r="1.6"/><circle cx="58" cy="38" r="1.6"/><circle cx="58" cy="48" r="1.6"/><circle cx="58" cy="58" r="1.6"/><circle cx="58" cy="68" r="1.6"/><circle cx="58" cy="78" r="1.6"/><circle cx="58" cy="88" r="1.6"/><circle cx="68" cy="18" r="1.6"/><circle cx="68" cy="28" r="1.6"/><circle cx="68" cy="38" r="1.6"/><circle cx="68" cy="48" r="1.6"/><circle cx="68" cy="58" r="1.6"/><circle cx="68" cy="68" r="1.6"/><circle cx="68" cy="78" r="1.6"/><circle cx="68" cy="88" r="1.6"/><circle cx="78" cy="18" r="1.6"/><circle cx="78" cy="28" r="1.6"/><circle cx="78" cy="38" r="1.6"/><circle cx="78" cy="48" r="1.6"/><circle cx="78" cy="58" r="1.6"/><circle cx="78" cy="68" r="1.6"/><circle cx="78" cy="78" r="1.6"/><circle cx="78" cy="88" r="1.6"/><circle cx="88" cy="18" r="1.6"/><circle cx="88" cy="28" r="1.6"/><circle cx="88" cy="38" r="1.6"/><circle cx="88" cy="48" r="1.6"/><circle cx="88" cy="58" r="1.6"/><circle cx="88" cy="68" r="1.6"/><circle cx="88" cy="78" r="1.6"/><circle cx="88" cy="88" r="1.6"/>
+  </g>
+  <g fill="#38bdf8">
+    <circle cx="48" cy="48" r="2.2"/><circle cx="58" cy="48" r="2.2"/><circle cx="68" cy="48" r="2.2"/>
+    <circle cx="48" cy="58" r="2.2"/><circle cx="58" cy="58" r="2.5"/><circle cx="68" cy="58" r="2.2"/>
+    <circle cx="48" cy="68" r="2.2"/><circle cx="58" cy="68" r="2.2"/>
+  </g>
+  <path d="M40 40 L40 76 L76 76" stroke="#38bdf8" stroke-width="2" fill="none" stroke-linecap="round" opacity="0.6"/>
+
+    </g>
+    
+        </svg>
+      </div>
+      <div class="meta">
+        <div class="num">#23</div>
+        <h3>Grid Matrix</h3>
+        <p class="angle">点阵网格</p>
+        <p class="tags">matrix, tech</p>
+      </div>
+    </article>
+    <article class="card" data-id="24">
+      <div class="icon-frame">
+        <svg viewBox="0 0 108 108" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Split Tone">
+          
+    <defs>
+      <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
+        <stop offset="0%" stop-color="#1a1b26"/>
+        <stop offset="100%" stop-color="#0d0e14"/>
+      </linearGradient>
+      <linearGradient id="purp" x1="0" y1="0" x2="1" y2="1">
+        <stop offset="0%" stop-color="#7c5cff"/>
+        <stop offset="100%" stop-color="#4f378b"/>
+      </linearGradient>
+      <linearGradient id="cyan" x1="0" y1="0" x2="1" y2="1">
+        <stop offset="0%" stop-color="#5ce1e6"/>
+        <stop offset="100%" stop-color="#2b6cb0"/>
+      </linearGradient>
+      <linearGradient id="green" x1="0" y1="0" x2="0" y2="1">
+        <stop offset="0%" stop-color="#3dd68c"/>
+        <stop offset="100%" stop-color="#0d9488"/>
+      </linearGradient>
+      <linearGradient id="orange" x1="0" y1="0" x2="1" y2="1">
+        <stop offset="0%" stop-color="#ffb86c"/>
+        <stop offset="100%" stop-color="#e85d04"/>
+      </linearGradient>
+      <linearGradient id="metal" x1="0" y1="0" x2="0" y2="1">
+        <stop offset="0%" stop-color="#3a3f4b"/>
+        <stop offset="50%" stop-color="#1e222b"/>
+        <stop offset="100%" stop-color="#0f1218"/>
+      </linearGradient>
+      <filter id="soft" x="-20%" y="-20%" width="140%" height="140%">
+        <feGaussianBlur in="SourceAlpha" stdDeviation="2" result="b"/>
+        <feOffset dy="1"/>
+        <feMerge><feMergeNode/><feMergeNode in="SourceGraphic"/></feMerge>
+      </filter>
+      <filter id="glow">
+        <feGaussianBlur stdDeviation="1.5" result="b"/>
+        <feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge>
+      </filter>
+      <clipPath id="squircle">
+        <rect x="4" y="4" width="100" height="100" rx="24"/>
+      </clipPath>
+    </defs>
+    <g clip-path="url(#squircle)">
+      
+  <rect width="54" height="108" fill="#0f172a"/>
+  <rect x="54" width="54" height="108" fill="#d0bcff"/>
+  <rect x="22" y="30" width="64" height="48" rx="8" fill="none" stroke="#f8fafc" stroke-width="2.5"/>
+  <path d="M36 48 L44 54 L36 60" stroke="#0f172a" stroke-width="3" fill="none" stroke-linecap="round"/>
+  <line x1="50" y1="60" x2="68" y2="60" stroke="#0f172a" stroke-width="3" stroke-linecap="round"/>
+
+    </g>
+    
+        </svg>
+      </div>
+      <div class="meta">
+        <div class="num">#24</div>
+        <h3>Split Tone</h3>
+        <p class="angle">半彩半墨终端</p>
+        <p class="tags">contrast</p>
+      </div>
+    </article>
+    <article class="card" data-id="25">
+      <div class="icon-frame">
+        <svg viewBox="0 0 108 108" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Island Float">
+          
+    <defs>
+      <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
+        <stop offset="0%" stop-color="#1a1b26"/>
+        <stop offset="100%" stop-color="#0d0e14"/>
+      </linearGradient>
+      <linearGradient id="purp" x1="0" y1="0" x2="1" y2="1">
+        <stop offset="0%" stop-color="#7c5cff"/>
+        <stop offset="100%" stop-color="#4f378b"/>
+      </linearGradient>
+      <linearGradient id="cyan" x1="0" y1="0" x2="1" y2="1">
+        <stop offset="0%" stop-color="#5ce1e6"/>
+        <stop offset="100%" stop-color="#2b6cb0"/>
+      </linearGradient>
+      <linearGradient id="green" x1="0" y1="0" x2="0" y2="1">
+        <stop offset="0%" stop-color="#3dd68c"/>
+        <stop offset="100%" stop-color="#0d9488"/>
+      </linearGradient>
+      <linearGradient id="orange" x1="0" y1="0" x2="1" y2="1">
+        <stop offset="0%" stop-color="#ffb86c"/>
+        <stop offset="100%" stop-color="#e85d04"/>
+      </linearGradient>
+      <linearGradient id="metal" x1="0" y1="0" x2="0" y2="1">
+        <stop offset="0%" stop-color="#3a3f4b"/>
+        <stop offset="50%" stop-color="#1e222b"/>
+        <stop offset="100%" stop-color="#0f1218"/>
+      </linearGradient>
+      <filter id="soft" x="-20%" y="-20%" width="140%" height="140%">
+        <feGaussianBlur in="SourceAlpha" stdDeviation="2" result="b"/>
+        <feOffset dy="1"/>
+        <feMerge><feMergeNode/><feMergeNode in="SourceGraphic"/></feMerge>
+      </filter>
+      <filter id="glow">
+        <feGaussianBlur stdDeviation="1.5" result="b"/>
+        <feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge>
+      </filter>
+      <clipPath id="squircle">
+        <rect x="4" y="4" width="100" height="100" rx="24"/>
+      </clipPath>
+    </defs>
+    <g clip-path="url(#squircle)">
+      
+  <rect width="108" height="108" fill="#1a1530"/>
+  <ellipse cx="54" cy="78" rx="28" ry="6" fill="#000" opacity="0.35"/>
+  <rect x="24" y="28" width="60" height="44" rx="12" fill="#2a2150" stroke="#c4b5fd" stroke-width="1.5"/>
+  <rect x="30" y="36" width="48" height="28" rx="6" fill="#120e24"/>
+  <path d="M38 46 L44 50 L38 54" stroke="#e9d5ff" stroke-width="2" fill="none" stroke-linecap="round"/>
+  <line x1="48" y1="54" x2="60" y2="54" stroke="#e9d5ff" stroke-width="2" stroke-linecap="round" opacity="0.7"/>
+
+    </g>
+    
+        </svg>
+      </div>
+      <div class="meta">
+        <div class="num">#25</div>
+        <h3>Island Float</h3>
+        <p class="angle">悬浮终端岛</p>
+        <p class="tags">spatial</p>
+      </div>
+    </article>
+    <article class="card" data-id="26">
+      <div class="icon-frame">
+        <svg viewBox="0 0 108 108" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Ribbon Stripe">
+          
+    <defs>
+      <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
+        <stop offset="0%" stop-color="#1a1b26"/>
+        <stop offset="100%" stop-color="#0d0e14"/>
+      </linearGradient>
+      <linearGradient id="purp" x1="0" y1="0" x2="1" y2="1">
+        <stop offset="0%" stop-color="#7c5cff"/>
+        <stop offset="100%" stop-color="#4f378b"/>
+      </linearGradient>
+      <linearGradient id="cyan" x1="0" y1="0" x2="1" y2="1">
+        <stop offset="0%" stop-color="#5ce1e6"/>
+        <stop offset="100%" stop-color="#2b6cb0"/>
+      </linearGradient>
+      <linearGradient id="green" x1="0" y1="0" x2="0" y2="1">
+        <stop offset="0%" stop-color="#3dd68c"/>
+        <stop offset="100%" stop-color="#0d9488"/>
+      </linearGradient>
+      <linearGradient id="orange" x1="0" y1="0" x2="1" y2="1">
+        <stop offset="0%" stop-color="#ffb86c"/>
+        <stop offset="100%" stop-color="#e85d04"/>
+      </linearGradient>
+      <linearGradient id="metal" x1="0" y1="0" x2="0" y2="1">
+        <stop offset="0%" stop-color="#3a3f4b"/>
+        <stop offset="50%" stop-color="#1e222b"/>
+        <stop offset="100%" stop-color="#0f1218"/>
+      </linearGradient>
+      <filter id="soft" x="-20%" y="-20%" width="140%" height="140%">
+        <feGaussianBlur in="SourceAlpha" stdDeviation="2" result="b"/>
+        <feOffset dy="1"/>
+        <feMerge><feMergeNode/><feMergeNode in="SourceGraphic"/></feMerge>
+      </filter>
+      <filter id="glow">
+        <feGaussianBlur stdDeviation="1.5" result="b"/>
+        <feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge>
+      </filter>
+      <clipPath id="squircle">
+        <rect x="4" y="4" width="100" height="100" rx="24"/>
+      </clipPath>
+    </defs>
+    <g clip-path="url(#squircle)">
+      
+  <rect width="108" height="108" fill="#18181b"/>
+  <rect x="0" y="0" width="108" height="14" fill="#7c5cff"/>
+  <rect x="0" y="14" width="108" height="6" fill="#4f378b"/>
+  <path d="M32 44 L48 58 L32 72" stroke="#fafafa" stroke-width="5" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
+  <line x1="52" y1="72" x2="78" y2="72" stroke="#a1a1aa" stroke-width="5" stroke-linecap="round"/>
+
+    </g>
+    
+        </svg>
+      </div>
+      <div class="meta">
+        <div class="num">#26</div>
+        <h3>Ribbon Stripe</h3>
+        <p class="angle">品牌色带</p>
+        <p class="tags">brand system</p>
+      </div>
+    </article>
+    <article class="card" data-id="27">
+      <div class="icon-frame">
+        <svg viewBox="0 0 108 108" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Corner Cut">
+          
+    <defs>
+      <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
+        <stop offset="0%" stop-color="#1a1b26"/>
+        <stop offset="100%" stop-color="#0d0e14"/>
+      </linearGradient>
+      <linearGradient id="purp" x1="0" y1="0" x2="1" y2="1">
+        <stop offset="0%" stop-color="#7c5cff"/>
+        <stop offset="100%" stop-color="#4f378b"/>
+      </linearGradient>
+      <linearGradient id="cyan" x1="0" y1="0" x2="1" y2="1">
+        <stop offset="0%" stop-color="#5ce1e6"/>
+        <stop offset="100%" stop-color="#2b6cb0"/>
+      </linearGradient>
+      <linearGradient id="green" x1="0" y1="0" x2="0" y2="1">
+        <stop offset="0%" stop-color="#3dd68c"/>
+        <stop offset="100%" stop-color="#0d9488"/>
+      </linearGradient>
+      <linearGradient id="orange" x1="0" y1="0" x2="1" y2="1">
+        <stop offset="0%" stop-color="#ffb86c"/>
+        <stop offset="100%" stop-color="#e85d04"/>
+      </linearGradient>
+      <linearGradient id="metal" x1="0" y1="0" x2="0" y2="1">
+        <stop offset="0%" stop-color="#3a3f4b"/>
+        <stop offset="50%" stop-color="#1e222b"/>
+        <stop offset="100%" stop-color="#0f1218"/>
+      </linearGradient>
+      <filter id="soft" x="-20%" y="-20%" width="140%" height="140%">
+        <feGaussianBlur in="SourceAlpha" stdDeviation="2" result="b"/>
+        <feOffset dy="1"/>
+        <feMerge><feMergeNode/><feMergeNode in="SourceGraphic"/></feMerge>
+      </filter>
+      <filter id="glow">
+        <feGaussianBlur stdDeviation="1.5" result="b"/>
+        <feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge>
+      </filter>
+      <clipPath id="squircle">
+        <rect x="4" y="4" width="100" height="100" rx="24"/>
+      </clipPath>
+    </defs>
+    <g clip-path="url(#squircle)">
+      
+  <rect width="108" height="108" fill="#1c1917"/>
+  <path d="M12 12 H80 L96 28 V96 H12 Z" fill="#292524" stroke="#a8a29e" stroke-width="2"/>
+  <path d="M80 12 V28 H96" fill="none" stroke="#a8a29e" stroke-width="2"/>
+  <rect x="28" y="40" width="52" height="36" rx="4" fill="#0c0a09"/>
+  <path d="M38 52 L46 58 L38 64" stroke="#fbbf24" stroke-width="2.5" fill="none" stroke-linecap="round"/>
+  <line x1="52" y1="64" x2="68" y2="64" stroke="#fbbf24" stroke-width="2.5" stroke-linecap="round"/>
+
+    </g>
+    
+        </svg>
+      </div>
+      <div class="meta">
+        <div class="num">#27</div>
+        <h3>Corner Cut</h3>
+        <p class="angle">切角工业标</p>
+        <p class="tags">industrial</p>
+      </div>
+    </article>
+    <article class="card" data-id="28">
+      <div class="icon-frame">
+        <svg viewBox="0 0 108 108" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Focus Rings">
+          
+    <defs>
+      <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
+        <stop offset="0%" stop-color="#1a1b26"/>
+        <stop offset="100%" stop-color="#0d0e14"/>
+      </linearGradient>
+      <linearGradient id="purp" x1="0" y1="0" x2="1" y2="1">
+        <stop offset="0%" stop-color="#7c5cff"/>
+        <stop offset="100%" stop-color="#4f378b"/>
+      </linearGradient>
+      <linearGradient id="cyan" x1="0" y1="0" x2="1" y2="1">
+        <stop offset="0%" stop-color="#5ce1e6"/>
+        <stop offset="100%" stop-color="#2b6cb0"/>
+      </linearGradient>
+      <linearGradient id="green" x1="0" y1="0" x2="0" y2="1">
+        <stop offset="0%" stop-color="#3dd68c"/>
+        <stop offset="100%" stop-color="#0d9488"/>
+      </linearGradient>
+      <linearGradient id="orange" x1="0" y1="0" x2="1" y2="1">
+        <stop offset="0%" stop-color="#ffb86c"/>
+        <stop offset="100%" stop-color="#e85d04"/>
+      </linearGradient>
+      <linearGradient id="metal" x1="0" y1="0" x2="0" y2="1">
+        <stop offset="0%" stop-color="#3a3f4b"/>
+        <stop offset="50%" stop-color="#1e222b"/>
+        <stop offset="100%" stop-color="#0f1218"/>
+      </linearGradient>
+      <filter id="soft" x="-20%" y="-20%" width="140%" height="140%">
+        <feGaussianBlur in="SourceAlpha" stdDeviation="2" result="b"/>
+        <feOffset dy="1"/>
+        <feMerge><feMergeNode/><feMergeNode in="SourceGraphic"/></feMerge>
+      </filter>
+      <filter id="glow">
+        <feGaussianBlur stdDeviation="1.5" result="b"/>
+        <feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge>
+      </filter>
+      <clipPath id="squircle">
+        <rect x="4" y="4" width="100" height="100" rx="24"/>
+      </clipPath>
+    </defs>
+    <g clip-path="url(#squircle)">
+      
+  <rect width="108" height="108" fill="#09090b"/>
+  <circle cx="54" cy="54" r="40" fill="none" stroke="#27272a" stroke-width="2"/>
+  <circle cx="54" cy="54" r="28" fill="none" stroke="#3f3f46" stroke-width="2"/>
+  <circle cx="54" cy="54" r="16" fill="#18181b" stroke="#a78bfa" stroke-width="2.5"/>
+  <path d="M48 48 L54 54 L48 60" stroke="#c4b5fd" stroke-width="2.2" fill="none" stroke-linecap="round"/>
+  <line x1="54" y1="54" x2="62" y2="54" stroke="#c4b5fd" stroke-width="2.2" stroke-linecap="round"/>
+
+    </g>
+    
+        </svg>
+      </div>
+      <div class="meta">
+        <div class="num">#28</div>
+        <h3>Focus Rings</h3>
+        <p class="angle">同心焦点</p>
+        <p class="tags">focus, session</p>
+      </div>
+    </article>
+    <article class="card" data-id="29">
+      <div class="icon-frame">
+        <svg viewBox="0 0 108 108" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Twin Pane">
+          
+    <defs>
+      <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
+        <stop offset="0%" stop-color="#1a1b26"/>
+        <stop offset="100%" stop-color="#0d0e14"/>
+      </linearGradient>
+      <linearGradient id="purp" x1="0" y1="0" x2="1" y2="1">
+        <stop offset="0%" stop-color="#7c5cff"/>
+        <stop offset="100%" stop-color="#4f378b"/>
+      </linearGradient>
+      <linearGradient id="cyan" x1="0" y1="0" x2="1" y2="1">
+        <stop offset="0%" stop-color="#5ce1e6"/>
+        <stop offset="100%" stop-color="#2b6cb0"/>
+      </linearGradient>
+      <linearGradient id="green" x1="0" y1="0" x2="0" y2="1">
+        <stop offset="0%" stop-color="#3dd68c"/>
+        <stop offset="100%" stop-color="#0d9488"/>
+      </linearGradient>
+      <linearGradient id="orange" x1="0" y1="0" x2="1" y2="1">
+        <stop offset="0%" stop-color="#ffb86c"/>
+        <stop offset="100%" stop-color="#e85d04"/>
+      </linearGradient>
+      <linearGradient id="metal" x1="0" y1="0" x2="0" y2="1">
+        <stop offset="0%" stop-color="#3a3f4b"/>
+        <stop offset="50%" stop-color="#1e222b"/>
+        <stop offset="100%" stop-color="#0f1218"/>
+      </linearGradient>
+      <filter id="soft" x="-20%" y="-20%" width="140%" height="140%">
+        <feGaussianBlur in="SourceAlpha" stdDeviation="2" result="b"/>
+        <feOffset dy="1"/>
+        <feMerge><feMergeNode/><feMergeNode in="SourceGraphic"/></feMerge>
+      </filter>
+      <filter id="glow">
+        <feGaussianBlur stdDeviation="1.5" result="b"/>
+        <feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge>
+      </filter>
+      <clipPath id="squircle">
+        <rect x="4" y="4" width="100" height="100" rx="24"/>
+      </clipPath>
+    </defs>
+    <g clip-path="url(#squircle)">
+      
+  <rect width="108" height="108" fill="#0c0c0e"/>
+  <rect x="14" y="22" width="36" height="64" rx="8" fill="#16161a" stroke="#52525b" stroke-width="1.5"/>
+  <rect x="58" y="22" width="36" height="64" rx="8" fill="#16161a" stroke="#7c5cff" stroke-width="2"/>
+  <path d="M22 40 h20 M22 48 h14 M22 56 h18" stroke="#71717a" stroke-width="2" stroke-linecap="round"/>
+  <path d="M66 40 L72 45 L66 50" stroke="#c4b5fd" stroke-width="2" fill="none" stroke-linecap="round"/>
+  <line x1="74" y1="50" x2="84" y2="50" stroke="#c4b5fd" stroke-width="2" stroke-linecap="round"/>
+  <path d="M66 60 h16 M66 68 h12" stroke="#52525b" stroke-width="2" stroke-linecap="round"/>
+
+    </g>
+    
+        </svg>
+      </div>
+      <div class="meta">
+        <div class="num">#29</div>
+        <h3>Twin Pane</h3>
+        <p class="angle">双栏工作区</p>
+        <p class="tags">split view</p>
+      </div>
+    </article>
+    <article class="card" data-id="30">
+      <div class="icon-frame">
+        <svg viewBox="0 0 108 108" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Emblem Crest">
+          
+    <defs>
+      <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
+        <stop offset="0%" stop-color="#1a1b26"/>
+        <stop offset="100%" stop-color="#0d0e14"/>
+      </linearGradient>
+      <linearGradient id="purp" x1="0" y1="0" x2="1" y2="1">
+        <stop offset="0%" stop-color="#7c5cff"/>
+        <stop offset="100%" stop-color="#4f378b"/>
+      </linearGradient>
+      <linearGradient id="cyan" x1="0" y1="0" x2="1" y2="1">
+        <stop offset="0%" stop-color="#5ce1e6"/>
+        <stop offset="100%" stop-color="#2b6cb0"/>
+      </linearGradient>
+      <linearGradient id="green" x1="0" y1="0" x2="0" y2="1">
+        <stop offset="0%" stop-color="#3dd68c"/>
+        <stop offset="100%" stop-color="#0d9488"/>
+      </linearGradient>
+      <linearGradient id="orange" x1="0" y1="0" x2="1" y2="1">
+        <stop offset="0%" stop-color="#ffb86c"/>
+        <stop offset="100%" stop-color="#e85d04"/>
+      </linearGradient>
+      <linearGradient id="metal" x1="0" y1="0" x2="0" y2="1">
+        <stop offset="0%" stop-color="#3a3f4b"/>
+        <stop offset="50%" stop-color="#1e222b"/>
+        <stop offset="100%" stop-color="#0f1218"/>
+      </linearGradient>
+      <filter id="soft" x="-20%" y="-20%" width="140%" height="140%">
+        <feGaussianBlur in="SourceAlpha" stdDeviation="2" result="b"/>
+        <feOffset dy="1"/>
+        <feMerge><feMergeNode/><feMergeNode in="SourceGraphic"/></feMerge>
+      </filter>
+      <filter id="glow">
+        <feGaussianBlur stdDeviation="1.5" result="b"/>
+        <feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge>
+      </filter>
+      <clipPath id="squircle">
+        <rect x="4" y="4" width="100" height="100" rx="24"/>
+      </clipPath>
+    </defs>
+    <g clip-path="url(#squircle)">
+      
+  <rect width="108" height="108" fill="#0a0a0c"/>
+  <circle cx="54" cy="50" r="34" fill="#141418" stroke="#d4d4d8" stroke-width="1.5"/>
+  <path d="M54 22 L62 42 L84 42 L66 56 L74 78 L54 64 L34 78 L42 56 L24 42 L46 42 Z" fill="none" stroke="#a78bfa" stroke-width="1.2" opacity="0.5"/>
+  <rect x="38" y="38" width="32" height="24" rx="4" fill="#0c0c0e" stroke="#e4e4e7" stroke-width="1.5"/>
+  <path d="M46 46 L50 50 L46 54" stroke="#fafafa" stroke-width="2" fill="none" stroke-linecap="round"/>
+  <line x1="52" y1="54" x2="62" y2="54" stroke="#a1a1aa" stroke-width="2" stroke-linecap="round"/>
+  <text x="34" y="88" font-family="system-ui,sans-serif" font-size="8" fill="#71717a" letter-spacing="2">M-TMUX</text>
+
+    </g>
+    
+        </svg>
+      </div>
+      <div class="meta">
+        <div class="num">#30</div>
+        <h3>Emblem Crest</h3>
+        <p class="angle">纹章式组合标</p>
+        <p class="tags">premium crest</p>
+      </div>
+    </article>
+  </div>
+
+  <footer>
+    <p><strong>设计说明：</strong>每枚图标独立叙事（窗格 / 链路 / CRT / 徽章 / Agent / 安全等），避免与「单字母 M」撞车。
+    上架建议优先试：#01 Pane Window Pro、#02 Quad Split、#05 Chevron Prompt、#07 Mosh Wave、#11 Agent Node、#30 Emblem Crest。</p>
+    <p>导出：浏览器打开本文件 → 右键 SVG / 用设计工具导入 SVG → 输出 1024×1024 PNG（Android adaptive 安全区约 66%）。</p>
+    <p>非官方：Not affiliated with the tmux project.</p>
+  </footer>
+</div>
+<script>
+const grid = document.getElementById('grid');
+document.getElementById('bgPrev').addEventListener('change', (e) => {
+  const v = e.target.value;
+  document.querySelectorAll('.icon-frame').forEach(el => {
+    if (v === 'check') el.style.background = '';
+    else if (v === 'black') el.style.background = '#000';
+    else if (v === 'white') el.style.background = '#fff';
+    else if (v === 'purple') el.style.background = 'linear-gradient(135deg,#4f378b,#1d1b20)';
+  });
+});
+document.getElementById('filter').addEventListener('input', (e) => {
+  const q = e.target.value.toLowerCase().trim();
+  document.querySelectorAll('.card').forEach(c => {
+    const t = c.innerText.toLowerCase();
+    c.style.display = !q || t.includes(q) ? '' : 'none';
+  });
+});
+grid.addEventListener('click', (e) => {
+  const card = e.target.closest('.card');
+  if (card) card.classList.toggle('picked');
+});
+</script>
+</body>
+</html>

@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  Muxa brand mark = design pack #03 "Remote Link" (exact composition).
+  Preview: full HTML art on metal plate, 24px rounded mask (store mock).
+  Adaptive Android icon uses the same art scaled 0.72 into the safe zone.
+-->
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 108 108" width="1024" height="1024">
+  <defs>
+    <linearGradient id="metal" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#3a3f4b"/>
+      <stop offset="50%" stop-color="#1e222b"/>
+      <stop offset="100%" stop-color="#0f1218"/>
+    </linearGradient>
+    <clipPath id="squircle">
+      <rect width="108" height="108" rx="24"/>
+    </clipPath>
+  </defs>
+  <g clip-path="url(#squircle)">
+    <rect width="108" height="108" fill="url(#metal)"/>
+    <!-- Exact HTML Remote Link geometry -->
+    <rect x="14" y="38" width="28" height="44" rx="5" fill="#1c1c1e" stroke="#8e8e93" stroke-width="1.5"/>
+    <rect x="18" y="44" width="20" height="28" rx="2" fill="#0a84ff" opacity="0.35"/>
+    <rect x="66" y="28" width="28" height="52" rx="4" fill="#2c2c2e" stroke="#aeaeb2" stroke-width="1.5"/>
+    <rect x="70" y="34" width="20" height="6" rx="1" fill="#30d158"/>
+    <rect x="70" y="44" width="20" height="3" rx="1" fill="#636366"/>
+    <rect x="70" y="50" width="16" height="3" rx="1" fill="#636366"/>
+    <path d="M42 58 C52 48, 56 68, 66 54" stroke="#0a84ff" stroke-width="2.5" fill="none" stroke-linecap="round"/>
+    <circle cx="54" cy="56" r="3" fill="#0a84ff"/>
+    <circle cx="54" cy="56" r="1.3" fill="#b6dcff"/>
+  </g>
+</svg>

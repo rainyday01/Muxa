@@ -1,0 +1,34 @@
+{
+  "id": "tmux",
+  "name": "tmux",
+  "version": 3,
+  "barKeys": [
+    { "id": "up", "label": "↑", "action": { "type": "key", "keyCode": "ArrowUp" } },
+    { "id": "down", "label": "↓", "action": { "type": "key", "keyCode": "ArrowDown" } },
+    { "id": "ctrl", "label": "Ctrl", "action": { "type": "modifier_latch", "modifier": "ctrl" } },
+    { "id": "shift", "label": "Shift", "action": { "type": "modifier_latch", "modifier": "shift" } },
+    { "id": "tab", "label": "Tab", "action": { "type": "key", "keyCode": "Tab" } }
+  ],
+  "expandedKeys": [
+    { "id": "c", "label": "c 新窗", "action": { "type": "chord", "keys": ["Control", "b", "c"] } },
+    { "id": "n", "label": "n 下一", "action": { "type": "chord", "keys": ["Control", "b", "n"] } },
+    { "id": "p", "label": "p 上一", "action": { "type": "chord", "keys": ["Control", "b", "p"] } },
+    { "id": "d", "label": "d 分离", "action": { "type": "chord", "keys": ["Control", "b", "d"] } },
+    { "id": "pct", "label": "% 竖分", "action": { "type": "chord", "keys": ["Control", "b", "%"] } },
+    { "id": "quot", "label": "\" 横分", "action": { "type": "chord", "keys": ["Control", "b", "\""] } },
+    { "id": "z", "label": "z 放大", "action": { "type": "chord", "keys": ["Control", "b", "z"] } },
+    { "id": "x", "label": "x 关窗", "action": { "type": "chord", "keys": ["Control", "b", "x"] } },
+    { "id": "stab", "label": "⇧Tab", "action": { "type": "chord", "keys": ["Shift", "Tab"] } },
+    { "id": "esc", "label": "Esc", "action": { "type": "key", "keyCode": "Escape" } },
+    { "id": "ctrl_c", "label": "Ctrl-C", "action": { "type": "chord", "keys": ["Control", "c"] } },
+    { "id": "ctrl_x", "label": "Ctrl-X", "action": { "type": "chord", "keys": ["Control", "x"] } },
+    { "id": "left", "label": "←", "action": { "type": "key", "keyCode": "ArrowLeft" } },
+    { "id": "right", "label": "→", "action": { "type": "key", "keyCode": "ArrowRight" } },
+    { "id": "home", "label": "Home", "action": { "type": "key", "keyCode": "Home" } },
+    { "id": "end", "label": "End", "action": { "type": "key", "keyCode": "End" } },
+    { "id": "pgup", "label": "Pg Up", "action": { "type": "key", "keyCode": "PageUp" } },
+    { "id": "pgdn", "label": "Pg Dn", "action": { "type": "key", "keyCode": "PageDown" } },
+    { "id": "paste", "label": "Paste", "action": { "type": "text", "text": "" } },
+    { "id": "enter2", "label": "Enter", "action": { "type": "key", "keyCode": "Enter" } }
+  ]
+}

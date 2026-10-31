@@ -1,0 +1,269 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1"/>
+<title>Muxa · Hex Terminal 暖色 20 + 缩小六边形 20</title>
+<style>
+  :root {
+    --bg: #12100e;
+    --card: #1a1714;
+    --ink: #f5efe6;
+    --muted: #a89888;
+    --line: rgba(255, 220, 180, 0.12);
+  }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0;
+    font-family: "SF Pro Text", "Segoe UI", system-ui, sans-serif;
+    background: radial-gradient(1200px 600px at 20% -10%, #2a1c14 0%, var(--bg) 55%);
+    color: var(--ink);
+    line-height: 1.45;
+    padding: 28px 20px 64px;
+  }
+  header {
+    max-width: 1180px;
+    margin: 0 auto 28px;
+  }
+  h1 {
+    font-size: 1.55rem;
+    font-weight: 650;
+    letter-spacing: -0.02em;
+    margin: 0 0 8px;
+  }
+  .sub {
+    color: var(--muted);
+    font-size: 0.95rem;
+    max-width: 72ch;
+  }
+  .sub code {
+    font-size: 0.85em;
+    background: rgba(255,200,140,.1);
+    padding: 1px 6px;
+    border-radius: 4px;
+    color: #f0c9a0;
+  }
+  section {
+    max-width: 1180px;
+    margin: 0 auto 36px;
+  }
+  h2 {
+    font-size: 1.1rem;
+    font-weight: 600;
+    margin: 0 0 6px;
+    display: flex;
+    align-items: baseline;
+    gap: 10px;
+  }
+  h2 .tag {
+    font-size: 0.72rem;
+    font-weight: 600;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+    color: #1a1008;
+    background: linear-gradient(135deg, #f0b27a, #e07a4a);
+    padding: 3px 8px;
+    border-radius: 999px;
+  }
+  .note {
+    color: var(--muted);
+    font-size: 0.88rem;
+    margin: 0 0 16px;
+  }
+  .grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(148px, 1fr));
+    gap: 14px;
+  }
+  .card {
+    background: var(--card);
+    border: 1px solid var(--line);
+    border-radius: 16px;
+    padding: 12px 10px 14px;
+    text-align: center;
+  }
+  .card.base {
+    border-color: rgba(255,255,255,.18);
+    box-shadow: 0 0 0 1px rgba(255,255,255,.04);
+  }
+  .preview {
+    width: 108px;
+    height: 108px;
+    margin: 0 auto 10px;
+    border-radius: 24px;
+    overflow: hidden;
+    box-shadow:
+      0 1px 0 rgba(255,255,255,.06) inset,
+      0 10px 28px rgba(0,0,0,.35);
+  }
+  .preview svg { display: block; width: 108px; height: 108px; }
+  .num {
+    font-size: 0.7rem;
+    color: var(--muted);
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+  }
+  .name {
+    font-size: 0.86rem;
+    font-weight: 600;
+    margin-top: 2px;
+  }
+  .hexes {
+    font-size: 0.65rem;
+    color: var(--muted);
+    margin-top: 6px;
+    font-family: ui-monospace, "SF Mono", Menlo, monospace;
+    word-break: break-all;
+    line-height: 1.35;
+  }
+  .legend {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+    gap: 10px;
+    margin-top: 8px;
+  }
+  .legend div {
+    background: rgba(255,255,255,.03);
+    border: 1px solid var(--line);
+    border-radius: 12px;
+    padding: 10px 12px;
+    font-size: 0.82rem;
+    color: var(--muted);
+  }
+  .legend strong { color: #f0d2b0; font-weight: 600; }
+  footer {
+    max-width: 1180px;
+    margin: 24px auto 0;
+    color: var(--muted);
+    font-size: 0.8rem;
+  }
+</style>
+</head>
+<body>
+<header>
+  <h1>Muxa · Hex Terminal 暖色方案</h1>
+  <p class="sub">
+    构图与当前线上海外标一致：外六边形 + 内六边形 + <code>&gt;_</code> 提示符（#08 Hex Terminal）。
+    仅改色彩；第二组在暖色基础上把六边形再缩小一档（中心缩放 <code>0.72 → 0.60</code>）。
+    背景板仍为圆角 24 的 108 画布。
+  </p>
+  <div class="legend">
+    <div><strong>几何</strong> 外 hex <code>54,12…</code> · 内 hex <code>54,22…</code> · prompt <code>M40 48 L50 58 L40 68</code> + 底线</div>
+    <div><strong>A 组</strong> 暖色 20 种 · 缩放与现网一致 <code>scale(0.72)</code></div>
+    <div><strong>B 组</strong> 同 20 套暖色 · 六边形缩小 <code>scale(0.60)</code></div>
+  </div>
+</header>
+
+<section>
+  <h2><span class="tag">Now</span> 当前线上（冷黑对照）</h2>
+  <p class="note">bg <code>#101014</code> · outer <code>#1c1c22 / #aeaeb2</code> · inner <code>#0a0a0c / #636366</code> · prompt <code>#ff6363</code> · scale 0.72</p>
+  <div class="grid" id="base"></div>
+</section>
+
+<section>
+  <h2><span class="tag">A · Warm ×20</span> 暖色系 · 几何不变</h2>
+  <p class="note">样式/线宽/比例不变，只换背景与六边形、描边、提示符的暖色关系。</p>
+  <div class="grid" id="series-a"></div>
+</section>
+
+<section>
+  <h2><span class="tag">B · Warm + Smaller ×20</span> 暖色 + 六边形缩小</h2>
+  <p class="note">与 A 组一一对应同色板；整体从中心再缩到 <code>0.60</code>（现网 0.72 再收约 17%），safe zone 更富余、桌面上看起来更「轻」。</p>
+  <div class="grid" id="series-b"></div>
+</section>
+
+<footer>
+  生成自 Hex Terminal HTML #08 · 选型后可直接回写 <code>ic_launcher_foreground/background</code> 与 design SVG。
+</footer>
+
+<script>
+/** @typedef {{id:string,name:string,bg:string,outer:string,outerStroke:string,inner:string,innerStroke:string,prompt:string}} Palette */
+
+/** @type {Palette} */
+const CURRENT = {
+  id: "00",
+  name: "Hex Terminal (now)",
+  bg: "#101014",
+  outer: "#1c1c22",
+  outerStroke: "#aeaeb2",
+  inner: "#0a0a0c",
+  innerStroke: "#636366",
+  prompt: "#ff6363",
+};
+
+/** 20 warm palettes — same structure as current icon */
+/** @type {Palette[]} */
+const WARMS = [
+  { id: "W01", name: "Ember Graphite", bg: "#1a1210", outer: "#2a1e1a", outerStroke: "#d4a090", inner: "#120c0a", innerStroke: "#8a6058", prompt: "#ff6b4a" },
+  { id: "W02", name: "Amber Terminal", bg: "#1c1408", outer: "#2e2210", outerStroke: "#e8c070", inner: "#120e06", innerStroke: "#9a7838", prompt: "#ffb020" },
+  { id: "W03", name: "Sunset Coal", bg: "#1a1014", outer: "#2c1a20", outerStroke: "#f0a080", inner: "#120a0e", innerStroke: "#a06058", prompt: "#ff7040" },
+  { id: "W04", name: "Terracotta Ink", bg: "#1c1210", outer: "#3a241c", outerStroke: "#e0a080", inner: "#140c0a", innerStroke: "#a06850", prompt: "#e07040" },
+  { id: "W05", name: "Honey Night", bg: "#161208", outer: "#2a2210", outerStroke: "#f0d080", inner: "#100e08", innerStroke: "#a08840", prompt: "#f0b830" },
+  { id: "W06", name: "Copper Shell", bg: "#181210", outer: "#2e2018", outerStroke: "#d09060", inner: "#100c0a", innerStroke: "#8a6040", prompt: "#e07838" },
+  { id: "W07", name: "Rust Prompt", bg: "#1a100c", outer: "#2c1814", outerStroke: "#c87858", inner: "#120a08", innerStroke: "#8a4838", prompt: "#d05030" },
+  { id: "W08", name: "Peach Char", bg: "#1a1412", outer: "#2c221c", outerStroke: "#f0c0a8", inner: "#120e0c", innerStroke: "#a08070", prompt: "#ff9060" },
+  { id: "W09", name: "Maple Dark", bg: "#18100c", outer: "#2a1a12", outerStroke: "#d08050", inner: "#100a08", innerStroke: "#8a5030", prompt: "#e06020" },
+  { id: "W10", name: "Sandstone", bg: "#1a1610", outer: "#2e2820", outerStroke: "#d8c0a0", inner: "#12100c", innerStroke: "#908070", prompt: "#d4a060" },
+  { id: "W11", name: "Latte Shell", bg: "#1c1814", outer: "#322a24", outerStroke: "#e0c8b0", inner: "#14100e", innerStroke: "#988878", prompt: "#c89060" },
+  { id: "W12", name: "Crimson Glow", bg: "#180c0e", outer: "#2a1418", outerStroke: "#e08090", inner: "#10080a", innerStroke: "#904858", prompt: "#ff4050" },
+  { id: "W13", name: "Saffron Coal", bg: "#1a1208", outer: "#2c1e0c", outerStroke: "#f0c040", inner: "#120c06", innerStroke: "#a07820", prompt: "#ffc010" },
+  { id: "W14", name: "Bronze Terminal", bg: "#16120e", outer: "#2a2218", outerStroke: "#c8a070", inner: "#0e0c0a", innerStroke: "#807050", prompt: "#d09840" },
+  { id: "W15", name: "Clay Prompt", bg: "#1a1410", outer: "#30241c", outerStroke: "#d0a080", inner: "#120e0a", innerStroke: "#907060", prompt: "#c07048" },
+  { id: "W16", name: "Warm Graphite", bg: "#161412", outer: "#282420", outerStroke: "#e0b090", inner: "#0e0c0a", innerStroke: "#887060", prompt: "#ff8a40" },
+  { id: "W17", name: "Chocolate", bg: "#140e0a", outer: "#241810", outerStroke: "#b08050", inner: "#0c0806", innerStroke: "#705030", prompt: "#c86828" },
+  { id: "W18", name: "Persimmon", bg: "#1a100c", outer: "#2c1810", outerStroke: "#f09050", inner: "#120a08", innerStroke: "#a05830", prompt: "#ff6820" },
+  { id: "W19", name: "Marigold Night", bg: "#161008", outer: "#281e0c", outerStroke: "#f0c860", inner: "#100c06", innerStroke: "#987830", prompt: "#ffb800" },
+  { id: "W20", name: "Cinnamon", bg: "#18100c", outer: "#2a1a14", outerStroke: "#d09060", inner: "#100a08", innerStroke: "#8a5838", prompt: "#d06030" },
+];
+
+/**
+ * Hex Terminal mark.
+ * @param {Palette} p
+ * @param {number} scale  0.72 current adaptive; 0.60 smaller hex
+ * @param {string} uid unique gradient/clip id
+ */
+function iconSvg(p, scale, uid) {
+  const s = scale;
+  // stroke widths compensate slightly when scaled so visual weight stays close
+  const swOuter = (2 / s).toFixed(2);
+  const swInner = (1 / s).toFixed(2);
+  const swPrompt = (3.5 / s).toFixed(2);
+  return `
+<svg viewBox="0 0 108 108" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="${p.name}">
+  <defs>
+    <clipPath id="sq-${uid}"><rect width="108" height="108" rx="24"/></clipPath>
+  </defs>
+  <g clip-path="url(#sq-${uid})">
+    <rect width="108" height="108" fill="${p.bg}"/>
+    <g transform="translate(54,54) scale(${s}) translate(-54,-54)">
+      <polygon points="54,12 90,32 90,76 54,96 18,76 18,32"
+        fill="${p.outer}" stroke="${p.outerStroke}" stroke-width="${swOuter}" stroke-linejoin="round"/>
+      <polygon points="54,22 82,38 82,70 54,86 26,70 26,38"
+        fill="${p.inner}" stroke="${p.innerStroke}" stroke-width="${swInner}" stroke-linejoin="round"/>
+      <path d="M40 48 L50 58 L40 68" fill="none" stroke="${p.prompt}"
+        stroke-width="${swPrompt}" stroke-linecap="round" stroke-linejoin="round"/>
+      <line x1="52" y1="68" x2="68" y2="68" stroke="${p.prompt}"
+        stroke-width="${swPrompt}" stroke-linecap="round"/>
+    </g>
+  </g>
+</svg>`;
+}
+
+function card(p, scale, series, extraClass = "") {
+  const uid = `${series}-${p.id}`;
+  const scaleLabel = `s=${scale.toFixed(2)}`;
+  return `
+    <article class="card ${extraClass}">
+      <div class="preview">${iconSvg(p, scale, uid)}</div>
+      <div class="num">${series} · ${p.id} · ${scaleLabel}</div>
+      <div class="name">${p.name}</div>
+      <div class="hexes">${p.bg} · ${p.prompt}</div>
+    </article>`;
+}
+
+document.getElementById("base").innerHTML = card(CURRENT, 0.72, "NOW", "base");
+document.getElementById("series-a").innerHTML = WARMS.map((p) => card(p, 0.72, "A")).join("");
+document.getElementById("series-b").innerHTML = WARMS.map((p) => card(p, 0.60, "B")).join("");
+</script>
+</body>
+</html>

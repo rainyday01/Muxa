@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="mosh_udp_ok">UDP %1$d reachable (reply in %2$dms)</string>
+    <string name="mosh_udp_fail">SSH got MOSH CONNECT (port %1$d), but no UDP reply within %2$dms. Usually the cloud security group/firewall does not allow inbound UDP 60000–61000 (client → server). Installing mosh-server is not enough.</string>
+    <string name="mosh_probe_fail">Mosh handshake/probe failed: %1$s</string>
+    <string name="mosh_no_connect">mosh-server did not return MOSH CONNECT. Output:\n%1$s</string>
+    <string name="mosh_disabled">Mosh client is disabled</string>
+</resources>

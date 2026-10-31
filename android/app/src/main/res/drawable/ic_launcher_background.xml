@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  R5 #10 Ambient Coral Glow — BACKGROUND only.
+  Near-black plate + tiny coral radial spot (not a brown wash).
+  Glow lives here so adaptive re-zoom still leaves dark margins.
+-->
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:aapt="http://schemas.android.com/aapt"
+    android:width="108dp"
+    android:height="108dp"
+    android:viewportWidth="108"
+    android:viewportHeight="108">
+
+    <!-- Deep plate (matches HTML #0E0D12 / #1C1B20) -->
+    <path android:pathData="M0,0h108v108h-108z">
+        <aapt:attr name="android:fillColor">
+            <gradient
+                android:type="linear"
+                android:startX="18"
+                android:startY="8"
+                android:endX="96"
+                android:endY="100">
+                <item android:offset="0" android:color="#16151A" />
+                <item android:offset="1" android:color="#0A090C" />
+            </gradient>
+        </aapt:attr>
+    </path>
+
+    <!-- Small soft coral core only (HTML glow r≈0.42 of *faded* radius; bright core is small) -->
+    <path android:pathData="M54,52 m-26,0 a26,26 0 1,1 52,0 a26,26 0 1,1 -52,0">
+        <aapt:attr name="android:fillColor">
+            <gradient
+                android:type="radial"
+                android:centerX="54"
+                android:centerY="52"
+                android:gradientRadius="26">
+                <item android:offset="0" android:color="#66E16259" />
+                <item android:offset="0.35" android:color="#33E16259" />
+                <item android:offset="0.7" android:color="#12E16259" />
+                <item android:offset="1" android:color="#00E16259" />
+            </gradient>
+        </aapt:attr>
+    </path>
+</vector>

@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!--
+      NoActionBar only. Do not set windowLightStatusBar here — it is system-static
+      and cannot track "app dark while phone is day". Runtime contrast is owned by
+      SystemBarContrast / MtmuxTheme (see that KDoc for all day/night combos).
+    -->
+    <style name="Theme.Mtmux" parent="android:Theme.Material.NoActionBar">
+        <item name="android:statusBarColor">@android:color/transparent</item>
+        <item name="android:navigationBarColor">@android:color/transparent</item>
+        <item name="android:windowDrawsSystemBarBackgrounds">true</item>
+    </style>
+</resources>

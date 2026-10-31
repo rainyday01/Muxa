@@ -1,0 +1,50 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://mtmux.app/schemas/keyboard-layout.schema.json",
+  "title": "m-tmux Keyboard Layout",
+  "type": "object",
+  "required": ["id", "name", "version", "barKeys", "expandedKeys"],
+  "properties": {
+    "id": { "type": "string", "pattern": "^[a-z0-9_-]+$" },
+    "name": { "type": "string" },
+    "version": { "type": "integer", "minimum": 1 },
+    "barKeys": {
+      "type": "array",
+      "items": { "$ref": "#/$defs/key" }
+    },
+    "expandedKeys": {
+      "type": "array",
+      "items": { "$ref": "#/$defs/key" }
+    }
+  },
+  "$defs": {
+    "key": {
+      "type": "object",
+      "required": ["id", "label", "action"],
+      "properties": {
+        "id": { "type": "string" },
+        "label": { "type": "string" },
+        "action": {
+          "type": "object",
+          "required": ["type"],
+          "properties": {
+            "type": {
+              "type": "string",
+              "enum": ["key", "text", "chord", "modifier_latch"]
+            },
+            "keyCode": { "type": "string" },
+            "text": { "type": "string" },
+            "keys": {
+              "type": "array",
+              "items": { "type": "string" }
+            },
+            "modifier": {
+              "type": "string",
+              "enum": ["ctrl", "alt", "shift"]
+            }
+          }
+        }
+      }
+    }
+  }
+}

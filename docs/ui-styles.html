@@ -1,0 +1,1206 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+  <title>Pane — UI 主题体系 v0.2（已拍板）</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&family=SF+Pro+Display:wght@400;500;600&display=swap" rel="stylesheet" />
+  <style>
+    :root {
+      --bg: #0b0c0f;
+      --panel: #12141a;
+      --text: #f2f4f8;
+      --muted: #8b93a7;
+      --line: rgba(255,255,255,.08);
+      --accent: #0a84ff;
+      --radius: 20px;
+      --phone-w: 320px;
+      --phone-h: 640px;
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: Inter, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      background: radial-gradient(1200px 600px at 10% -10%, #1a2744 0%, transparent 50%),
+                  radial-gradient(900px 500px at 100% 0%, #2a1840 0%, transparent 45%),
+                  var(--bg);
+      color: var(--text);
+      min-height: 100vh;
+      line-height: 1.5;
+    }
+
+    .page {
+      max-width: 1280px;
+      margin: 0 auto;
+      padding: 40px 24px 80px;
+    }
+
+    header.hero {
+      margin-bottom: 36px;
+    }
+    header.hero .eyebrow {
+      display: inline-flex;
+      gap: 8px;
+      align-items: center;
+      font-size: 12px;
+      letter-spacing: .08em;
+      text-transform: uppercase;
+      color: var(--muted);
+      margin-bottom: 12px;
+    }
+    header.hero h1 {
+      font-size: clamp(28px, 4vw, 40px);
+      font-weight: 700;
+      letter-spacing: -0.03em;
+      margin-bottom: 12px;
+    }
+    header.hero p {
+      max-width: 720px;
+      color: var(--muted);
+      font-size: 15px;
+    }
+    header.hero .meta {
+      margin-top: 18px;
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+    }
+    .chip {
+      font-size: 12px;
+      padding: 6px 12px;
+      border-radius: 999px;
+      border: 1px solid var(--line);
+      background: rgba(255,255,255,.03);
+      color: #c9d0e0;
+    }
+
+    .layout {
+      display: grid;
+      grid-template-columns: 280px 1fr;
+      gap: 24px;
+      align-items: start;
+    }
+    @media (max-width: 960px) {
+      .layout { grid-template-columns: 1fr; }
+    }
+
+    .sidebar {
+      position: sticky;
+      top: 16px;
+      background: rgba(18,20,26,.85);
+      border: 1px solid var(--line);
+      border-radius: 16px;
+      padding: 14px;
+      backdrop-filter: blur(16px);
+    }
+    .sidebar h2 {
+      font-size: 12px;
+      text-transform: uppercase;
+      letter-spacing: .08em;
+      color: var(--muted);
+      margin: 4px 8px 12px;
+    }
+    .style-btn {
+      width: 100%;
+      text-align: left;
+      border: 1px solid transparent;
+      background: transparent;
+      color: var(--text);
+      border-radius: 12px;
+      padding: 12px;
+      cursor: pointer;
+      display: grid;
+      grid-template-columns: 36px 1fr;
+      gap: 10px;
+      align-items: center;
+      transition: .15s ease;
+      font: inherit;
+    }
+    .style-btn:hover { background: rgba(255,255,255,.04); }
+    .style-btn.active {
+      background: rgba(10,132,255,.12);
+      border-color: rgba(10,132,255,.35);
+    }
+    .swatch {
+      width: 36px; height: 36px;
+      border-radius: 10px;
+      border: 1px solid rgba(255,255,255,.12);
+    }
+    .style-btn .name { font-size: 13px; font-weight: 600; display: flex; align-items: center; gap: 6px; flex-wrap: wrap; }
+    .style-btn .desc { font-size: 11px; color: var(--muted); margin-top: 2px; }
+    .badge {
+      font-size: 9px;
+      font-weight: 700;
+      letter-spacing: .04em;
+      padding: 2px 6px;
+      border-radius: 999px;
+      text-transform: uppercase;
+    }
+    .badge-sys { background: rgba(10,132,255,.2); color: #6cb6ff; }
+    .badge-pers { background: rgba(255,255,255,.08); color: #a8b0c0; }
+
+    .main { min-width: 0; }
+
+    .stage {
+      display: grid;
+      grid-template-columns: minmax(320px, 380px) 1fr;
+      gap: 28px;
+      background: rgba(255,255,255,.02);
+      border: 1px solid var(--line);
+      border-radius: 24px;
+      padding: 28px;
+    }
+    @media (max-width: 900px) {
+      .stage { grid-template-columns: 1fr; justify-items: center; }
+    }
+
+    /* Phone chrome */
+    .phone {
+      width: var(--phone-w);
+      height: var(--phone-h);
+      border-radius: 36px;
+      padding: 10px;
+      position: relative;
+      box-shadow:
+        0 0 0 1px rgba(255,255,255,.08),
+        0 30px 80px rgba(0,0,0,.55),
+        inset 0 1px 0 rgba(255,255,255,.08);
+      background: #1a1b1f;
+    }
+    .phone-inner {
+      width: 100%;
+      height: 100%;
+      border-radius: 28px;
+      overflow: hidden;
+      position: relative;
+      display: flex;
+      flex-direction: column;
+    }
+    .notch {
+      position: absolute;
+      top: 8px; left: 50%;
+      transform: translateX(-50%);
+      width: 96px; height: 24px;
+      background: #000;
+      border-radius: 20px;
+      z-index: 5;
+      opacity: .85;
+    }
+    .status-bar {
+      height: 42px;
+      padding: 14px 18px 0;
+      display: flex;
+      justify-content: space-between;
+      font-size: 11px;
+      font-weight: 600;
+      z-index: 2;
+    }
+    .content {
+      flex: 1;
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+      padding: 0 14px 10px;
+      position: relative;
+      z-index: 1;
+    }
+    .tabbar {
+      height: 58px;
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      align-items: center;
+      font-size: 9px;
+      text-align: center;
+      border-top: 1px solid transparent;
+      z-index: 2;
+    }
+    .tabbar .tab { opacity: .55; padding: 6px 0; }
+    .tabbar .tab.on { opacity: 1; font-weight: 600; }
+    .tabbar .ico { font-size: 16px; display: block; margin-bottom: 2px; }
+
+    .nav {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin: 4px 0 12px;
+    }
+    .nav h3 { font-size: 22px; font-weight: 700; letter-spacing: -0.03em; }
+    .nav .actions { display: flex; gap: 8px; }
+    .pill {
+      font-size: 11px;
+      padding: 6px 10px;
+      border-radius: 999px;
+      border: 1px solid transparent;
+      font-weight: 500;
+    }
+    .search {
+      height: 34px;
+      border-radius: 10px;
+      display: flex;
+      align-items: center;
+      padding: 0 12px;
+      font-size: 12px;
+      margin-bottom: 12px;
+      gap: 8px;
+      opacity: .9;
+    }
+    .section-label {
+      font-size: 11px;
+      font-weight: 600;
+      letter-spacing: .04em;
+      text-transform: uppercase;
+      opacity: .55;
+      margin: 4px 2px 8px;
+    }
+    .cards { display: flex; flex-direction: column; gap: 10px; flex: 1; overflow: hidden; }
+    .session-card {
+      border-radius: 14px;
+      padding: 10px 12px;
+      border: 1px solid transparent;
+      cursor: default;
+    }
+    .session-card .row1 {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 6px;
+    }
+    .session-card .title {
+      font-size: 13px;
+      font-weight: 600;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+    .dot {
+      width: 7px; height: 7px; border-radius: 50%;
+      background: #30d158;
+      box-shadow: 0 0 8px rgba(48,209,88,.6);
+    }
+    .dot.warn { background: #ffd60a; box-shadow: 0 0 8px rgba(255,214,10,.5); }
+    .meta-line { font-size: 10px; opacity: .6; }
+    .snap {
+      margin-top: 8px;
+      border-radius: 8px;
+      padding: 8px 10px;
+      font-family: "JetBrains Mono", ui-monospace, monospace;
+      font-size: 9px;
+      line-height: 1.45;
+      white-space: pre;
+      overflow: hidden;
+      max-height: 52px;
+    }
+    .card-actions {
+      display: flex;
+      gap: 6px;
+      margin-top: 8px;
+    }
+    .mini-btn {
+      font-size: 10px;
+      padding: 4px 8px;
+      border-radius: 6px;
+      border: none;
+      font-weight: 600;
+      cursor: default;
+    }
+    .fab-hint {
+      position: absolute;
+      right: 18px;
+      bottom: 70px;
+      width: 44px; height: 44px;
+      border-radius: 14px;
+      display: grid;
+      place-items: center;
+      font-size: 22px;
+      font-weight: 300;
+      z-index: 3;
+    }
+
+    /* Detail panel */
+    .detail h2 {
+      font-size: 24px;
+      font-weight: 700;
+      letter-spacing: -0.03em;
+      margin-bottom: 6px;
+    }
+    .detail .tagline {
+      color: var(--muted);
+      margin-bottom: 20px;
+      font-size: 14px;
+    }
+    .detail .grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 12px;
+      margin-bottom: 20px;
+    }
+    @media (max-width: 600px) {
+      .detail .grid { grid-template-columns: 1fr; }
+    }
+    .fact {
+      background: rgba(255,255,255,.03);
+      border: 1px solid var(--line);
+      border-radius: 14px;
+      padding: 14px;
+    }
+    .fact dt {
+      font-size: 11px;
+      color: var(--muted);
+      text-transform: uppercase;
+      letter-spacing: .06em;
+      margin-bottom: 6px;
+    }
+    .fact dd { font-size: 13px; color: #e6eaf2; }
+    .pros {
+      list-style: none;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      margin-bottom: 20px;
+    }
+    .pros li {
+      font-size: 13px;
+      padding: 10px 12px;
+      border-radius: 10px;
+      background: rgba(255,255,255,.03);
+      border: 1px solid var(--line);
+      color: #d5dbe8;
+    }
+    .pros li strong { color: #fff; }
+    .cta-row { display: flex; flex-wrap: wrap; gap: 10px; }
+    .btn {
+      border: none;
+      border-radius: 12px;
+      padding: 12px 18px;
+      font-weight: 600;
+      font-size: 13px;
+      cursor: pointer;
+      font-family: inherit;
+    }
+    .btn-primary {
+      background: linear-gradient(180deg, #3b9bff, #0a84ff);
+      color: white;
+      box-shadow: 0 8px 24px rgba(10,132,255,.35);
+    }
+    .btn-ghost {
+      background: transparent;
+      color: var(--text);
+      border: 1px solid var(--line);
+    }
+    .selected-banner {
+      display: none;
+      margin-top: 14px;
+      padding: 12px 14px;
+      border-radius: 12px;
+      background: rgba(48,209,88,.12);
+      border: 1px solid rgba(48,209,88,.3);
+      color: #b6f5c6;
+      font-size: 13px;
+    }
+    .selected-banner.show { display: block; }
+
+    .compare {
+      margin-top: 28px;
+      border: 1px solid var(--line);
+      border-radius: 16px;
+      overflow: hidden;
+    }
+    .compare table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 12px;
+    }
+    .compare th, .compare td {
+      padding: 12px 14px;
+      text-align: left;
+      border-bottom: 1px solid var(--line);
+    }
+    .compare th {
+      background: rgba(255,255,255,.03);
+      color: var(--muted);
+      font-weight: 600;
+      font-size: 11px;
+      text-transform: uppercase;
+      letter-spacing: .05em;
+    }
+    .compare tr:last-child td { border-bottom: none; }
+    .compare td.name { font-weight: 600; }
+    .compare tr.clickable { cursor: pointer; }
+    .compare tr.clickable:hover { background: rgba(255,255,255,.03); }
+    .compare tr.hl { background: rgba(10,132,255,.1); }
+
+    footer.note {
+      margin-top: 28px;
+      color: var(--muted);
+      font-size: 12px;
+      max-width: 800px;
+    }
+
+    /* ========== STYLE THEMES (phone skins) ========== */
+
+    /* 1 Sequoia Glass */
+    .s-sequoia .phone-inner {
+      background: linear-gradient(165deg, #1c1c1e 0%, #0f1014 50%, #151820 100%);
+      color: #f5f5f7;
+    }
+    .s-sequoia .phone-inner::before {
+      content: "";
+      position: absolute; inset: 0;
+      background:
+        radial-gradient(ellipse 80% 50% at 20% 0%, rgba(10,132,255,.25), transparent 55%),
+        radial-gradient(ellipse 60% 40% at 90% 20%, rgba(191,90,242,.18), transparent 50%);
+      pointer-events: none;
+    }
+    .s-sequoia .status-bar { color: #f5f5f7; }
+    .s-sequoia .pill {
+      background: rgba(255,255,255,.12);
+      backdrop-filter: blur(20px);
+      color: #fff;
+    }
+    .s-sequoia .search {
+      background: rgba(118,118,128,.24);
+      color: rgba(235,235,245,.6);
+    }
+    .s-sequoia .session-card {
+      background: rgba(255,255,255,.08);
+      backdrop-filter: blur(24px);
+      border-color: rgba(255,255,255,.1);
+      box-shadow: 0 8px 32px rgba(0,0,0,.2);
+    }
+    .s-sequoia .snap {
+      background: rgba(0,0,0,.35);
+      color: #a8e6a3;
+    }
+    .s-sequoia .mini-btn {
+      background: rgba(10,132,255,.9);
+      color: #fff;
+    }
+    .s-sequoia .mini-btn.ghost {
+      background: rgba(255,255,255,.12);
+      color: #fff;
+    }
+    .s-sequoia .tabbar {
+      background: rgba(30,30,32,.72);
+      backdrop-filter: blur(30px);
+      border-top-color: rgba(255,255,255,.06);
+      color: #8e8e93;
+    }
+    .s-sequoia .tabbar .tab.on { color: #0a84ff; }
+    .s-sequoia .fab-hint {
+      background: rgba(10,132,255,.95);
+      color: #fff;
+      box-shadow: 0 8px 24px rgba(10,132,255,.4);
+    }
+
+    /* 2 Big Sur Soft */
+    .s-bigsur .phone-inner {
+      background: #f2f2f7;
+      color: #1c1c1e;
+    }
+    .s-bigsur .status-bar { color: #1c1c1e; }
+    .s-bigsur .notch { background: #1c1c1e; opacity: 1; }
+    .s-bigsur .pill {
+      background: #e5e5ea;
+      color: #007aff;
+    }
+    .s-bigsur .search {
+      background: #e5e5ea;
+      color: #8e8e93;
+    }
+    .s-bigsur .session-card {
+      background: #fff;
+      border-color: transparent;
+      box-shadow: 0 2px 12px rgba(0,0,0,.06), 0 1px 2px rgba(0,0,0,.04);
+    }
+    .s-bigsur .snap {
+      background: #1e1e22;
+      color: #c6e7a6;
+    }
+    .s-bigsur .mini-btn {
+      background: #007aff;
+      color: #fff;
+    }
+    .s-bigsur .mini-btn.ghost {
+      background: #e5e5ea;
+      color: #007aff;
+    }
+    .s-bigsur .tabbar {
+      background: rgba(255,255,255,.82);
+      backdrop-filter: blur(20px);
+      border-top-color: rgba(0,0,0,.06);
+      color: #8e8e93;
+    }
+    .s-bigsur .tabbar .tab.on { color: #007aff; }
+    .s-bigsur .section-label { color: #6c6c70; opacity: 1; }
+    .s-bigsur .meta-line { opacity: .5; color: #3a3a3c; }
+    .s-bigsur .fab-hint {
+      background: #007aff;
+      color: #fff;
+      box-shadow: 0 8px 20px rgba(0,122,255,.35);
+    }
+
+    /* 3 Classic Aqua */
+    .s-aqua .phone-inner {
+      background: linear-gradient(180deg, #b8d4f0 0%, #6a9fd4 40%, #4a7fb5 100%);
+      color: #0a1628;
+    }
+    .s-aqua .status-bar { color: #0a1628; }
+    .s-aqua .notch { background: #1a2a40; }
+    .s-aqua .nav h3 {
+      text-shadow: 0 1px 0 rgba(255,255,255,.4);
+    }
+    .s-aqua .pill {
+      background: linear-gradient(180deg, #fff 0%, #d0e4f8 100%);
+      border: 1px solid #5a8ab8;
+      color: #0b4f8a;
+      box-shadow: inset 0 1px 0 #fff, 0 1px 2px rgba(0,0,0,.15);
+    }
+    .s-aqua .search {
+      background: rgba(255,255,255,.75);
+      border: 1px solid #5a8ab8;
+      color: #4a6080;
+      box-shadow: inset 0 1px 2px rgba(0,0,0,.08);
+    }
+    .s-aqua .session-card {
+      background: linear-gradient(180deg, #f8fbff 0%, #e4eef8 100%);
+      border: 1px solid #7aa3c9;
+      box-shadow: 0 2px 0 rgba(255,255,255,.5) inset, 0 3px 8px rgba(0,40,80,.2);
+    }
+    .s-aqua .snap {
+      background: #1a1a24;
+      color: #7dff7d;
+      border: 1px solid #333;
+    }
+    .s-aqua .mini-btn {
+      background: linear-gradient(180deg, #6db3f2, #1a6fbf);
+      color: #fff;
+      border: 1px solid #0d4d8c;
+      box-shadow: inset 0 1px 0 rgba(255,255,255,.4);
+    }
+    .s-aqua .mini-btn.ghost {
+      background: linear-gradient(180deg, #fff, #dce8f4);
+      color: #0b4f8a;
+      border: 1px solid #7aa3c9;
+    }
+    .s-aqua .tabbar {
+      background: linear-gradient(180deg, #dce9f5, #a8c4de);
+      border-top: 1px solid #6a90b0;
+      color: #3a5068;
+    }
+    .s-aqua .tabbar .tab.on { color: #0b4f8a; }
+    .s-aqua .section-label { color: #1a3a58; opacity: .7; }
+    .s-aqua .fab-hint {
+      background: linear-gradient(180deg, #7ec0f7, #1a6fbf);
+      color: #fff;
+      border: 1px solid #0d4d8c;
+      box-shadow: 0 4px 12px rgba(0,60,120,.35), inset 0 1px 0 rgba(255,255,255,.45);
+    }
+
+    /* 4 Space Gray Pro */
+    .s-space .phone-inner {
+      background: #000;
+      color: #f5f5f7;
+    }
+    .s-space .status-bar { color: #f5f5f7; }
+    .s-space .pill {
+      background: #1c1c1e;
+      color: #0a84ff;
+      border: 1px solid #2c2c2e;
+    }
+    .s-space .search {
+      background: #1c1c1e;
+      color: #8e8e93;
+      border: 1px solid #2c2c2e;
+    }
+    .s-space .session-card {
+      background: #1c1c1e;
+      border-color: #2c2c2e;
+    }
+    .s-space .session-card.featured {
+      border-color: #0a84ff;
+      box-shadow: 0 0 0 1px rgba(10,132,255,.25);
+    }
+    .s-space .snap {
+      background: #0a0a0a;
+      color: #e0e0e0;
+      border: 1px solid #2c2c2e;
+    }
+    .s-space .mini-btn {
+      background: #0a84ff;
+      color: #fff;
+    }
+    .s-space .mini-btn.ghost {
+      background: transparent;
+      color: #0a84ff;
+      border: 1px solid #2c2c2e;
+    }
+    .s-space .tabbar {
+      background: #000;
+      border-top-color: #1c1c1e;
+      color: #636366;
+    }
+    .s-space .tabbar .tab.on { color: #0a84ff; }
+    .s-space .fab-hint {
+      background: #0a84ff;
+      color: #fff;
+    }
+
+    /* 5 Terminal Pure (iTerm / Warp-ish Mac dev) */
+    .s-terminal .phone-inner {
+      background: #0c0c0c;
+      color: #e6edf3;
+      font-family: "JetBrains Mono", ui-monospace, monospace;
+    }
+    .s-terminal .status-bar {
+      color: #7d8590;
+      font-size: 10px;
+    }
+    .s-terminal .nav h3 {
+      font-size: 16px;
+      font-weight: 600;
+      color: #3fb950;
+    }
+    .s-terminal .nav h3::before { content: "~/"; color: #58a6ff; }
+    .s-terminal .pill {
+      background: transparent;
+      border: 1px solid #30363d;
+      color: #58a6ff;
+      border-radius: 6px;
+      font-family: inherit;
+    }
+    .s-terminal .search {
+      background: #161b22;
+      border: 1px solid #30363d;
+      color: #7d8590;
+      border-radius: 6px;
+      font-family: inherit;
+    }
+    .s-terminal .section-label {
+      color: #7d8590;
+      font-family: inherit;
+      text-transform: none;
+      letter-spacing: 0;
+    }
+    .s-terminal .section-label::before { content: "# "; color: #3fb950; }
+    .s-terminal .session-card {
+      background: #161b22;
+      border: 1px solid #30363d;
+      border-radius: 8px;
+    }
+    .s-terminal .session-card.featured {
+      border-color: #3fb950;
+    }
+    .s-terminal .title { font-size: 12px; color: #58a6ff; }
+    .s-terminal .snap {
+      background: #0d1117;
+      color: #3fb950;
+      border: 1px solid #21262d;
+      border-radius: 4px;
+    }
+    .s-terminal .mini-btn {
+      background: #238636;
+      color: #fff;
+      border-radius: 6px;
+      font-family: inherit;
+    }
+    .s-terminal .mini-btn.ghost {
+      background: transparent;
+      border: 1px solid #30363d;
+      color: #c9d1d9;
+    }
+    .s-terminal .tabbar {
+      background: #010409;
+      border-top-color: #21262d;
+      color: #7d8590;
+      font-family: inherit;
+      font-size: 8px;
+    }
+    .s-terminal .tabbar .tab.on { color: #3fb950; }
+    .s-terminal .fab-hint {
+      background: #238636;
+      color: #fff;
+      border-radius: 8px;
+      font-family: inherit;
+    }
+    .s-terminal .meta-line { font-size: 9px; }
+
+    /* 6 Control Center / Vision Glass */
+    .s-vision .phone-inner {
+      background: #0a0a12;
+      color: #fff;
+    }
+    .s-vision .phone-inner::before {
+      content: "";
+      position: absolute; inset: 0;
+      background:
+        radial-gradient(circle at 30% 20%, rgba(120,160,255,.35), transparent 40%),
+        radial-gradient(circle at 80% 60%, rgba(255,100,180,.2), transparent 40%),
+        radial-gradient(circle at 40% 90%, rgba(80,220,200,.15), transparent 40%);
+      filter: blur(2px);
+      pointer-events: none;
+    }
+    .s-vision .status-bar { color: #fff; }
+    .s-vision .pill {
+      background: rgba(255,255,255,.14);
+      backdrop-filter: blur(40px);
+      border: 1px solid rgba(255,255,255,.18);
+      color: #fff;
+      border-radius: 12px;
+    }
+    .s-vision .search {
+      background: rgba(255,255,255,.1);
+      backdrop-filter: blur(40px);
+      border: 1px solid rgba(255,255,255,.12);
+      color: rgba(255,255,255,.55);
+      border-radius: 14px;
+    }
+    .s-vision .session-card {
+      background: rgba(255,255,255,.1);
+      backdrop-filter: blur(40px) saturate(160%);
+      border: 1px solid rgba(255,255,255,.16);
+      border-radius: 18px;
+      box-shadow: 0 12px 40px rgba(0,0,0,.25);
+    }
+    .s-vision .snap {
+      background: rgba(0,0,0,.35);
+      color: #b8f0ff;
+      border-radius: 12px;
+      border: 1px solid rgba(255,255,255,.06);
+    }
+    .s-vision .mini-btn {
+      background: rgba(255,255,255,.9);
+      color: #111;
+      border-radius: 10px;
+    }
+    .s-vision .mini-btn.ghost {
+      background: rgba(255,255,255,.12);
+      color: #fff;
+    }
+    .s-vision .tabbar {
+      background: rgba(20,20,30,.45);
+      backdrop-filter: blur(40px);
+      border-top-color: rgba(255,255,255,.08);
+      color: rgba(255,255,255,.45);
+    }
+    .s-vision .tabbar .tab.on { color: #fff; }
+    .s-vision .fab-hint {
+      background: rgba(255,255,255,.92);
+      color: #111;
+      border-radius: 16px;
+      box-shadow: 0 12px 40px rgba(0,0,0,.3);
+    }
+
+    /* 7 Paper / Human Interface Light Editorial */
+    .s-paper .phone-inner {
+      background: #f7f4ef;
+      color: #1a1a1a;
+    }
+    .s-paper .status-bar { color: #1a1a1a; }
+    .s-paper .notch { background: #1a1a1a; }
+    .s-paper .nav h3 {
+      font-weight: 600;
+      letter-spacing: -0.04em;
+    }
+    .s-paper .pill {
+      background: transparent;
+      border: 1px solid #1a1a1a;
+      color: #1a1a1a;
+      border-radius: 4px;
+    }
+    .s-paper .search {
+      background: #fff;
+      border: 1px solid #ddd5c8;
+      color: #8a8278;
+      border-radius: 4px;
+    }
+    .s-paper .section-label {
+      font-family: Inter, sans-serif;
+      letter-spacing: .12em;
+      color: #8a8278;
+      opacity: 1;
+    }
+    .s-paper .session-card {
+      background: #fff;
+      border: 1px solid #e5ddd0;
+      border-radius: 4px;
+      box-shadow: 4px 4px 0 rgba(26,26,26,.06);
+    }
+    .s-paper .session-card.featured {
+      border-color: #1a1a1a;
+      box-shadow: 4px 4px 0 rgba(26,26,26,.12);
+    }
+    .s-paper .snap {
+      background: #1a1a1a;
+      color: #e8e0d4;
+      border-radius: 2px;
+    }
+    .s-paper .mini-btn {
+      background: #1a1a1a;
+      color: #f7f4ef;
+      border-radius: 2px;
+    }
+    .s-paper .mini-btn.ghost {
+      background: #fff;
+      color: #1a1a1a;
+      border: 1px solid #1a1a1a;
+    }
+    .s-paper .tabbar {
+      background: #f7f4ef;
+      border-top-color: #e5ddd0;
+      color: #8a8278;
+    }
+    .s-paper .tabbar .tab.on { color: #1a1a1a; }
+    .s-paper .fab-hint {
+      background: #1a1a1a;
+      color: #f7f4ef;
+      border-radius: 4px;
+    }
+    .s-paper .dot { box-shadow: none; }
+  </style>
+</head>
+<body>
+  <div class="page">
+    <header class="hero">
+      <div class="eyebrow">Pane · UI Theme System v0.2 · 已拍板</div>
+      <h1>主题体系：系统深/浅 + 个性化</h1>
+      <p>
+        <strong>默认随系统：</strong>深色 = Sequoia Glass，浅色 = Big Sur Soft。
+        <strong>个性化四套：</strong>Space Gray / Terminal Pure / Vision Layers / Paper Editorial。
+        Classic Aqua 已剔除。v0.3：会话卡片「进入 / 推送到电脑 / 快照」；无手机主屏捷径；Android 全功能优先。
+        详见 <code>android-full-plan-v0.3.md</code>。
+      </p>
+      <div class="meta">
+        <span class="chip">System Dark → Sequoia</span>
+        <span class="chip">System Light → Big Sur</span>
+        <span class="chip">4 套个性化</span>
+        <span class="chip">推送到电脑 · 方案 D</span>
+        <span class="chip">SSH + Mosh · Android 先</span>
+      </div>
+    </header>
+
+    <div class="layout">
+      <aside class="sidebar">
+        <h2>选择风格</h2>
+        <div id="style-list"></div>
+      </aside>
+
+      <div class="main">
+        <div class="stage" id="stage">
+          <div class="phone-wrap">
+            <div class="phone" id="phone">
+              <div class="phone-inner">
+                <div class="notch"></div>
+                <div class="status-bar">
+                  <span>9:41</span>
+                  <span>︎ ︎ 100%</span>
+                </div>
+                <div class="content">
+                  <div class="nav">
+                    <h3>Sessions</h3>
+                    <div class="actions">
+                      <span class="pill" id="pill-action">+ 模板</span>
+                    </div>
+                  </div>
+                  <div class="search">⌕  会话、主机、claude…</div>
+                  <div class="section-label">最近 · lax-vps</div>
+                  <div class="cards">
+                    <div class="session-card featured">
+                      <div class="row1">
+                        <div class="title"><span class="dot"></span> claude-main</div>
+                        <div class="meta-line">2 panes · 12s</div>
+                      </div>
+                      <div class="meta-line">user@host… · attach 可恢复</div>
+                      <div class="snap" id="snap1">░ Claude Code v1.0
+▸ editing deploy/sync.py
+  tokens  ▓▓▓▓▓░  62%</div>
+                      <div class="card-actions">
+                        <span class="mini-btn">进入</span>
+                        <span class="mini-btn ghost">推送到电脑</span>
+                        <span class="mini-btn ghost">快照</span>
+                      </div>
+                    </div>
+                    <div class="session-card">
+                      <div class="row1">
+                        <div class="title"><span class="dot warn"></span> codex-api</div>
+                        <div class="meta-line">1 pane · 1h</div>
+                      </div>
+                      <div class="meta-line">ecs · 空闲</div>
+                      <div class="snap" id="snap2">$ codex
+› waiting for input_
+  last: refactor auth</div>
+                      <div class="card-actions">
+                        <span class="mini-btn">进入</span>
+                        <span class="mini-btn ghost">推送到电脑</span>
+                      </div>
+                    </div>
+                    <div class="session-card">
+                      <div class="row1">
+                        <div class="title"><span class="dot"></span> grok-tui</div>
+                        <div class="meta-line">3 panes · 4m</div>
+                      </div>
+                      <div class="meta-line">lax · 活跃</div>
+                      <div class="snap">~/tmuxapp
+❯ git status -sb
+## main…origin</div>
+                    </div>
+                  </div>
+                  <div class="fab-hint">+</div>
+                </div>
+                <div class="tabbar">
+                  <div class="tab on"><span class="ico">▢</span>会话</div>
+                  <div class="tab"><span class="ico">◎</span>主机</div>
+                  <div class="tab"><span class="ico">🖥</span>电脑</div>
+                  <div class="tab"><span class="ico">⚙</span>设置</div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="detail" id="detail">
+            <!-- filled by JS -->
+          </div>
+        </div>
+
+        <div class="compare">
+          <table>
+            <thead>
+              <tr>
+                <th>风格</th>
+                <th>角色</th>
+                <th>最适合</th>
+                <th>实现成本</th>
+                <th>冲击力</th>
+              </tr>
+            </thead>
+            <tbody id="compare-body"></tbody>
+          </table>
+        </div>
+
+        <footer class="note">
+          说明：v0.2 已拍板默认主题映射；本页用于预览系统主题与个性化主题。决策全文见
+          <code>decisions-v0.2.md</code>，总案见 <code>product-brief.md</code>。
+          Classic Aqua 已移除。v0.3：「推送到电脑」= 桌面伴侣通知一点开（方案 D）；不做手机主屏捷径。
+        </footer>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    const styles = [
+      {
+        id: "sequoia",
+        className: "s-sequoia",
+        name: "Sequoia Glass",
+        short: "系统深色 · 默认 Dark",
+        role: "system-dark",
+        roleLabel: "默认深色",
+        swatch: "linear-gradient(135deg,#0a84ff,#bf5af2 60%,#1c1c1e)",
+        tagline: "已拍板：系统深色模式默认主题。当代 macOS 磨砂玻璃：材质、景深、系统蓝。",
+        vibe: "高级、安静、官方感",
+        bestFor: "系统 Dark / 夜间默认",
+        cost: "中 — blur/材质需双端仔细调",
+        impact: "★★★★★",
+        pros: [
+          "<strong>已定为 System Dark</strong>：与 iOS/Android 深色外观联动",
+          "<strong>深色玻璃 + 彩光</strong>：会话卡片有层次，快照区像嵌入的终端浮层",
+          "<strong>与 SF Symbols 叙事</strong>兼容，iOS 上最讨好",
+          "风险：材质必须真 blur + 细边框，避免廉价感"
+        ],
+        tokens: "背景 #0f1014 · 卡片 rgba(255,255,255,.08) · 强调 #0A84FF · 圆角 14–28"
+      },
+      {
+        id: "bigsur",
+        className: "s-bigsur",
+        name: "Big Sur Soft",
+        short: "系统浅色 · 默认 Light",
+        role: "system-light",
+        roleLabel: "默认浅色",
+        swatch: "linear-gradient(135deg,#e8f1ff,#ffffff 40%,#f2f2f7)",
+        tagline: "已拍板：系统浅色模式默认主题。大圆角、轻阴影、白天可读。",
+        vibe: "清爽、友好、消费级",
+        bestFor: "系统 Light / 白天默认",
+        cost: "低 — 最容易在 Compose/SwiftUI 落地",
+        impact: "★★★★☆",
+        pros: [
+          "<strong>已定为 System Light</strong>：户外与强光环境可读",
+          "<strong>工程友好</strong>：少 blur，列表性能最好",
+          "浅色列表 + 深色快照对比清晰",
+          "与 Sequoia 成对，构成「随系统」双主题"
+        ],
+        tokens: "背景 #F2F2F7 · 卡片 #FFF · 强调 #007AFF · 阴影 soft"
+      },
+      {
+        id: "space",
+        className: "s-space",
+        name: "Space Gray Pro",
+        short: "个性化 · 太空灰",
+        role: "personal",
+        roleLabel: "个性化",
+        swatch: "linear-gradient(135deg,#000,#1c1c1e 50%,#0a84ff)",
+        tagline: "个性化主题。Space Gray + 纯黑：克制、密集信息、专业。",
+        vibe: "冷静、Pro、硬件感",
+        bestFor: "硬核用户、强调性能与专业工具定位",
+        cost: "低 — 结构简单，重在排版与间距",
+        impact: "★★★★☆",
+        pros: [
+          "<strong>个性化可选</strong>：不随系统，用户设置里点选",
+          "终端内容为绝对主角，OLED 真黑",
+          "与「高性能原生」叙事贴合",
+          "风险：易同质化 — 靠快照卡片与动效破局"
+        ],
+        tokens: "纯黑 #000 · 卡片 #1C1C1E · 线 #2C2C2E · 强调蓝"
+      },
+      {
+        id: "terminal",
+        className: "s-terminal",
+        name: "Terminal Pure",
+        short: "个性化 · 纯终端",
+        role: "personal",
+        roleLabel: "个性化",
+        swatch: "linear-gradient(135deg,#0d1117,#238636 40%,#58a6ff)",
+        tagline: "个性化主题。把 App 壳做成「会 tmux 的终端」：等宽、仓库绿。",
+        vibe: "极客、直接、无废话",
+        bestFor: "CLI 党自选皮肤",
+        cost: "低–中 — UI 简单，终端渲染要求高",
+        impact: "★★★★☆",
+        pros: [
+          "<strong>个性化可选</strong>：圈层识别度高",
+          "与 tmux/CLI 产品语义统一",
+          "信息密度适合多会话",
+          "不作为系统默认，避免劝退非极客"
+        ],
+        tokens: "GitHub 暗色系 · 绿 #3FB950 · 蓝 #58A6FF · 等宽全局"
+      },
+      {
+        id: "vision",
+        className: "s-vision",
+        name: "Vision Layers",
+        short: "个性化 · 空间玻璃",
+        role: "personal",
+        roleLabel: "个性化",
+        swatch: "linear-gradient(135deg,#78a0ff,#ff64b4 50%,#50dcc8)",
+        tagline: "个性化主题。visionOS / 控制中心：厚重毛玻璃、彩光、浮层卡片。",
+        vibe: "未来感、展示欲、旗舰",
+        bestFor: "商店截图 / 社交传播自选",
+        cost: "高 — 多层 blur 要精细，中低端需降级",
+        impact: "★★★★★",
+        pros: [
+          "<strong>个性化可选</strong>：截图冲击力最强",
+          "会话卡片像空间窗口，隐喻 pane",
+          "可与小组件统一语言",
+          "列表大量 blur 时要注意性能降级策略"
+        ],
+        tokens: "彩光氛围 · 卡片 10–14% 白 · 超大圆角 18 · 白按钮 CTA"
+      },
+      {
+        id: "paper",
+        className: "s-paper",
+        name: "Paper Editorial",
+        short: "个性化 · 纸感",
+        role: "personal",
+        roleLabel: "个性化",
+        swatch: "linear-gradient(135deg,#f7f4ef,#1a1a1a)",
+        tagline: "个性化主题。印刷编辑感：暖纸色、硬边框、少装饰。",
+        vibe: "克制、设计感、独立 App",
+        bestFor: "品牌独立向用户",
+        cost: "中 — 靠字体与留白",
+        impact: "★★★★☆",
+        pros: [
+          "<strong>个性化可选</strong>：终端类 App 少见纸感",
+          "无重度 blur，性能友好",
+          "快照黑块记忆点强",
+          "注意对比度与无障碍"
+        ],
+        tokens: "纸色 #F7F4EF · 墨色 #1A1A1A · 硬阴影 4px · 小圆角"
+      }
+    ];
+
+    let current = "sequoia";
+    const saved = localStorage.getItem("pane-ui-choice");
+
+    function roleBadge(s) {
+      const cls = s.role && s.role.startsWith("system") ? "badge-sys" : "badge-pers";
+      return `<span class="badge ${cls}">${s.roleLabel || ""}</span>`;
+    }
+
+    function renderList() {
+      const el = document.getElementById("style-list");
+      const sys = styles.filter(s => s.role && s.role.startsWith("system"));
+      const pers = styles.filter(s => s.role === "personal");
+      const block = (title, list) => `
+        <div style="font-size:10px;color:var(--muted);letter-spacing:.08em;text-transform:uppercase;margin:10px 8px 6px">${title}</div>
+        ${list.map(s => `
+        <button class="style-btn ${s.id === current ? "active" : ""}" data-id="${s.id}">
+          <div class="swatch" style="background:${s.swatch}"></div>
+          <div>
+            <div class="name">${s.name} ${roleBadge(s)}</div>
+            <div class="desc">${s.short}</div>
+          </div>
+        </button>`).join("")}`;
+      el.innerHTML = block("系统默认（随深浅色）", sys) + block("个性化主题", pers);
+      el.querySelectorAll(".style-btn").forEach(btn => {
+        btn.addEventListener("click", () => select(btn.dataset.id));
+      });
+    }
+
+    function renderDetail() {
+      const s = styles.find(x => x.id === current);
+      const phone = document.getElementById("phone");
+      phone.className = "phone " + s.className;
+      document.getElementById("stage").className = "stage " + s.className;
+
+      document.getElementById("detail").innerHTML = `
+        <h2>${s.name} ${roleBadge(s)}</h2>
+        <p class="tagline">${s.tagline}</p>
+        <div class="grid">
+          <div class="fact"><dt>角色</dt><dd>${s.roleLabel}（${s.role}）</dd></div>
+          <div class="fact"><dt>气质</dt><dd>${s.vibe}</dd></div>
+          <div class="fact"><dt>最适合</dt><dd>${s.bestFor}</dd></div>
+          <div class="fact"><dt>实现成本</dt><dd>${s.cost}</dd></div>
+        </div>
+        <ul class="pros">${s.pros.map(p => `<li>${p}</li>`).join("")}</ul>
+        <div class="fact" style="margin-bottom:16px"><dt>Design tokens 草案</dt><dd>${s.tokens}</dd></div>
+        <div class="cta-row">
+          <button class="btn btn-ghost" id="btn-next">下一种 →</button>
+        </div>
+        <div class="selected-banner show" id="banner">
+          ✓ 主题体系已拍板：System Dark=Sequoia · System Light=Big Sur · 另 4 套个性化 · Aqua 已移除。
+          决策见 <strong>decisions-v0.2.md</strong>。
+        </div>
+      `;
+      document.getElementById("btn-next").onclick = () => {
+        const i = styles.findIndex(x => x.id === current);
+        select(styles[(i + 1) % styles.length].id);
+      };
+    }
+
+    function renderCompare() {
+      document.getElementById("compare-body").innerHTML = styles.map(s => `
+        <tr class="clickable ${s.id === current ? "hl" : ""}" data-id="${s.id}">
+          <td class="name">${s.name}</td>
+          <td>${s.roleLabel}</td>
+          <td>${s.bestFor}</td>
+          <td>${s.cost.split("—")[0]}</td>
+          <td>${s.impact}</td>
+        </tr>
+      `).join("");
+      document.querySelectorAll("#compare-body tr").forEach(tr => {
+        tr.addEventListener("click", () => select(tr.dataset.id));
+      });
+    }
+
+    function select(id) {
+      current = id;
+      renderList();
+      renderDetail();
+      renderCompare();
+    }
+
+    // Aqua 等旧 localStorage 选择忽略
+    const initial = (saved && styles.some(s => s.id === saved)) ? saved : "sequoia";
+    select(initial);
+  </script>
+</body>
+</html>

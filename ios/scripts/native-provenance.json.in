@@ -1,0 +1,23 @@
+{
+  "deploymentTarget": "17.0",
+  "architectures": {
+    "ios": ["arm64"],
+    "iosSimulator": ["arm64"]
+  },
+  "dependencies": {
+    "OpenSSL": {
+      "version": "@OPENSSL_VERSION@",
+      "license": "Apache-2.0",
+      "sourceSHA256": "@OPENSSL_SOURCE_SHA256@",
+      "deviceLibrarySHA256": "@OPENSSL_DEVICE_SHA256@",
+      "simulatorLibrarySHA256": "@OPENSSL_SIMULATOR_SHA256@"
+    },
+    "libssh2": {
+      "version": "@LIBSSH2_VERSION@",
+      "license": "BSD-3-Clause",
+      "sourceSHA256": "@LIBSSH2_SOURCE_SHA256@",
+      "deviceLibrarySHA256": "@LIBSSH2_DEVICE_SHA256@",
+      "simulatorLibrarySHA256": "@LIBSSH2_SIMULATOR_SHA256@"
+    }
+  }
+}

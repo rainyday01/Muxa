@@ -1,0 +1,23 @@
+{
+  "deploymentTarget": "17.0",
+  "architectures": {
+    "ios": ["arm64"],
+    "iosSimulator": ["arm64"]
+  },
+  "dependencies": {
+    "OpenSSL": {
+      "version": "3.5.7",
+      "license": "Apache-2.0",
+      "sourceSHA256": "a8c0d28a529ca480f9f36cf5792e2cd21984552a3c8e4aa11a24aa31aeac98e8",
+      "deviceLibrarySHA256": "5a0e83c1424f5b9f02cdadc73d8eee0bc7abf30ae470887aef544ac7effa4e4f",
+      "simulatorLibrarySHA256": "4f28a3be102b368d40b7ed5eddbd252b98a21dbf9d1726741152a3914af9c918"
+    },
+    "libssh2": {
+      "version": "1.11.1",
+      "license": "BSD-3-Clause",
+      "sourceSHA256": "d9ec76cbe34db98eec3539fe2c899d26b0c837cb3eb466a56b0f109cabf658f7",
+      "deviceLibrarySHA256": "3e89a807cbfcc0ae664afa1ae697360732ce949545e91bd6d4875acbc902f40e",
+      "simulatorLibrarySHA256": "095e24eb0e2e8568e3aba5990d0e345c853fd4f1b00df0f974c56184f3185302"
+    }
+  }
+}

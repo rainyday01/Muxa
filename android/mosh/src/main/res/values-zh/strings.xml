@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="mosh_udp_ok">UDP %1$d 可达（%2$dms 内收到回包）</string>
+    <string name="mosh_udp_fail">SSH 已拿到 MOSH CONNECT（端口 %1$d），但 %2$dms 内无 UDP 回包。多半是云安全组/防火墙未放行 UDP 60000–61000 入站（客户端→服务器）。仅装 mosh-server 不够。</string>
+    <string name="mosh_probe_fail">Mosh 握手/探测失败: %1$s</string>
+    <string name="mosh_no_connect">mosh-server 未返回 MOSH CONNECT。输出：\n%1$s</string>
+    <string name="mosh_disabled">Mosh 客户端未启用</string>
+</resources>

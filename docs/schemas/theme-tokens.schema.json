@@ -1,0 +1,36 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://mtmux.app/schemas/theme-tokens.schema.json",
+  "title": "m-tmux Theme Tokens",
+  "type": "object",
+  "required": ["id", "displayName", "role", "colors"],
+  "properties": {
+    "id": { "type": "string" },
+    "displayName": { "type": "string" },
+    "role": {
+      "type": "string",
+      "enum": ["system_dark", "system_light", "personal"]
+    },
+    "colors": {
+      "type": "object",
+      "required": [
+        "background",
+        "surface",
+        "onSurface",
+        "primary",
+        "onPrimary",
+        "outline",
+        "terminalBackground",
+        "terminalForeground"
+      ],
+      "additionalProperties": { "type": "string" }
+    },
+    "shapes": {
+      "type": "object",
+      "properties": {
+        "cardRadiusDp": { "type": "number" },
+        "barRadiusDp": { "type": "number" }
+      }
+    }
+  }
+}

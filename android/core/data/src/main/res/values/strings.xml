@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="kb_cannot_overwrite">Cannot overwrite a built-in layout</string>
+    <string name="kb_id_conflict">id “%1$s” conflicts with a built-in layout; pick another id</string>
+    <string name="kb_cannot_delete_builtin">Cannot delete a built-in layout</string>
+    <string name="kb_copy_name">%1$s copy</string>
+</resources>
