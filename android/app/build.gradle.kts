@@ -17,14 +17,14 @@ val logHubUploadToken: String =
 
 android {
     namespace = "app.mtmux.android"
-    compileSdk = 35
+    compileSdk = 36
 
     defaultConfig {
         applicationId = "app.mtmux.android"
         minSdk = 26
-        targetSdk = 35
-        versionCode = 128
-        versionName = "0.3.18"
+        targetSdk = 36
+        versionCode = 129
+        versionName = "0.3.19"
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
         buildConfigField("String", "LOGHUB_UPLOAD_TOKEN", "\"$logHubUploadToken\"")
     }
@@ -33,6 +33,9 @@ android {
     // updates install over existing m-tmux without "signature mismatch".
     // File is gitignored: android/keystore/mtmux-debug.keystore
     val sharedDebugKs = rootProject.file("keystore/mtmux-debug.keystore")
+    // Store upload key for Google Play / Galaxy Store builds, from local.properties
+    // (release.storeFile / release.storePassword / release.keyAlias / release.keyPassword).
+    val releaseKs = localProps.getProperty("release.storeFile")?.let { rootProject.file(it) }?.takeIf { it.isFile }
     signingConfigs {
         getByName("debug") {
             if (sharedDebugKs.isFile) {
@@ -40,6 +43,14 @@ android {
                 storePassword = "android"
                 keyAlias = "androiddebugkey"
                 keyPassword = "android"
+            }
+        }
+        if (releaseKs != null) {
+            create("release") {
+                storeFile = releaseKs
+                storePassword = localProps.getProperty("release.storePassword")
+                keyAlias = localProps.getProperty("release.keyAlias")
+                keyPassword = localProps.getProperty("release.keyPassword")
             }
         }
     }
@@ -50,9 +61,12 @@ android {
         }
         release {
             isMinifyEnabled = false
-            // Keep same key as debug for sideload continuity until a release key exists.
-            if (sharedDebugKs.isFile) {
-                signingConfig = signingConfigs.getByName("debug")
+            // Stores reject debug-signed uploads: use the release key when configured,
+            // else the shared debug key for sideload continuity.
+            signingConfig = when {
+                releaseKs != null -> signingConfigs.getByName("release")
+                sharedDebugKs.isFile -> signingConfigs.getByName("debug")
+                else -> null
             }
             proguardFiles(
                 getDefaultProguardFile("proguard-android-optimize.txt"),

@@ -76,6 +76,7 @@ fun HostEditorScreen(
     var privateKey by remember { mutableStateOf("") }
     var passphrase by remember { mutableStateOf(savedPassphrase.orEmpty()) }
     var error by remember { mutableStateOf<String?>(null) }
+    var confirmDelete by remember { mutableStateOf(false) }
 
     val editing = initial != null
     val hasSavedAuth = initial?.hasPassword == true ||
@@ -136,7 +137,7 @@ fun HostEditorScreen(
                 p.localizedNote(ctx)?.let { error = it }
             }
             Field(stringResource(R.string.host_port), port, testTag = "host_port") {
-                port = it.filter { ch -> ch.isDigit() }.ifEmpty { "22" }
+                port = it.filter { ch -> ch.isDigit() }.take(5)
             }
             Field(stringResource(R.string.host_username), username, testTag = "host_username") { username = it }
             Spacer(Modifier.height(8.dp))
@@ -229,6 +230,11 @@ fun HostEditorScreen(
                         pw = parsed.password
                         password = pw
                     }
+                    val portNum = port.toIntOrNull()
+                    if (portNum == null || portNum !in 1..65535) {
+                        error = ctx.getString(R.string.host_err_port)
+                        return@Button
+                    }
                     if (parsed.host.isBlank() || !HostFieldSanitizer.isPlausibleHost(parsed.host)) {
                         error = ctx.getString(R.string.host_err_hostname, parsed.host, parsed.host.length)
                         return@Button
@@ -254,7 +260,7 @@ fun HostEditorScreen(
                         id = initial?.id.orEmpty(),
                         alias = alias.trim(),
                         hostname = parsed.host,
-                        port = port.toIntOrNull() ?: 22,
+                        port = portNum,
                         username = username.trim(),
                         transport = TransportPreference.SSH,
                         hasPrivateKey = privateKey.isNotBlank() || keepKey,
@@ -286,7 +292,7 @@ fun HostEditorScreen(
             if (onDelete != null) {
                 Spacer(Modifier.height(8.dp))
                 Button(
-                    onClick = onDelete,
+                    onClick = { confirmDelete = true },
                     modifier = Modifier
                         .fillMaxWidth()
                         .testTag("host_delete"),
@@ -295,6 +301,24 @@ fun HostEditorScreen(
                 }
             }
         }
+    }
+    if (confirmDelete && onDelete != null) {
+        androidx.compose.material3.AlertDialog(
+            onDismissRequest = { confirmDelete = false },
+            title = { Text(stringResource(R.string.host_delete)) },
+            text = { Text(stringResource(R.string.host_delete_confirm, initial?.alias.orEmpty())) },
+            confirmButton = {
+                androidx.compose.material3.TextButton(onClick = {
+                    confirmDelete = false
+                    onDelete()
+                }) { Text(stringResource(R.string.delete), color = theme.colors.warning) }
+            },
+            dismissButton = {
+                androidx.compose.material3.TextButton(onClick = { confirmDelete = false }) {
+                    Text(stringResource(R.string.cancel))
+                }
+            },
+        )
     }
 }
 

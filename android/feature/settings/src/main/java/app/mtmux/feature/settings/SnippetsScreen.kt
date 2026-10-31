@@ -53,6 +53,7 @@ fun SnippetsScreen(
     val theme = LocalMtmuxTheme.current
     var editing by remember { mutableStateOf<Snippet?>(null) }
     var showEditor by remember { mutableStateOf(false) }
+    var pendingDelete by remember { mutableStateOf<Snippet?>(null) }
 
     Column(
         Modifier
@@ -82,6 +83,13 @@ fun SnippetsScreen(
             contentPadding = PaddingValues(16.dp),
             verticalArrangement = Arrangement.spacedBy(8.dp),
         ) {
+            item {
+                Text(
+                    stringResource(if (snippets.isEmpty()) R.string.snippets_empty else R.string.snippets_hint),
+                    color = theme.colors.onSurfaceMuted,
+                    fontSize = 13.sp,
+                )
+            }
             items(snippets, key = { it.id }) { s ->
                 Card(modifier = Modifier.fillMaxWidth()) {
                     Column(modifier = Modifier.padding(12.dp)) {
@@ -98,12 +106,29 @@ fun SnippetsScreen(
                                 editing = s
                                 showEditor = true
                             }) { Text(stringResource(R.string.edit)) }
-                            TextButton(onClick = { onDelete(s.id) }) { Text(stringResource(R.string.delete)) }
+                            TextButton(onClick = { pendingDelete = s }) { Text(stringResource(R.string.delete)) }
                         }
                     }
                 }
             }
         }
+    }
+
+    pendingDelete?.let { sn ->
+        AlertDialog(
+            onDismissRequest = { pendingDelete = null },
+            title = { Text(stringResource(R.string.delete)) },
+            text = { Text(stringResource(R.string.snippet_delete_confirm, sn.name)) },
+            confirmButton = {
+                TextButton(onClick = {
+                    pendingDelete = null
+                    onDelete(sn.id)
+                }) { Text(stringResource(R.string.delete), color = theme.colors.warning) }
+            },
+            dismissButton = {
+                TextButton(onClick = { pendingDelete = null }) { Text(stringResource(R.string.cancel)) }
+            },
+        )
     }
 
     if (showEditor) {

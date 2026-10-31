@@ -64,6 +64,30 @@ class HostRepository(
         return entity.toModel()
     }
 
+    /**
+     * Adds or updates a host from a config import. An existing host keeps its
+     * probe data and saved secrets unless the import carries new ones.
+     */
+    suspend fun importHost(
+        host: Host,
+        password: String? = null,
+        privateKeyPem: String? = null,
+        keyPassphrase: String? = null,
+    ) {
+        val merged = get(host.id)?.copy(
+            alias = host.alias,
+            hostname = host.hostname,
+            port = host.port,
+            username = host.username,
+        ) ?: host
+        upsert(
+            host = merged,
+            privateKeyPem = privateKeyPem,
+            password = password?.toCharArray(),
+            keyPassphrase = keyPassphrase?.toCharArray(),
+        )
+    }
+
     suspend fun delete(id: String) {
         val existing = dao.get(id)
         if (existing != null) {

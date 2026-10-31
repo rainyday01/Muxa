@@ -79,6 +79,23 @@ fun KeyboardListScreen(
     onNew: () -> Unit,
 ) {
     val theme = LocalMtmuxTheme.current
+    var pendingDelete by remember { mutableStateOf<KeyboardLayout?>(null) }
+    pendingDelete?.let { layout ->
+        AlertDialog(
+            onDismissRequest = { pendingDelete = null },
+            title = { Text(stringResource(R.string.delete)) },
+            text = { Text(stringResource(R.string.kb_delete_confirm, layout.name)) },
+            confirmButton = {
+                TextButton(onClick = {
+                    pendingDelete = null
+                    onDelete(layout)
+                }) { Text(stringResource(R.string.delete), color = theme.colors.warning) }
+            },
+            dismissButton = {
+                TextButton(onClick = { pendingDelete = null }) { Text(stringResource(R.string.cancel)) }
+            },
+        )
+    }
     Column(
         Modifier
             .fillMaxSize()
@@ -136,7 +153,7 @@ fun KeyboardListScreen(
                     onSelect = { onSelectActive(layout.id) },
                     onEdit = { onEdit(layout) },
                     onDuplicate = { onDuplicate(layout) },
-                    onDelete = { onDelete(layout) },
+                    onDelete = { pendingDelete = layout },
                     onExport = { onExport(layout) },
                 )
             }

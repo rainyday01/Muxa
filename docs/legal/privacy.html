@@ -8,44 +8,71 @@
     :root { color-scheme: light dark; }
     body { font-family: system-ui, sans-serif; max-width: 42rem; margin: 2rem auto; padding: 0 1.25rem; line-height: 1.55; }
     h1, h2 { line-height: 1.25; }
-    .meta { color: CanvasText; opacity: .7; }
-    hr { border: 0; border-top: 1px solid color-mix(in srgb, CanvasText 18%, transparent); }
+    .meta { opacity: .7; }
+    hr { border: 0; border-top: 1px solid color-mix(in srgb, CanvasText 18%, transparent); margin: 2.5rem 0; }
   </style>
 </head>
 <body>
   <h1>Muxa Privacy Policy</h1>
-  <p class="meta">Effective 14 September 2026 · Product: Muxa (iOS) · Bundle ID: app.mtmux.ios</p>
-  <p>Muxa is a native SSH and tmux terminal. It does not require a Muxa account, does not include ads or analytics SDKs, and does not operate a central server for your sessions.</p>
+  <p class="meta">Effective 30 October 2026 · Muxa for Android (app.mtmux.android) and iOS (app.mtmux.ios)</p>
+  <p>Muxa is an SSH and tmux client. It has no accounts, no ads and no analytics or crash-reporting SDKs. Your terminal sessions go directly between your device and the servers you configure; they never pass through a Muxa server.</p>
 
   <h2>Data stored on your device</h2>
-  <p>Host names, usernames, session lists, snippets, keyboard layouts, and preferences are stored locally. Passwords, private keys, and related secrets are stored in the iOS Keychain using This Device Only accessibility and without a shared Keychain access group.</p>
+  <p>Host names, ports, usernames, session lists and screen snapshots, snippets, command history used for completion, keyboard layouts and settings are stored only on your device. Passwords, private keys and key passphrases are encrypted with a key held in the Android Keystore (Android) or stored in the Keychain with This Device Only access (iOS). Android system backup is turned off for Muxa.</p>
 
-  <h2>Network traffic</h2>
-  <p>When you connect, traffic goes only between your device and the SSH hosts you configure. Session content is not routed through Muxa-operated servers.</p>
+  <h2>Network connections</h2>
+  <p>Muxa connects only to the SSH hosts you add. When completion is on, Muxa runs small commands on that host (for example to list file names) over the same SSH connection.</p>
 
-  <h2>Diagnostics</h2>
-  <p>Muxa does not upload logs to a Muxa server. You may export or share a locally redacted log using the system share sheet. Muxa receives that file only if you send it yourself.</p>
+  <h2>Feedback you choose to send</h2>
+  <p>Nothing is uploaded automatically. If you tap <em>Send to developer</em> under Settings → Diagnostics, Muxa uploads to the developer's log server (loginfo.xcodeuk.com):</p>
+  <ul>
+    <li>the app's diagnostic log, which can contain host names or IP addresses, usernames, tmux session names and short excerpts of terminal output;</li>
+    <li>your note, the app version, the device manufacturer and model, the OS version, and a random ID created when the app is installed (not a hardware or advertising ID).</li>
+  </ul>
+  <p>Passwords, private keys and passphrases are never written to the log. Uploads are used only to diagnose the problem you report and are deleted once they are no longer needed for that.</p>
+  <p>If you choose <em>GitHub issue</em> instead, Muxa first removes IP addresses, host names, usernames, session names and screen text from the log, saves it as a file you control, and opens a GitHub issue form. Anything you post on GitHub is public and governed by GitHub's terms.</p>
 
-  <h2>Device identifiers</h2>
-  <p>Muxa does not send Identifier for Vendor or other device identifiers to Muxa-operated servers.</p>
+  <h2>Exports</h2>
+  <p>An encrypted config export (and, if you opt in, the passwords and keys inside it) leaves your device only where you save or paste it. It is encrypted with the password you choose; Muxa cannot recover it.</p>
+
+  <h2>Sharing</h2>
+  <p>We do not sell personal data or share it with third parties for advertising or any other purpose.</p>
 
   <h2>Deletion</h2>
   <ul>
-    <li>Deleting a host removes that host’s Keychain secrets immediately.</li>
-    <li>Settings → Privacy → Delete all data on this device removes every Muxa Keychain item and saved host on the device.</li>
-    <li>Uninstalling Muxa removes those This-Device-Only Keychain items because they are not in a shared access group.</li>
+    <li>Deleting a host removes its saved secrets immediately.</li>
+    <li>Settings → Privacy → Delete all data on this device erases everything Muxa stores on the device.</li>
+    <li>Uninstalling Muxa removes its local data. To have a feedback upload deleted sooner, email us with the reference shown after sending.</li>
   </ul>
 
   <h2>Children</h2>
   <p>Muxa is a developer tool and is not directed at children.</p>
 
-  <h2>Contact</h2>
-  <p>Privacy questions: <a href="mailto:rainyday0312@outlook.com">rainyday0312@outlook.com</a></p>
+  <h2>Changes and contact</h2>
+  <p>We will update this page when what Muxa collects changes. Questions: <a href="mailto:rainyday0312@outlook.com">rainyday0312@outlook.com</a></p>
 
   <hr>
   <h1 lang="zh-Hans">Muxa 隐私政策</h1>
-  <p lang="zh-Hans">Muxa 是原生 SSH / tmux 终端。无需 Muxa 账号，不含广告或分析 SDK，也不会把你的会话经过 Muxa 运营的中央服务器。</p>
-  <p lang="zh-Hans">主机、会话、片段和偏好保存在本机；密码与私钥保存在 iOS Keychain（仅本机、无 iCloud 共享组）。网络只到达你配置的 SSH 主机。诊断日志不会自动上传，仅在你导出或系统分享时离开本机。删除主机或使用「删除本机全部数据」会清除对应 Keychain 项；卸载应用也会清除这些仅本机 Keychain 项。</p>
-  <p lang="zh-Hans">联系：<a href="mailto:rainyday0312@outlook.com">rainyday0312@outlook.com</a></p>
+  <div lang="zh-Hans">
+  <p class="meta">生效日期 2026 年 10 月 30 日 · 适用于 Muxa Android 版（app.mtmux.android）与 iOS 版（app.mtmux.ios）</p>
+  <p>Muxa 是 SSH / tmux 客户端，无需账号，不含广告、统计或崩溃上报 SDK。终端会话只在你的设备和你配置的服务器之间传输，不经过 Muxa 的服务器。</p>
+  <h2>保存在本机的数据</h2>
+  <p>主机名、端口、用户名、会话列表与快照、命令片段、用于补全的命令历史、键盘布局和设置只保存在本机。密码、私钥和私钥口令在 Android 上用 Android Keystore 中的密钥加密保存，在 iOS 上保存在仅本机可用的钥匙串中。Android 版关闭了系统备份。</p>
+  <h2>网络连接</h2>
+  <p>Muxa 只连接你添加的 SSH 主机。开启补全时，Muxa 会通过同一条 SSH 连接在该主机上执行少量命令（例如列出文件名）。</p>
+  <h2>你主动发送的反馈</h2>
+  <p>Muxa 不会自动上传任何内容。只有在「设置 → 诊断」里点击「发送给开发者」时，才会上传到开发者的日志服务器（loginfo.xcodeuk.com）：应用诊断日志（可能包含主机名或 IP、用户名、tmux 会话名和少量终端输出片段），以及你的备注、应用版本、设备厂商和型号、系统版本、安装时随机生成的 ID（不是硬件 ID 或广告 ID）。密码、私钥和口令从不写入日志。上传内容只用于排查你反馈的问题，不再需要时即删除。</p>
+  <p>如果选择「提 GitHub Issue」，Muxa 会先去掉日志中的 IP、主机名、用户名、会话名和屏幕文字，保存为你自己掌握的文件，再打开 GitHub 的 Issue 页面。发布在 GitHub 上的内容是公开的，受 GitHub 条款约束。</p>
+  <h2>导出</h2>
+  <p>加密配置导出（以及你选择包含的密码和私钥）只会去到你保存或粘贴的位置，并用你设定的密码加密，Muxa 无法找回。</p>
+  <h2>共享</h2>
+  <p>我们不出售个人数据，也不会出于广告或其他目的与第三方共享。</p>
+  <h2>删除</h2>
+  <p>删除主机会立即清除其保存的密钥；「设置 → 隐私 → 删除本机全部数据」会清除 Muxa 在本机保存的全部内容；卸载 Muxa 也会删除本地数据。如需尽快删除某次反馈上传，请发邮件并附上发送后显示的编号。</p>
+  <h2>儿童</h2>
+  <p>Muxa 是开发者工具，不面向儿童。</p>
+  <h2>变更与联系</h2>
+  <p>收集内容发生变化时我们会更新本页。联系：<a href="mailto:rainyday0312@outlook.com">rainyday0312@outlook.com</a></p>
+  </div>
 </body>
 </html>

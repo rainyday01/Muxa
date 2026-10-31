@@ -58,6 +58,7 @@ fun SessionMoreSheet(
     val sheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
     var renaming by remember { mutableStateOf(false) }
     var newName by remember { mutableStateOf(session.name) }
+    var confirmKill by remember { mutableStateOf(false) }
 
     ModalBottomSheet(onDismissRequest = onDismiss, sheetState = sheetState) {
         Column(Modifier.padding(horizontal = 16.dp, vertical = 8.dp)) {
@@ -72,7 +73,8 @@ fun SessionMoreSheet(
                     singleLine = true,
                 )
                 TextButton(onClick = {
-                    if (newName.isNotBlank()) onRename(newName.trim())
+                    val clean = NewSessionCommand.tmuxSessionName(newName)
+                    if (clean.isNotBlank() && clean != session.name) onRename(clean)
                     renaming = false
                 }) { Text(stringResource(R.string.more_rename_confirm)) }
             } else {
@@ -127,10 +129,28 @@ fun SessionMoreSheet(
                 }
 
                 HorizontalDivider(Modifier.padding(vertical = 6.dp))
-                TextButton(onClick = onKill, modifier = Modifier.fillMaxWidth()) { Text(stringResource(R.string.more_kill)) }
+                TextButton(onClick = { confirmKill = true }, modifier = Modifier.fillMaxWidth()) {
+                    Text(stringResource(R.string.more_kill), color = LocalMtmuxTheme.current.colors.warning)
+                }
             }
             TextButton(onClick = onDismiss, modifier = Modifier.fillMaxWidth()) { Text(stringResource(R.string.close)) }
         }
+    }
+    if (confirmKill) {
+        androidx.compose.material3.AlertDialog(
+            onDismissRequest = { confirmKill = false },
+            title = { Text(stringResource(R.string.more_kill)) },
+            text = { Text(stringResource(R.string.more_kill_confirm, session.name, session.hostAlias ?: session.hostId)) },
+            confirmButton = {
+                TextButton(onClick = {
+                    confirmKill = false
+                    onKill()
+                }) { Text(stringResource(R.string.more_kill), color = LocalMtmuxTheme.current.colors.warning) }
+            },
+            dismissButton = {
+                TextButton(onClick = { confirmKill = false }) { Text(stringResource(R.string.cancel)) }
+            },
+        )
     }
 }
 
@@ -348,8 +368,13 @@ fun NewSessionDialog(
                     when {
                         hosts.isEmpty() -> error = ctx.getString(R.string.err_add_host_first)
                         host == null -> error = ctx.getString(R.string.err_pick_host)
-                        name.isBlank() -> error = ctx.getString(R.string.err_session_name)
-                        else -> onCreate(host, name.trim(), template.takeIf { it.isNotBlank() })
+                        NewSessionCommand.tmuxSessionName(name).isBlank() ->
+                            error = ctx.getString(R.string.err_session_name)
+                        else -> onCreate(
+                            host,
+                            NewSessionCommand.tmuxSessionName(name),
+                            template.takeIf { it.isNotBlank() },
+                        )
                     }
                 },
                 modifier = Modifier

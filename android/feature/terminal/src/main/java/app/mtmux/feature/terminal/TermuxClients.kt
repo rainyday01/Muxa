@@ -50,6 +50,9 @@ class MtmuxViewClient(
     /** Sticky Shift from the special key bar (one-shot with soft/hardware keys). */
     private val isShiftLatched: () -> Boolean = { false },
     private val onShiftLatchConsumed: (() -> Unit)? = null,
+    /** Sticky Alt from the special key bar: the next character goes out ESC-prefixed. */
+    private val isAltLatched: () -> Boolean = { false },
+    private val onAltLatchConsumed: (() -> Unit)? = null,
     /** Alt-screen finger page. Return true if handled (tmux copy-mode). */
     private val altFingerScrollHandler: ((Boolean) -> Boolean)? = null,
     /**
@@ -71,7 +74,7 @@ class MtmuxViewClient(
     override fun onKeyUp(keyCode: Int, e: KeyEvent): Boolean = false
     override fun onLongPress(event: MotionEvent): Boolean = false
     override fun readControlKey(): Boolean = isCtrlLatched()
-    override fun readAltKey(): Boolean = false
+    override fun readAltKey(): Boolean = isAltLatched()
     override fun readShiftKey(): Boolean = isShiftLatched()
     override fun readFnKey(): Boolean = false
     override fun onCodePoint(codePoint: Int, ctrlDown: Boolean, session: TerminalSession): Boolean {
@@ -80,13 +83,16 @@ class MtmuxViewClient(
         if (ctrlDown && isCtrlLatched()) {
             onCtrlLatchConsumed?.invoke()
         }
+        // TerminalView read the Alt latch before this call and writes ESC + char.
+        val altDown = isAltLatched()
+        if (altDown) onAltLatchConsumed?.invoke()
         if (isShiftLatched()) {
             onShiftLatchConsumed?.invoke()
             // Termux only uppercases letters for IME; map 1→! etc. ourselves.
             if (!ctrlDown) {
                 val mapped = KeyboardActionResolver.applyUsShift(codePoint)
                 if (mapped != codePoint) {
-                    session.writeCodePoint(false, mapped)
+                    session.writeCodePoint(altDown, mapped)
                     return true
                 }
             }

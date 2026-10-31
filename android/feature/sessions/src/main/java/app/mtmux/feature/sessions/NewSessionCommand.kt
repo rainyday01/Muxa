@@ -32,8 +32,16 @@ object NewSessionCommand {
         val t = path.trim()
         if (t.isEmpty()) return t
         if (t.all { it.isLetterOrDigit() || it in "/._-~" }) return t
-        return "'" + t.replace("'", "'\"'\"'") + "'"
+        // A leading ~/ stays outside the quotes so the shell still expands it.
+        if (t.startsWith("~/")) return "~/" + singleQuote(t.substring(2))
+        return singleQuote(t)
     }
+
+    private fun singleQuote(s: String) = "'" + s.replace("'", "'\"'\"'") + "'"
+
+    /** tmux turns ':' and '.' into '_' (they address windows/panes); do it up front so cards match. */
+    fun tmuxSessionName(raw: String): String =
+        raw.trim().filterNot { it.isISOControl() }.replace(':', '_').replace('.', '_')
 
     fun compose(
         dir: String,

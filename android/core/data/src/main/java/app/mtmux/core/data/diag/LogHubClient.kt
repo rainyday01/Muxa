@@ -2,7 +2,6 @@ package app.mtmux.core.data.diag
 
 import android.content.Context
 import android.os.Build
-import android.provider.Settings
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.withContext
@@ -44,12 +43,16 @@ object LogHubClient {
         val note: String?,
     )
 
+    /**
+     * Random per-install id so uploads from one phone can be grouped. Not the
+     * hardware ANDROID_ID: it resets on reinstall or "delete all data".
+     */
     fun deviceId(context: Context): String {
-        val androidId = runCatching {
-            Settings.Secure.getString(context.contentResolver, Settings.Secure.ANDROID_ID)
-        }.getOrNull().orEmpty()
-        val raw = if (androidId.isNotBlank()) androidId else "unknown"
-        return "muxa-" + raw.filter { it.isLetterOrDigit() }.take(16).ifEmpty { "dev" }
+        val prefs = context.getSharedPreferences("muxa_diag", Context.MODE_PRIVATE)
+        prefs.getString("install_id", null)?.let { return it }
+        val id = "muxa-" + java.util.UUID.randomUUID().toString().replace("-", "").take(16)
+        prefs.edit().putString("install_id", id).apply()
+        return id
     }
 
     /**

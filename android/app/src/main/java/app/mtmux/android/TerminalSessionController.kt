@@ -181,6 +181,14 @@ class TerminalSessionController(
     /** Scrollback lines for next Termux session create. */
     var transcriptRows: Int = 1000
 
+    /** Bytes the user typed or pasted through the terminal view (main thread). */
+    var onUserInput: ((ByteArray) -> Unit)? = null
+
+    /** Attached tmux session and socket, or null for none / the install shell. */
+    fun attachedTmuxTarget(): Pair<String, String?>? =
+        lastAttach?.takeIf { !it.rawShell && it.sessionName.isNotBlank() }
+            ?.let { it.sessionName to it.socketPath }
+
     init {
         // Single writer: order of trySend == order of remote stdin.
         writerJob = scope.launch(Dispatchers.IO) {
@@ -304,6 +312,7 @@ class TerminalSessionController(
             if (count <= 0) return@WriteListener
             // Copy immediately: writeCodePoint reuses a small shared buffer.
             val copy = data.copyOfRange(offset, offset + count)
+            if (!session.isWritingEmulatorReply()) onUserInput?.invoke(copy)
             cancelTmuxCopyModeIfNeeded()
             // Non-blocking enqueue; writerJob drains FIFO on IO.
             if (writeQueue.trySend(copy).isFailure) {

@@ -476,6 +476,24 @@ exec tmux new-session -A -s $nameQ
             }
         }
 
+        /**
+         * Completion probe for an attached pane. tmux keeps the outer terminal on
+         * the alternate screen, so the pane is asked instead: prints `ALT=0|1`,
+         * then (shell panes only) runs [compgenCmd] in the pane's directory.
+         */
+        fun paneCompletionCmd(sessionName: String, socketPath: String?, compgenCmd: String?): String {
+            val q = shellQuote(sessionName)
+            return withSessionSocket(sessionName, socketPath) { t ->
+                buildString {
+                    append("_i=$($t display-message -p -t $q '#{alternate_on}|#{pane_current_path}' 2>/dev/null); ")
+                    append("echo \"ALT=${'$'}{_i%%|*}\"")
+                    if (compgenCmd != null) {
+                        append("; [ \"${'$'}{_i%%|*}\" = 1 ] || (cd \"${'$'}{_i#*|}\" 2>/dev/null; $compgenCmd)")
+                    }
+                }
+            }
+        }
+
         fun scrollHistoryCmd(
             sessionName: String,
             socketPath: String?,

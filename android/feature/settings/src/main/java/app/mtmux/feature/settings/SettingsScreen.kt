@@ -281,7 +281,7 @@ fun SettingsScreen(
     if (showTermType) {
         AlertDialog(
             onDismissRequest = { showTermType = false },
-            title = { Text("Terminal type") },
+            title = { Text(stringResource(R.string.settings_term_type)) },
             text = {
                 Column {
                     UserPreferences.TERM_TYPES.forEach { t ->
@@ -319,12 +319,12 @@ fun SettingsScreen(
     if (showBuffer) {
         AlertDialog(
             onDismissRequest = { showBuffer = false },
-            title = { Text("Terminal back buffer size") },
+            title = { Text(stringResource(R.string.settings_buffer)) },
             text = {
                 OutlinedTextField(
                     value = bufferDraft,
                     onValueChange = { bufferDraft = it.filter { c -> c.isDigit() }.take(5) },
-                    label = { Text("lines") },
+                    label = { Text(stringResource(R.string.settings_buffer_lines)) },
                     singleLine = true,
                     modifier = Modifier.fillMaxWidth(),
                 )

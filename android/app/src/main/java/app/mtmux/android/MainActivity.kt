@@ -62,6 +62,7 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import app.mtmux.autocomplete.AutocompleteEngine
+import app.mtmux.autocomplete.InputLineTracker
 import app.mtmux.core.data.db.CachedSessionEntity
 import app.mtmux.core.data.db.SnippetEntity
 import app.mtmux.core.data.db.SnapshotEntity
@@ -85,6 +86,7 @@ import app.mtmux.core.model.SessionListMode
 import app.mtmux.core.model.SnapshotText
 import app.mtmux.core.model.Snippet
 import app.mtmux.core.model.Suggestion
+import app.mtmux.core.model.SuggestionSource
 import app.mtmux.core.model.TmuxSession
 import app.mtmux.core.model.TransportPreference
 import app.mtmux.core.ui.feedback.LocalSnackbarHost
@@ -217,6 +219,11 @@ private fun MtmuxRoot(app: MtmuxApp, activity: ComponentActivity) {
         return "tmux=$tmux${env.latencyMs?.let { " ${it}ms" } ?: ""}"
     }
     val snippetsFlow by c.db.snippets().observeAll().collectAsState(initial = emptyList())
+    val snippetModels = remember(snippetsFlow) {
+        snippetsFlow.map {
+            Snippet(it.id, it.name, it.body, it.tagsCsv.split(',').filter { t -> t.isNotBlank() }, it.runOnSelect)
+        }
+    }
     val keyboardLayouts by c.keyboards.observeAll().collectAsState(initial = BuiltinKeyboards.all())
     val activeKeyboardId by c.keyboards.activeLayoutId.collectAsState(initial = "general")
     val activeKeyboard: KeyboardLayout =
@@ -267,6 +274,7 @@ private fun MtmuxRoot(app: MtmuxApp, activity: ComponentActivity) {
     }
     var ctrlLatched by remember { mutableStateOf(false) }
     var shiftLatched by remember { mutableStateOf(false) }
+    var altLatched by remember { mutableStateOf(false) }
     var editingHost by remember { mutableStateOf<Host?>(null) }
     /** Loaded secrets for host editor (prefill password field as masked bullets). */
     var editingSavedPassword by remember { mutableStateOf<String?>(null) }
@@ -288,10 +296,21 @@ private fun MtmuxRoot(app: MtmuxApp, activity: ComponentActivity) {
     var keyboardImport by remember { mutableStateOf(false) }
     var suggestions by remember { mutableStateOf<List<Suggestion>>(emptyList()) }
     var suggestJob by remember { mutableStateOf<Job?>(null) }
-    var lineBuffer by remember { mutableStateOf("") }
+    /** Shell line being typed, rebuilt from the bytes sent to the PTY. */
+    val inputTracker = remember { InputLineTracker() }
+    /** Last completion probe found a shell prompt (not a full-screen app). */
+    var shellLineActive by remember { mutableStateOf(false) }
+    /** Uptime of the last probe that found a full-screen app: skip probing while typing into it. */
+    val lastTuiProbeAt = remember { longArrayOf(0L) }
     var didOpenLast by remember { mutableStateOf(false) }
-    var exportPassword by remember { mutableStateOf<String?>(null) }
-    var importBlob by remember { mutableStateOf<String?>(null) }
+    var showExport by remember { mutableStateOf(false) }
+    var exportBusy by remember { mutableStateOf(false) }
+    /** Encrypted export waiting for the user to pick a file. */
+    var pendingExportBlob by remember { mutableStateOf<String?>(null) }
+    var showImport by remember { mutableStateOf(false) }
+    var importBusy by remember { mutableStateOf(false) }
+    var importLoaded by remember { mutableStateOf<String?>(null) }
+    var importError by remember { mutableStateOf<String?>(null) }
     /** hostId\\tname → last opened epoch (AND-104 recent view) */
     var lastOpened by remember { mutableStateOf<Map<String, Long>>(emptyMap()) }
     /** In-process last background capture-pane, so stale cards are not hammered every refresh. */
@@ -396,6 +415,140 @@ private fun MtmuxRoot(app: MtmuxApp, activity: ComponentActivity) {
                 pendingDiagZip = null
                 pendingIssueUrl?.let { url -> openUrl(url) }
                 pendingIssueUrl = null
+            }
+        }
+    }
+
+    /** Clipboard copy that Android 13+ keeps out of the clipboard preview. */
+    fun copySensitive(label: String, text: String) {
+        val clip = ClipData.newPlainText(label, text)
+        clip.description.extras = android.os.PersistableBundle().apply {
+            putBoolean("android.content.extra.IS_SENSITIVE", true)
+        }
+        (ctx.getSystemService(Context.CLIPBOARD_SERVICE) as ClipboardManager).setPrimaryClip(clip)
+    }
+
+    val saveExportFile = rememberLauncherForActivityResult(
+        ActivityResultContracts.CreateDocument("application/json"),
+    ) { uri ->
+        val blob = pendingExportBlob
+        pendingExportBlob = null
+        if (uri == null || blob == null) return@rememberLauncherForActivityResult
+        scope.launch {
+            val ok = withContext(Dispatchers.IO) {
+                runCatching {
+                    ctx.contentResolver.openOutputStream(uri)?.use { it.write(blob.toByteArray()) } != null
+                }.getOrDefault(false)
+            }
+            toast(tr(if (ok) UiR.string.toast_export_saved else UiR.string.toast_export_fail), force = true)
+        }
+    }
+
+    val openImportFile = rememberLauncherForActivityResult(
+        ActivityResultContracts.OpenDocument(),
+    ) { uri ->
+        if (uri == null) return@rememberLauncherForActivityResult
+        scope.launch {
+            val text = withContext(Dispatchers.IO) {
+                runCatching {
+                    ctx.contentResolver.openInputStream(uri)?.use { input ->
+                        val bytes = input.readNBytesCompat(1 shl 20)
+                        String(bytes, Charsets.UTF_8)
+                    }
+                }.getOrNull()
+            }
+            if (text.isNullOrBlank()) {
+                importError = tr(UiR.string.import_err_read)
+            } else {
+                importError = null
+                importLoaded = text
+            }
+        }
+    }
+
+    fun runExport(password: CharArray, includeSecrets: Boolean, target: ExportTarget) {
+        exportBusy = true
+        scope.launch {
+            val result = runCatching {
+                withContext(Dispatchers.Default) {
+                    val hostList = c.hosts.observeHosts().first()
+                    val secrets = if (!includeSecrets) emptyMap() else {
+                        hostList.associate { h ->
+                            h.id to ConfigExport.HostSecrets(
+                                password = c.hosts.password(h.id),
+                                privateKeyPem = c.hosts.privateKeyPem(h.id),
+                                passphrase = c.hosts.keyPassphrase(h.id),
+                            )
+                        }.filterValues { !it.isEmpty }
+                    }
+                    val json = ConfigExport.exportJson(
+                        ConfigExport.Bundle(hostList, c.db.snippets().all(), secrets),
+                    )
+                    ConfigExport.encrypt(json, password)
+                }
+            }
+            password.fill('\u0000')
+            exportBusy = false
+            result.onSuccess { blob ->
+                DiagLog.i("export", "config export ok secrets=$includeSecrets target=$target")
+                showExport = false
+                when (target) {
+                    ExportTarget.Clipboard -> {
+                        copySensitive("muxa-config", blob)
+                        toast(
+                            tr(
+                                if (includeSecrets) UiR.string.toast_export_copied_secrets
+                                else UiR.string.toast_export_copied,
+                            ),
+                            force = true,
+                        )
+                    }
+                    ExportTarget.File -> {
+                        pendingExportBlob = blob
+                        val stamp = java.text.SimpleDateFormat("yyyyMMdd-HHmm", java.util.Locale.US)
+                            .format(java.util.Date())
+                        runCatching { saveExportFile.launch("muxa-config-$stamp.json") }.onFailure {
+                            pendingExportBlob = null
+                            toast(tr(UiR.string.toast_export_fail), force = true)
+                        }
+                    }
+                }
+            }.onFailure {
+                DiagLog.e("export", "config export failed", it)
+                toast(tr(UiR.string.toast_export_fail), force = true)
+            }
+        }
+    }
+
+    fun runImport(blob: String, password: CharArray) {
+        importBusy = true
+        importError = null
+        scope.launch {
+            val result = runCatching {
+                withContext(Dispatchers.Default) {
+                    val bundle = ConfigExport.parseImport(ConfigExport.decrypt(blob, password))
+                    bundle.hosts.forEach { h ->
+                        val sec = bundle.secrets[h.id]
+                        c.hosts.importHost(h, sec?.password, sec?.privateKeyPem, sec?.passphrase)
+                    }
+                    bundle.snippets.forEach { c.db.snippets().upsert(it) }
+                    bundle
+                }
+            }
+            password.fill('\u0000')
+            importBusy = false
+            result.onSuccess { b ->
+                DiagLog.i("export", "config import ok hosts=${b.hosts.size} snippets=${b.snippets.size} secrets=${b.secrets.size}")
+                showImport = false
+                importLoaded = null
+                toast(tr(UiR.string.toast_imported_n, b.hosts.size, b.snippets.size), force = true)
+            }.onFailure {
+                DiagLog.w("export", "config import failed ${it.javaClass.simpleName}")
+                importError = when (it) {
+                    is ConfigExport.WrongPasswordException -> tr(UiR.string.import_err_password)
+                    is org.json.JSONException, is IllegalArgumentException -> tr(UiR.string.import_err_format)
+                    else -> tr(UiR.string.toast_import_fail_msg, it.message ?: it.javaClass.simpleName)
+                }
             }
         }
     }
@@ -734,46 +887,105 @@ private fun MtmuxRoot(app: MtmuxApp, activity: ComponentActivity) {
         )
     }
 
-    fun scheduleSuggest(hostId: String, text: String, host: Host?, sessionName: String?) {
-        if (!autocompleteOn) {
+    /**
+     * Suggestions for the line in [inputTracker]. Inside tmux the outer terminal
+     * is always on the alternate screen, so the pane itself is asked whether a
+     * full-screen app is running, and paths complete in the pane's directory.
+     */
+    fun scheduleSuggest(session: TmuxSession) {
+        suggestJob?.cancel()
+        val prefix = inputTracker.line.takeLast(80)
+        if (!autocompleteOn || prefix.isBlank()) {
             suggestions = emptyList()
             return
         }
-        lineBuffer = text
-        suggestJob?.cancel()
+        val host = hosts.find { it.id == session.hostId }
+        if (android.os.SystemClock.uptimeMillis() - lastTuiProbeAt[0] < 3_000L) {
+            suggestions = emptyList()
+            return
+        }
         suggestJob = scope.launch {
             delay(200)
-            val prefix = lineBuffer.substringAfterLast('\n').takeLast(80)
-            val em = termController.termuxSession?.getEmulator()
-            val tui = AutocompleteEngine.isTuiMode(
-                alternateScreen = em?.isAlternateBufferActive == true,
-                plainSnapshot = "",
-                lineBuffer = prefix,
-            )
-            if (tui) {
-                suggestions = emptyList()
-                return@launch
-            }
-            // AND-088: remote path completion (silent on failure)
-            val pathHints = runCatching {
-                val cmd = AutocompleteEngine.remoteCompgenCommand(prefix) ?: return@runCatching emptyList()
-                val raw = c.connections.exec(hostId, cmd).getOrNull().orEmpty()
-                AutocompleteEngine.parseCompgenOutput(raw)
-            }.getOrDefault(emptyList())
-            suggestions = c.autocomplete.suggest(
-                hostId = hostId,
-                linePrefix = prefix,
-                tuiMode = false,
-                pathHints = pathHints,
-                vars = buildMap {
-                    host?.let {
-                        put("host", it.hostname)
-                        put("user", it.username)
+            val compgen = AutocompleteEngine.remoteCompgenCommand(prefix)
+            val target = termController.attachedTmuxTarget()
+            val tui: Boolean
+            val pathHints: List<String>
+            if (target != null) {
+                val out = withContext(Dispatchers.IO) {
+                    c.connections.exec(
+                        session.hostId,
+                        TmuxControl.paneCompletionCmd(target.first, target.second, compgen),
+                    ).getOrNull()
+                }.orEmpty()
+                val lines = out.lines()
+                tui = lines.any { it.trim() == "ALT=1" }
+                pathHints = AutocompleteEngine.parseCompgenOutput(
+                    lines.filterNot { it.startsWith("ALT=") }.joinToString("\n"),
+                )
+            } else {
+                tui = termController.termuxSession?.getEmulator()?.isAlternateBufferActive == true
+                pathHints = if (tui || compgen == null) {
+                    emptyList()
+                } else {
+                    withContext(Dispatchers.IO) {
+                        AutocompleteEngine.parseCompgenOutput(
+                            c.connections.exec(session.hostId, compgen).getOrNull().orEmpty(),
+                        )
                     }
-                    sessionName?.let { put("session", it) }
-                },
-            )
+                }
+            }
+            shellLineActive = !tui
+            lastTuiProbeAt[0] = if (tui) android.os.SystemClock.uptimeMillis() else 0L
+            suggestions = if (tui) {
+                emptyList()
+            } else {
+                c.autocomplete.suggest(
+                    hostId = session.hostId,
+                    linePrefix = prefix,
+                    tuiMode = false,
+                    pathHints = pathHints,
+                    vars = buildMap {
+                        host?.let {
+                            put("host", it.hostname)
+                            put("user", it.username)
+                        }
+                        put("session", session.name)
+                    },
+                )
+            }
         }
+    }
+
+    /** Every byte the user sends to the terminal passes through here. */
+    fun trackUserInput(bytes: ByteArray) {
+        val session = terminalSession ?: return
+        val submitted = inputTracker.feed(bytes)
+        if (submitted != null && autocompleteOn && shellLineActive) {
+            scope.launch { c.autocomplete.recordHistory(session.hostId, submitted) }
+        }
+        scheduleSuggest(session)
+    }
+    termController.onUserInput = { trackUserInput(it) }
+
+    /** Snippet body with {{host}}/{{user}}/{{session}} filled in, sent as typed input. */
+    fun insertSnippet(sn: Snippet) {
+        val session = terminalSession
+        val host = session?.let { s -> hosts.find { it.id == s.hostId } }
+        val body = AutocompleteEngine.applyVars(
+            sn.body,
+            buildMap {
+                host?.let {
+                    put("host", it.hostname)
+                    put("user", it.username)
+                }
+                session?.let { put("session", it.name) }
+            },
+        )
+        if (!termController.trySendDraft(body)) {
+            toast(tr(UiR.string.toast_not_connected), force = true)
+            return
+        }
+        if (sn.runOnSelect) scope.launch { termController.sendRawBytes("\r".toByteArray()) }
     }
 
     fun markSessionOpened(hostId: String, sessionName: String) {
@@ -792,38 +1004,31 @@ private fun MtmuxRoot(app: MtmuxApp, activity: ComponentActivity) {
                     termController.toggleShiftLatch()
                     shiftLatched = termController.isShiftLatched()
                 }
-                ResolvedKeyAction.LatchAlt -> { /* reserved */ }
+                ResolvedKeyAction.LatchAlt -> altLatched = !altLatched
                 is ResolvedKeyAction.SendBytes -> {
-                    if (ctrlLatched && resolved.data.size == 1) {
-                        val ch = resolved.data[0].toInt().toChar()
+                    var payload = resolved.data
+                    if (ctrlLatched && payload.size == 1) {
+                        val ch = payload[0].toInt().toChar()
                         if (ch in 'a'..'z' || ch in 'A'..'Z') {
-                            termController.sendKeyLabel(ch.lowercaseChar().toString())
-                            ctrlLatched = termController.isCtrlLatched()
-                            return@launch
+                            payload = byteArrayOf((ch.lowercaseChar().code - 96).toByte())
+                            termController.setCtrlLatch(false)
+                            ctrlLatched = false
                         }
                     }
-                    val payload = if (shiftLatched) {
-                        val shifted = KeyboardActionResolver.applyShiftLatch(resolved.data)
+                    if (shiftLatched) {
+                        payload = KeyboardActionResolver.applyShiftLatch(payload)
                         termController.setShiftLatch(false)
                         shiftLatched = false
-                        shifted
-                    } else {
-                        resolved.data
+                    }
+                    if (altLatched) {
+                        // Meta sends ESC first (readline Alt-b / Alt-f, TUI shortcuts).
+                        payload = byteArrayOf(0x1B) + payload
+                        altLatched = false
                     }
                     termController.sendRawBytes(payload)
                     ctrlLatched = termController.isCtrlLatched()
                     shiftLatched = termController.isShiftLatched()
-                    if (key.action.keyCode == "Backspace" && lineBuffer.isNotEmpty()) {
-                        lineBuffer = lineBuffer.dropLast(1)
-                        terminalSession?.let { s ->
-                            scheduleSuggest(
-                                s.hostId,
-                                lineBuffer,
-                                hosts.find { it.id == s.hostId },
-                                s.name,
-                            )
-                        }
-                    }
+                    trackUserInput(payload)
                 }
                 ResolvedKeyAction.None -> Unit
             }
@@ -860,15 +1065,14 @@ private fun MtmuxRoot(app: MtmuxApp, activity: ComponentActivity) {
                     onBack = { showPrivacy = false },
                     onDeleteAllData = {
                         scope.launch {
-                            runCatching { c.hosts.deleteAllData() }
-                                .onSuccess {
-                                    sessions = emptyList()
-                                    toast(tr(UiR.string.privacy_delete_all_done))
-                                    showPrivacy = false
-                                }
-                                .onFailure {
-                                    toast(tr(UiR.string.privacy_delete_all_fail))
-                                }
+                            // Secrets first (Keystore-backed), then every file, database and
+                            // preference the app owns. The system kills the process afterwards.
+                            val secretsOk = runCatching { c.hosts.deleteAllData() }.isSuccess
+                            val am = ctx.getSystemService(Context.ACTIVITY_SERVICE) as android.app.ActivityManager
+                            if (!am.clearApplicationUserData()) {
+                                DiagLog.e("privacy", "clearApplicationUserData refused secretsOk=$secretsOk")
+                                toast(tr(UiR.string.privacy_delete_all_fail), force = true)
+                            }
                         }
                     },
                 )
@@ -878,9 +1082,7 @@ private fun MtmuxRoot(app: MtmuxApp, activity: ComponentActivity) {
             if (showSnippets) {
                 BackHandler { showSnippets = false }
                 SnippetsScreen(
-                    snippets = snippetsFlow.map {
-                        Snippet(it.id, it.name, it.body, it.tagsCsv.split(',').filter { t -> t.isNotBlank() }, it.runOnSelect)
-                    },
+                    snippets = snippetModels,
                     onBack = { showSnippets = false },
                     onSave = { sn ->
                         scope.launch {
@@ -939,7 +1141,7 @@ private fun MtmuxRoot(app: MtmuxApp, activity: ComponentActivity) {
                     onSelectActive = { id ->
                         scope.launch {
                             c.keyboards.setActive(id)
-                            toast(tr(UiR.string.toast_switched, id))
+                            toast(tr(UiR.string.toast_switched, keyboardLayouts.find { it.id == id }?.name ?: id))
                         }
                     },
                     onEdit = { editingKeyboard = it },
@@ -992,78 +1194,28 @@ private fun MtmuxRoot(app: MtmuxApp, activity: ComponentActivity) {
                 return@CompositionLocalProvider
             }
 
-            if (exportPassword != null) {
-                var pwd by remember { mutableStateOf("") }
-                AlertDialog(
-                    onDismissRequest = { exportPassword = null },
-                    title = { Text(stringResource(UiR.string.export_title)) },
-                    text = {
-                        OutlinedTextField(
-                            value = pwd,
-                            onValueChange = { pwd = it },
-                            label = { Text(stringResource(UiR.string.export_password)) },
-                            singleLine = true,
-                        )
-                    },
-                    confirmButton = {
-                        TextButton(onClick = {
-                            scope.launch {
-                                val hostsE = hosts.mapNotNull { c.db.hosts().get(it.id) }
-                                val snips = c.db.snippets().all()
-                                val plain = ConfigExport.exportJson(hostsE, snips, includeKeys = false)
-                                val enc = ConfigExport.encrypt(plain, pwd.toCharArray())
-                                val cm = ctx.getSystemService(Context.CLIPBOARD_SERVICE) as ClipboardManager
-                                cm.setPrimaryClip(ClipData.newPlainText("mtmux-export", enc))
-                                toast(tr(UiR.string.toast_export_copied))
-                                exportPassword = null
-                            }
-                        }) { Text(stringResource(UiR.string.export_clipboard)) }
-                    },
-                    dismissButton = {
-                        TextButton(onClick = { exportPassword = null }) { Text(stringResource(UiR.string.cancel)) }
-                    },
+            if (showExport) {
+                ExportConfigDialog(
+                    busy = exportBusy,
+                    onDismiss = { showExport = false },
+                    onExport = { pwd, includeSecrets, target -> runExport(pwd, includeSecrets, target) },
                 )
             }
 
-            if (importBlob != null) {
-                var blob by remember { mutableStateOf("") }
-                var pwd by remember { mutableStateOf("") }
-                AlertDialog(
-                    onDismissRequest = { importBlob = null },
-                    title = { Text(stringResource(UiR.string.import_title)) },
-                    text = {
-                        Column {
-                            OutlinedTextField(
-                                value = blob,
-                                onValueChange = { blob = it },
-                                label = { Text(stringResource(UiR.string.import_json)) },
-                                minLines = 3,
-                            )
-                            OutlinedTextField(
-                                value = pwd,
-                                onValueChange = { pwd = it },
-                                label = { Text(stringResource(UiR.string.import_password)) },
-                                singleLine = true,
-                            )
-                        }
+            if (showImport) {
+                ImportConfigDialog(
+                    busy = importBusy,
+                    loadedText = importLoaded,
+                    error = importError,
+                    onDismiss = {
+                        showImport = false
+                        importLoaded = null
+                        importError = null
                     },
-                    confirmButton = {
-                        TextButton(onClick = {
-                            scope.launch {
-                                runCatching {
-                                    val plain = ConfigExport.decrypt(blob, pwd.toCharArray())
-                                    val (hs, sn) = ConfigExport.parseImport(plain)
-                                    hs.forEach { c.db.hosts().upsert(it) }
-                                    sn.forEach { c.db.snippets().upsert(it) }
-                                    toast(tr(UiR.string.toast_imported_n, hs.size, sn.size))
-                                }.onFailure { toast(tr(UiR.string.toast_import_fail_msg, it.message ?: "")) }
-                                importBlob = null
-                            }
-                        }) { Text(stringResource(UiR.string.import_action)) }
+                    onPickFile = {
+                        runCatching { openImportFile.launch(arrayOf("application/json", "text/plain", "*/*")) }
                     },
-                    dismissButton = {
-                        TextButton(onClick = { importBlob = null }) { Text(stringResource(UiR.string.cancel)) }
-                    },
+                    onImport = { blob, pwd -> runImport(blob, pwd) },
                 )
             }
 
@@ -1100,7 +1252,8 @@ private fun MtmuxRoot(app: MtmuxApp, activity: ComponentActivity) {
                     text = {
                         Text(
                             wins.joinToString("\n") {
-                                "${it.index}: ${it.name} (${it.panes} panes)${if (it.active) " *" else ""}"
+                                "${it.index}: ${it.name} · " + tr(UiR.string.windows_panes, it.panes) +
+                                    if (it.active) " *" else ""
                             }.ifBlank { tr(UiR.string.windows_empty) },
                         )
                     },
@@ -1255,13 +1408,15 @@ fi
                     onCopyCommand = {
                         val host = hosts.find { it.id == sess.hostId }
                         val sock = sess.socketPath
+                        val target = TmuxControl.shellQuote(sess.name)
                         val attachPart = if (!sock.isNullOrBlank()) {
-                            "tmux -S ${TmuxControl.shellQuote(sock)} attach -t ${sess.name}"
+                            "tmux -S ${TmuxControl.shellQuote(sock)} attach -t $target"
                         } else {
-                            "tmux attach -t ${sess.name}"
+                            "tmux attach -t $target"
                         }
                         val cmd = if (host != null) {
-                            "ssh -p ${host.port} ${host.username}@${host.hostname} -t ${TmuxControl.shellQuote(attachPart)}"
+                            val portPart = if (host.port != 22) "-p ${host.port} " else ""
+                            "ssh -t $portPart${host.username}@${host.hostname} ${TmuxControl.shellQuote(attachPart)}"
                         } else {
                             attachPart
                         }
@@ -1386,6 +1541,7 @@ fi
                     installPty = null
                     ctrlLatched = false
                     shiftLatched = false
+                    altLatched = false
                     if (reprobe) {
                         scope.launch {
                             if (!connectWithHostKeyUi(h)) {
@@ -1496,6 +1652,8 @@ fi
                         termController.setShiftLatch(latched)
                         shiftLatched = latched
                     },
+                    altLatched = altLatched,
+                    onAltLatch = { altLatched = it },
                     connecting = !installShellReady,
                     connectingMessage = installPhase.ifBlank { tr(UiR.string.term_connecting) },
                     onBack = { leaveInstall(reprobe = true) },
@@ -1635,8 +1793,11 @@ fi
                     terminalSession = null
                     ctrlLatched = false
                     shiftLatched = false
+                    altLatched = false
+                    suggestJob?.cancel()
                     suggestions = emptyList()
-                    lineBuffer = ""
+                    inputTracker.reset()
+                    shellLineActive = false
 
                     scope.launch {
                         val remote = runCatching {
@@ -2076,6 +2237,11 @@ fi
                         termController.setShiftLatch(latched)
                         shiftLatched = latched
                     },
+                    altLatched = altLatched,
+                    onAltLatch = { altLatched = it },
+                    snippets = snippetModels,
+                    onSnippet = { insertSnippet(it) },
+                    autocompleteEnabled = autocompleteOn,
                     keyboardLayout = activeKeyboard,
                     availableLayouts = keyboardLayouts,
                     onKeyboardLayoutChange = { id -> scope.launch { c.keyboards.setActive(id) } },
@@ -2097,13 +2263,23 @@ fi
                     onSendDraft = { text -> termController.trySendDraft(text) },
                     onSuggestion = { sug ->
                         val body = ComposeHistory.payload(sug.insertion)
-                        if (termController.trySendDraft(body)) {
-                            if (sug.runAfterInsert) {
-                                scope.launch { termController.sendText("\r") }
-                                lineBuffer = ""
-                            } else {
-                                lineBuffer += body
+                        // Paths complete the last token; other suggestions replace the typed line.
+                        val typed = if (sug.source == SuggestionSource.PATH) 0 else {
+                            inputTracker.line.let { it.codePointCount(0, it.length) }
+                        }
+                        scope.launch {
+                            if (typed > 0) {
+                                val erase = ByteArray(typed) { 0x7F }
+                                termController.sendRawBytes(erase)
+                                inputTracker.feed(erase)
                             }
+                            if (termController.trySendDraft(body)) {
+                                if (sug.runAfterInsert) {
+                                    termController.sendRawBytes("\r".toByteArray())
+                                    trackUserInput("\r".toByteArray())
+                                }
+                            }
+                            suggestJob?.cancel()
                             suggestions = emptyList()
                         }
                     },
@@ -2284,7 +2460,9 @@ fi
                             onNewSession = { showNewSession = true },
                             onOpenInstall = {
                                 scope.launch {
-                                    val h = hosts.firstOrNull()
+                                    // The empty list means tmux is missing somewhere: check that host first.
+                                    val h = hosts.firstOrNull { it.tmuxInstalled == false }
+                                        ?: hosts.firstOrNull()
                                     if (h == null) {
                                         toast(tr(UiR.string.toast_add_host_first))
                                         return@launch
@@ -2399,8 +2577,12 @@ fi
                             onOpenSnippets = { showSnippets = true },
                             onOpenKeyboards = { showKeyboards = true },
                             onOpenPrivacy = { showPrivacy = true },
-                            onExport = { exportPassword = "show" },
-                            onImport = { importBlob = "show" },
+                            onExport = { showExport = true },
+                            onImport = {
+                                importLoaded = null
+                                importError = null
+                                showImport = true
+                            },
                             onFeedbackLog = { note ->
                                 scope.launch {
                                     dismissToasts()
@@ -2446,4 +2628,16 @@ fi
             }
         }
     }
+}
+
+/** InputStream.readNBytes is API 33+; read at most [limit] bytes. */
+private fun java.io.InputStream.readNBytesCompat(limit: Int): ByteArray {
+    val out = java.io.ByteArrayOutputStream()
+    val buf = ByteArray(8192)
+    while (out.size() < limit) {
+        val n = read(buf, 0, minOf(buf.size, limit - out.size()))
+        if (n <= 0) break
+        out.write(buf, 0, n)
+    }
+    return out.toByteArray()
 }

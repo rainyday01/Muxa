@@ -104,6 +104,7 @@ import app.mtmux.core.model.KeyActionType
 import app.mtmux.core.model.KeyboardKey
 import app.mtmux.core.model.KeyboardLayout
 import app.mtmux.core.model.ShortcutOrder
+import app.mtmux.core.model.Snippet
 import app.mtmux.core.model.Suggestion
 import app.mtmux.core.ui.terminal.BuiltinSchemes
 import app.mtmux.core.ui.terminal.TerminalTypefaceCache
@@ -132,6 +133,7 @@ fun TerminalScreen(
     onKeyboardLayoutChange: ((String) -> Unit)? = null,
     ctrlLatched: Boolean = false,
     shiftLatched: Boolean = false,
+    altLatched: Boolean = false,
     /**
      * Font size in **px** for Termux [TerminalView.setTextSize] (Termux KEY_FONTSIZE).
      * Min 13 matches 0.1.22 hardcoded size.
@@ -144,6 +146,10 @@ fun TerminalScreen(
     onSurfaceSize: ((cols: Int, rows: Int) -> Unit)? = null,
     onDisconnect: (() -> Unit)? = null,
     onToggleAutocomplete: (() -> Unit)? = null,
+    autocompleteEnabled: Boolean = false,
+    /** Saved snippets offered from the ⋮ menu; picking one calls [onSnippet]. */
+    snippets: List<Snippet> = emptyList(),
+    onSnippet: ((Snippet) -> Unit)? = null,
     onPaste: (() -> Unit)? = null,
     onOpenKeyboardSettings: (() -> Unit)? = null,
     connecting: Boolean = false,
@@ -153,6 +159,7 @@ fun TerminalScreen(
     onScrollChanged: (() -> Unit)? = null,
     onCtrlLatch: ((Boolean) -> Unit)? = null,
     onShiftLatch: ((Boolean) -> Unit)? = null,
+    onAltLatch: ((Boolean) -> Unit)? = null,
     /** Alt-screen finger page (tmux copy-mode for inline CLIs). */
     onAltFingerScroll: ((Boolean) -> Boolean)? = null,
     shortcutOrder: List<String> = emptyList(),
@@ -166,6 +173,7 @@ fun TerminalScreen(
     var expanded by remember { mutableStateOf(false) }
     var menuOpen by remember { mutableStateOf(false) }
     var reorderOpen by remember { mutableStateOf(false) }
+    var snippetsOpen by remember { mutableStateOf(false) }
     var draft by remember { mutableStateOf("") }
     var historyOpen by remember { mutableStateOf(false) }
     val context = LocalContext.current
@@ -193,6 +201,8 @@ fun TerminalScreen(
             var onCtrlConsumed: (() -> Unit)? = null
             var shiftLatched: Boolean = false
             var onShiftConsumed: (() -> Unit)? = null
+            var altLatched: Boolean = false
+            var onAltConsumed: (() -> Unit)? = null
             var onAltScroll: ((Boolean) -> Boolean)? = null
         }
     }
@@ -209,6 +219,11 @@ fun TerminalScreen(
     sizeListeners.onShiftConsumed = {
         sizeListeners.shiftLatched = false
         onShiftLatch?.invoke(false)
+    }
+    sizeListeners.altLatched = altLatched
+    sizeListeners.onAltConsumed = {
+        sizeListeners.altLatched = false
+        onAltLatch?.invoke(false)
     }
     sizeListeners.onAltScroll = onAltFingerScroll
 
@@ -263,6 +278,8 @@ fun TerminalScreen(
             onCtrlLatchConsumed = { sizeListeners.onCtrlConsumed?.invoke() },
             isShiftLatched = { sizeListeners.shiftLatched },
             onShiftLatchConsumed = { sizeListeners.onShiftConsumed?.invoke() },
+            isAltLatched = { sizeListeners.altLatched },
+            onAltLatchConsumed = { sizeListeners.onAltConsumed?.invoke() },
             altFingerScrollHandler = { up -> sizeListeners.onAltScroll?.invoke(up) ?: false },
             terminalSelected = { !composeEditor.focused },
         )
@@ -563,8 +580,22 @@ fun TerminalScreen(
                             },
                         )
                     }
+                    if (onSnippet != null) {
+                        DropdownMenuItem(
+                            text = { Text(stringResource(R.string.term_snippets)) },
+                            onClick = {
+                                menuOpen = false
+                                snippetsOpen = true
+                            },
+                        )
+                    }
                     DropdownMenuItem(
-                        text = { Text(stringResource(R.string.term_toggle_complete)) },
+                        text = {
+                            Text(
+                                (if (autocompleteEnabled) "✓ " else "") +
+                                    stringResource(R.string.term_toggle_complete),
+                            )
+                        },
                         onClick = {
                             onToggleAutocomplete?.invoke()
                             menuOpen = false
@@ -671,31 +702,6 @@ fun TerminalScreen(
             }
         }
 
-        if (suggestions.isNotEmpty() && !expanded) {
-            Row(
-                Modifier
-                    .fillMaxWidth()
-                    .background(keyBarBg)
-                    .horizontalScroll(rememberScrollState())
-                    .padding(horizontal = 8.dp, vertical = 4.dp),
-                horizontalArrangement = Arrangement.spacedBy(6.dp),
-            ) {
-                val chipBg = Color.White.copy(alpha = 0.12f)
-                suggestions.forEach { s ->
-                    Text(
-                        s.label,
-                        color = keyText,
-                        fontSize = 12.sp,
-                        modifier = Modifier
-                            .clip(RoundedCornerShape(8.dp))
-                            .background(chipBg)
-                            .clickable { onSuggestion(s) }
-                            .padding(horizontal = 10.dp, vertical = 6.dp),
-                    )
-                }
-            }
-        }
-
         // Bottom chrome:
         //   special bar  (always)
         //   slot under bar  (height = keyboard footprint OR 0)
@@ -753,13 +759,37 @@ fun TerminalScreen(
                         modifier = Modifier.size(22.dp),
                     )
                 }
+                // Completion chips lead the scrolling keys inside the bar: a separate
+                // row would change the grid height (and send WINCH) on every keystroke.
+                val barScroll = rememberScrollState()
+                val showChips = suggestions.isNotEmpty() && !expanded
+                LaunchedEffect(showChips, suggestions) {
+                    if (showChips) barScroll.scrollTo(0)
+                }
                 Row(
                     Modifier
                         .weight(1f)
                         .fillMaxHeight()
-                        .horizontalScroll(rememberScrollState()),
+                        .horizontalScroll(barScroll),
                     verticalAlignment = Alignment.CenterVertically,
                 ) {
+                    if (showChips) {
+                        suggestions.forEach { sug ->
+                            Text(
+                                sug.label,
+                                color = keyText,
+                                fontSize = 13.sp,
+                                maxLines = 1,
+                                modifier = Modifier
+                                    .padding(start = 6.dp)
+                                    .clip(RoundedCornerShape(8.dp))
+                                    .background(Color(0xFF3A3A6A))
+                                    .clickable { onSuggestion(sug) }
+                                    .padding(horizontal = 10.dp, vertical = 7.dp),
+                            )
+                        }
+                        Spacer(Modifier.width(6.dp))
+                    }
                     orderedBarKeys.forEach { key ->
                         val label = app.mtmux.core.ui.keyboard.BuiltinKeyLabels.of(
                             key,
@@ -767,13 +797,19 @@ fun TerminalScreen(
                         )
                         val latched = key.action.type == KeyActionType.MODIFIER_LATCH &&
                             when (key.action.modifier?.lowercase()) {
-                                "ctrl" -> ctrlLatched
+                                "ctrl", "control" -> ctrlLatched
                                 "shift" -> shiftLatched
+                                "alt", "meta" -> altLatched
                                 else -> false
                             }
                         SpecialBarCell(
                             Modifier.widthIn(min = 52.dp),
-                            onClick = { onKeyPress(key) },
+                            onClick = {
+                                when (key.id) {
+                                    "paste", "hide", "settings", "more" -> pressSpecial(key.id, key)
+                                    else -> onKeyPress(key)
+                                }
+                            },
                             onLongClick = { reorderOpen = true },
                             divider = true,
                             dividerColor = keyBarDivider,
@@ -860,13 +896,14 @@ fun TerminalScreen(
                                                 color = keyText,
                                                 selected = k.action.type == KeyActionType.MODIFIER_LATCH &&
                                                     when (k.action.modifier?.lowercase()) {
-                                                        "ctrl" -> ctrlLatched
+                                                        "ctrl", "control" -> ctrlLatched
                                                         "shift" -> shiftLatched
+                                                        "alt", "meta" -> altLatched
                                                         else -> false
                                                     },
                                                 onClick = {
                                                     when (k.id) {
-                                                        "paste", "hide", "settings" -> pressSpecial(k.id, k)
+                                                        "paste", "hide", "settings", "more" -> pressSpecial(k.id, k)
                                                         else -> onKeyPress(k)
                                                     }
                                                 },
@@ -879,6 +916,16 @@ fun TerminalScreen(
                     }
                 }
             }
+        }
+        if (snippetsOpen && onSnippet != null) {
+            SnippetPickerDialog(
+                snippets = snippets,
+                onPick = {
+                    snippetsOpen = false
+                    onSnippet(it)
+                },
+                onDismiss = { snippetsOpen = false },
+            )
         }
         if (reorderOpen) {
             ShortcutReorderDialog(
@@ -1105,6 +1152,49 @@ private fun ComposeDraftBar(
             )
         }
     }
+}
+
+@Composable
+private fun SnippetPickerDialog(
+    snippets: List<Snippet>,
+    onPick: (Snippet) -> Unit,
+    onDismiss: () -> Unit,
+) {
+    AlertDialog(
+        onDismissRequest = onDismiss,
+        title = { Text(stringResource(R.string.term_snippets)) },
+        text = {
+            if (snippets.isEmpty()) {
+                Text(stringResource(R.string.term_snippets_empty))
+            } else {
+                Column(Modifier.verticalScroll(rememberScrollState())) {
+                    snippets.forEach { sn ->
+                        Column(
+                            Modifier
+                                .fillMaxWidth()
+                                .clickable { onPick(sn) }
+                                .padding(vertical = 10.dp),
+                        ) {
+                            Text(
+                                (if (sn.runOnSelect) "⏎ " else "") + sn.name,
+                                fontWeight = FontWeight.Medium,
+                            )
+                            Text(
+                                sn.body.lineSequence().firstOrNull().orEmpty(),
+                                fontSize = 12.sp,
+                                fontFamily = androidx.compose.ui.text.font.FontFamily.Monospace,
+                                maxLines = 1,
+                                overflow = TextOverflow.Ellipsis,
+                            )
+                        }
+                    }
+                }
+            }
+        },
+        confirmButton = {
+            TextButton(onClick = onDismiss) { Text(stringResource(R.string.close)) }
+        },
+    )
 }
 
 @Composable

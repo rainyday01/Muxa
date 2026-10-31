@@ -133,6 +133,11 @@ public final class TerminalSession extends TerminalOutput {
         }
     }
 
+    /** True while the emulator answers a remote query (DA, DSR…): that write is not user input. */
+    public boolean isWritingEmulatorReply() {
+        return mInEmulatorAppend;
+    }
+
     /** Uptime (ms) of the last remote output applied to the emulator; 0 if none. */
     public long getLastRemoteOutputAt() {
         return mLastRemoteOutputAt;
