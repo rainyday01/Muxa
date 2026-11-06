@@ -737,9 +737,14 @@ public final class TerminalView extends View {
                 return;
             }
             // Local VT transcript when the alt buffer actually accumulated lines.
-            if (mTopRow < 0 || transcript >= Math.max(8, mEmulator.mRows / 4)) {
+            if (mTopRow < 0 || usableLocal) {
                 mRemotePageRowAcc = 0;
                 scrollLocalTranscript(up, amount);
+                return;
+            }
+            // Inline pane at the top of its history: nothing above, and no app to page.
+            if (mClient != null && mClient.isAltPaneInline()) {
+                mRemotePageRowAcc = 0;
                 return;
             }
             // True full-screen TUI with no local history: Shift+Up/Down + PgUp/PgDn.
@@ -759,6 +764,7 @@ public final class TerminalView extends View {
      */
     private boolean hasUsableLocalHistory(int transcriptRows) {
         if (mEmulator == null || transcriptRows <= 0) return false;
+        if (mClient != null && mClient.isAltPaneInline()) return true;
         return transcriptRows >= Math.max(8, mEmulator.mRows / 4);
     }
 

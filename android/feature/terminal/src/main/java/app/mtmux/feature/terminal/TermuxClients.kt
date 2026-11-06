@@ -55,6 +55,8 @@ class MtmuxViewClient(
     private val onAltLatchConsumed: (() -> Unit)? = null,
     /** Alt-screen finger page. Return true if handled (tmux copy-mode). */
     private val altFingerScrollHandler: ((Boolean) -> Boolean)? = null,
+    /** tmux pane known to be on its main screen; see [TerminalViewClient.isAltPaneInline]. */
+    private val altPaneInline: () -> Boolean = { false },
     /**
      * False while the compose field is the editor. Termux only advertises the
      * terminal input type when this is true, so a focused text field can own the IME.
@@ -65,6 +67,7 @@ class MtmuxViewClient(
     override fun onSingleTapUp(e: MotionEvent) = onSingleTap()
     override fun onAltFingerScroll(up: Boolean, rows: Int): Boolean =
         altFingerScrollHandler?.invoke(up) ?: false
+    override fun isAltPaneInline(): Boolean = altPaneInline()
     override fun shouldBackButtonBeMappedToEscape(): Boolean = false
     override fun shouldEnforceCharBasedInput(): Boolean = true
     override fun shouldUseCtrlSpaceWorkaround(): Boolean = false

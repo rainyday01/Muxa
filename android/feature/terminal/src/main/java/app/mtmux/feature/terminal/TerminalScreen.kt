@@ -162,6 +162,7 @@ fun TerminalScreen(
     onAltLatch: ((Boolean) -> Unit)? = null,
     /** Alt-screen finger page (tmux copy-mode for inline CLIs). */
     onAltFingerScroll: ((Boolean) -> Boolean)? = null,
+    isAltPaneInline: () -> Boolean = { false },
     shortcutOrder: List<String> = emptyList(),
     onShortcutOrderChange: (List<String>) -> Unit = {},
     composeEnabled: Boolean = false,
@@ -204,6 +205,7 @@ fun TerminalScreen(
             var altLatched: Boolean = false
             var onAltConsumed: (() -> Unit)? = null
             var onAltScroll: ((Boolean) -> Boolean)? = null
+            var altPaneInline: () -> Boolean = { false }
         }
     }
     sizeListeners.onSurface = onSurfaceSize
@@ -226,6 +228,7 @@ fun TerminalScreen(
         onAltLatch?.invoke(false)
     }
     sizeListeners.onAltScroll = onAltFingerScroll
+    sizeListeners.altPaneInline = isAltPaneInline
 
     fun reportGeometry(cols: Int, rows: Int) {
         if (cols == applied[1] && rows == applied[2]) return
@@ -281,6 +284,7 @@ fun TerminalScreen(
             isAltLatched = { sizeListeners.altLatched },
             onAltLatchConsumed = { sizeListeners.onAltConsumed?.invoke() },
             altFingerScrollHandler = { up -> sizeListeners.onAltScroll?.invoke(up) ?: false },
+            altPaneInline = { sizeListeners.altPaneInline() },
             terminalSelected = { !composeEditor.focused },
         )
     }

@@ -47,6 +47,8 @@ class UserPreferences(private val context: Context) {
     private val terminalBufferLinesKey = intPreferencesKey("terminal_buffer_lines")
     /** Keep display on while terminal session is open (Termius "Prevent sleeping"). */
     private val preventSleepingKey = booleanPreferencesKey("terminal_prevent_sleeping")
+    /** Minutes the connection is held after leaving the app; 0 = no holding. */
+    private val backgroundKeepMinutesKey = intPreferencesKey("background_keep_minutes")
     /**
      * Host ids where Mosh UDP was **positively** verified (env check or live session with bytes).
      * AUTO prefers Mosh only for these — never on "binary installed" alone.
@@ -127,6 +129,11 @@ class UserPreferences(private val context: Context) {
 
     val terminalBufferLines: Flow<Int> = context.dataStore.data.map { prefs ->
         (prefs[terminalBufferLinesKey] ?: DEFAULT_BUFFER_LINES).coerceIn(MIN_BUFFER_LINES, MAX_BUFFER_LINES)
+    }
+
+    val backgroundKeepMinutes: Flow<Int> = context.dataStore.data.map { prefs ->
+        (prefs[backgroundKeepMinutesKey] ?: DEFAULT_BACKGROUND_KEEP_MINUTES)
+            .coerceIn(0, MAX_BACKGROUND_KEEP_MINUTES)
     }
 
     val preventSleeping: Flow<Boolean> = context.dataStore.data.map { prefs ->
@@ -211,6 +218,12 @@ class UserPreferences(private val context: Context) {
     suspend fun setTerminalBufferLines(lines: Int) {
         context.dataStore.edit {
             it[terminalBufferLinesKey] = lines.coerceIn(MIN_BUFFER_LINES, MAX_BUFFER_LINES)
+        }
+    }
+
+    suspend fun setBackgroundKeepMinutes(minutes: Int) {
+        context.dataStore.edit {
+            it[backgroundKeepMinutesKey] = minutes.coerceIn(0, MAX_BACKGROUND_KEEP_MINUTES)
         }
     }
 
@@ -328,7 +341,11 @@ class UserPreferences(private val context: Context) {
         const val DEFAULT_TERM_TYPE = "xterm-256color"
         const val MIN_BUFFER_LINES = 100
         const val MAX_BUFFER_LINES = 50000
-        const val DEFAULT_BUFFER_LINES = 1000
+        /** Above tmux's default history-limit (2000), so a pane's whole history fits. */
+        const val DEFAULT_BUFFER_LINES = 5000
+        const val DEFAULT_BACKGROUND_KEEP_MINUTES = 5
+        const val MAX_BACKGROUND_KEEP_MINUTES = 1440
+        val BACKGROUND_KEEP_PRESETS: List<Int> = listOf(0, 1, 5, 15, 30, 60, 120)
 
         fun parseCsv(raw: String?): List<String> =
             raw?.split(',')?.map { it.trim() }?.filter { it.isNotEmpty() }.orEmpty()

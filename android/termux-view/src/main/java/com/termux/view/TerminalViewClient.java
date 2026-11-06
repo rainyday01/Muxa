@@ -36,6 +36,14 @@ public interface TerminalViewClient {
         return false;
     }
 
+    /**
+     * True when the tmux pane is known to be on its main screen. Its history is what the
+     * local transcript holds, and paging keys would only land in the app's prompt.
+     */
+    default boolean isAltPaneInline() {
+        return false;
+    }
+
     boolean shouldBackButtonBeMappedToEscape();
 
     boolean shouldEnforceCharBasedInput();

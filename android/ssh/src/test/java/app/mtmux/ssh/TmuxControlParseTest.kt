@@ -62,6 +62,33 @@ class TmuxControlParseTest {
     }
 
     @Test
+    fun rememberedSocketFallsBackToDiscovery() {
+        val cmd = TmuxControl.paneHistoryCmd("agy", "/run/user/1000/tmux-1000/default", 100, null)
+        assertTrue(cmd.contains("has-session -t 'agy'"))
+        assertTrue(cmd.contains("_sock=${'$'}(_mtmux_find_session 'agy')"))
+        assertTrue(cmd.contains("'/run/user/1000/tmux-1000/default'"))
+    }
+
+    @Test
+    fun parsePaneHistorySkipsProfileNoiseAndTrailingNewline() {
+        val out = "Welcome\nMUXA_PANE 0 3 120 %5\none\n\nthree\n"
+        val h = TmuxControl.parsePaneHistory(out)!!
+        org.junit.Assert.assertFalse(h.alternate)
+        assertEquals(3, h.historySize)
+        assertEquals("0 3 120 %5", h.signature)
+        assertEquals(listOf("one", "", "three"), h.lines)
+    }
+
+    @Test
+    fun parsePaneHistoryAltAndEmpty() {
+        val alt = TmuxControl.parsePaneHistory("MUXA_PANE 1 900 5000 %2\n")!!
+        assertTrue(alt.alternate)
+        assertTrue(alt.lines.isEmpty())
+        assertNull(TmuxControl.parsePaneHistory("MUXA_PANE \n"))
+        assertNull(TmuxControl.parsePaneHistory(""))
+    }
+
+    @Test
     fun parseHostResourcesKv() {
         val raw = """
             TMUX=/usr/bin/tmux

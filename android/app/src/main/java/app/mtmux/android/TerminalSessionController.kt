@@ -17,6 +17,7 @@ import com.termux.terminal.TerminalSessionClient
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
+import kotlinx.coroutines.async
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.channels.consumeEach
 import kotlinx.coroutines.delay
@@ -28,6 +29,11 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
 import kotlinx.coroutines.withContext
+import kotlinx.coroutines.withTimeoutOrNull
+
+/** Finger scroll calls closer together than this belong to one gesture. */
+private const val SCROLL_GESTURE_GAP_MS = 400L
+private const val RESUME_PROBE_TIMEOUT_MS = 5_000L
 
 /**
  * Binds remote SSH PTY bytes into a **Termux** [TerminalSession] (battle-tested VT).
@@ -134,6 +140,12 @@ class TerminalSessionController(
     @Volatile private var tmuxHistoryPaging = false
     @Volatile private var tmuxCopyModeDepth = 0
     @Volatile private var lastTmuxPageMs = 0L
+    /** Pane is known to be on its main screen; false until the first pull answers. */
+    @Volatile private var tmuxPaneInline = false
+    @Volatile private var paneHistorySignature: String? = null
+    @Volatile private var lastPaneSyncMs = 0L
+    private var lastAltScrollMs = 0L
+    private val paneSyncRunning = java.util.concurrent.atomic.AtomicBoolean(false)
     /** Epoch captured when current collector started. */
     private var collectorEpoch: Long = -1L
 
@@ -274,16 +286,24 @@ class TerminalSessionController(
             markLinkDead("SSH not connected on resume")
             return@withContext false
         }
-        // Touch channel with a no-op resize; half-open sockets often fail here.
-        val cols = lastRemoteCols.coerceAtLeast(80)
-        val rows = lastRemoteRows.coerceAtLeast(24)
-        val ok = runCatching { p.resize(cols, rows) }.isSuccess
-        if (!ok) {
-            markLinkDead("PTY resize failed on resume")
+        // Writes succeed on a half-open socket for a long time; only a reply proves the link.
+        val hostId = lastAttach?.hostId ?: attachedHostId
+        val probe = scope.async(Dispatchers.IO) {
+            hostId != null && engine.exec(hostId, "true").isSuccess
+        }
+        if (withTimeoutOrNull(RESUME_PROBE_TIMEOUT_MS) { probe.await() } != true) {
+            probe.cancel()
+            markLinkDead("no reply on resume")
             return@withContext false
         }
+        DiagLog.i("pty", "link alive on resume")
         markLinkAlive()
         true
+    }
+
+    /** The keep-alive window ended in the background: give the connection up on purpose. */
+    fun releaseLinkInBackground() {
+        markLinkDead("background keep window ended")
     }
 
     fun isCtrlLatched(): Boolean = ctrlLatch
@@ -773,6 +793,7 @@ class TerminalSessionController(
      * history on the main buffer (AGy inline) — host runs `tmux copy-mode`.
      */
     fun onAltFingerScroll(up: Boolean): Boolean {
+        syncPaneHistoryOnGesture()
         if (!tmuxHistoryPaging) return false
         val now = android.os.SystemClock.uptimeMillis()
         if (now - lastTmuxPageMs < 130L) return true
@@ -804,14 +825,30 @@ class TerminalSessionController(
         return true
     }
 
+    /** tmux pane known to be on its main screen; see [TmuxControl.paneHistoryCmd]. */
+    fun isAltPaneInline(): Boolean = tmuxPaneInline
+
+    /**
+     * tmux holds the real history of an inline pane. Its lines reach the local transcript
+     * only partly: a burst larger than a screen, a redraw, a window switch or a reconnect
+     * leaves gaps. So a new scroll gesture pulls the pane's history again, if anything
+     * arrived since the last pull.
+     */
+    private fun syncPaneHistoryOnGesture() {
+        val now = android.os.SystemClock.uptimeMillis()
+        val newGesture = now - lastAltScrollMs > SCROLL_GESTURE_GAP_MS
+        lastAltScrollMs = now
+        if (!newGesture) return
+        val lastOutput = termuxSession?.getLastRemoteOutputAt() ?: return
+        if (lastOutput <= lastPaneSyncMs) return
+        syncPaneHistory()
+    }
+
     private fun refreshTmuxPagingHint() {
         tmuxHistoryPaging = false
         tmuxCopyModeDepth = 0
-        val attach = lastAttach ?: return
-        if (attach.rawShell || attach.sessionName.isBlank()) return
-        val hostId = attach.hostId
-        val session = attach.sessionName
-        val sock = attach.socketPath
+        tmuxPaneInline = false
+        paneHistorySignature = null
         val epoch = channelEpoch.get()
         scope.launch(Dispatchers.IO) {
             repeat(25) {
@@ -819,35 +856,57 @@ class TerminalSessionController(
                 delay(40)
             }
             delay(120)
-            if (!epochLive(epoch) || lastAttach?.sessionName != session) return@launch
-            val meta = runCatching {
-                engine.exec(hostId, TmuxControl.paneScrollMetaCmd(session, sock)).getOrNull()
-            }.getOrNull()?.trim().orEmpty()
-            val parts = meta.split(Regex("\\s+"))
-            val alt = parts.getOrNull(0) == "1"
-            val hist = parts.getOrNull(1)?.toIntOrNull() ?: 0
-            val height = parts.getOrNull(2)?.toIntOrNull() ?: 24
-            DiagLog.i("pty", "tmux scroll meta alt=$alt hist=$hist h=$height")
-            if (alt || hist <= height + 2) {
-                tmuxHistoryPaging = false
-                return@launch
-            }
-            val dump = runCatching {
-                engine.exec(hostId, TmuxControl.captureHistoryCmd(session, sock)).getOrNull()
-            }.getOrNull().orEmpty()
-            val all = dump.split('\n').map { it.trimEnd('\r') }
-            val keep = if (all.size > height) all.dropLast(height) else emptyList()
-            if (keep.isEmpty()) {
-                tmuxHistoryPaging = true
-                DiagLog.i("pty", "tmux scroll seed empty — copy-mode page fallback")
-                return@launch
-            }
-            val lines = keep.takeLast(800).toTypedArray()
-            tmuxHistoryPaging = false
-            withContext(Dispatchers.Main) {
-                if (!epochLive(epoch)) return@withContext
-                termuxSession?.prependScrollback(lines)
-                DiagLog.i("pty", "tmux scroll seeded ${lines.size} lines for local finger-follow")
+            if (epochLive(epoch)) syncPaneHistory()
+        }
+    }
+
+    private fun syncPaneHistory() {
+        val attach = lastAttach ?: return
+        if (attach.rawShell || attach.sessionName.isBlank()) return
+        if (!paneSyncRunning.compareAndSet(false, true)) return
+        val epoch = channelEpoch.get()
+        val session = termuxSession
+        val capacity = (transcriptRows - (session?.getEmulator()?.mRows ?: lastRemoteRows))
+            .coerceAtLeast(1)
+        scope.launch(Dispatchers.IO) {
+            try {
+                lastPaneSyncMs = android.os.SystemClock.uptimeMillis()
+                val cmd = TmuxControl.paneHistoryCmd(
+                    attach.sessionName,
+                    attach.socketPath,
+                    capacity,
+                    paneHistorySignature,
+                )
+                val pane = engine.exec(attach.hostId, cmd).getOrNull()
+                    ?.let(TmuxControl::parsePaneHistory)
+                if (!epochLive(epoch) || lastAttach?.sessionName != attach.sessionName) return@launch
+                if (pane == null) {
+                    DiagLog.w("pty", "tmux scroll meta unavailable session=${attach.sessionName}")
+                    return@launch
+                }
+                DiagLog.i(
+                    "pty",
+                    "tmux scroll meta alt=${pane.alternate} hist=${pane.historySize} lines=${pane.lines.size}",
+                )
+                tmuxPaneInline = !pane.alternate
+                // An alt-screen app's own redraws refill the transcript, so that case always clears.
+                if (!pane.alternate && pane.signature == paneHistorySignature) return@launch
+                // A pane with history that returned none: page it on the host instead.
+                tmuxHistoryPaging = !pane.alternate && pane.historySize > 0 && pane.lines.isEmpty()
+                if (tmuxHistoryPaging) {
+                    DiagLog.i("pty", "tmux scroll seed empty — copy-mode page fallback")
+                    return@launch
+                }
+                // An alt-screen app pages itself, so nothing local may shadow its keys.
+                val lines = if (pane.alternate) emptyArray() else pane.lines.toTypedArray()
+                withContext(Dispatchers.Main) {
+                    if (!epochLive(epoch) || termuxSession !== session) return@withContext
+                    session?.replaceScrollback(lines)
+                    paneHistorySignature = pane.signature
+                    DiagLog.i("pty", "tmux scroll seeded ${lines.size} lines for local finger-follow")
+                }
+            } finally {
+                paneSyncRunning.set(false)
             }
         }
     }
@@ -987,6 +1046,8 @@ class TerminalSessionController(
         termuxSession = null
         tmuxHistoryPaging = false
         tmuxCopyModeDepth = 0
+        tmuxPaneInline = false
+        paneHistorySignature = null
         clearStatus()
         _latencyMs.value = null
         _transportLabel.value = "SSH"

@@ -10,10 +10,19 @@ import java.io.BufferedOutputStream
 import java.io.ByteArrayOutputStream
 import java.io.File
 import java.net.HttpURLConnection
+import java.net.SocketTimeoutException
 import java.net.URL
 import java.util.zip.ZipEntry
 import java.util.zip.ZipOutputStream
 import kotlin.random.Random
+
+/** LogHub answered with a non-2xx status. */
+class LogHubHttpException(val code: Int, body: String) :
+    Exception("LogHub HTTP $code: ${body.take(400)}")
+
+/** This device already sent a log within [LogHubClient.UPLOAD_COOLDOWN_MS]. */
+class LogHubCooldownException(val waitSeconds: Int) :
+    Exception("LogHub cooldown ${waitSeconds}s")
 
 /**
  * Upload diagnostic packages to LogHub (https://loginfo.xcodeuk.com).
@@ -37,6 +46,12 @@ object LogHubClient {
     /** Cap log text so zip stays small (MinIO / reverse-proxy friendly). */
     private const val MAX_LOG_CHARS = 400_000
 
+    /** Server limits: 10 MB per package (multipart overhead left out), 20 uploads/hour per device. */
+    private const val MAX_ZIP_BYTES = 9_500_000
+    const val UPLOAD_COOLDOWN_MS = 60_000L
+    private const val RETRY_DELAY_MS = 1_000L
+    private const val LAST_UPLOAD_KEY = "last_upload_at"
+
     data class UploadResult(
         val id: String,
         val status: String,
@@ -57,7 +72,8 @@ object LogHubClient {
 
     /**
      * Build zip: app.log + device.json + note.txt, then multipart POST.
-     * [note] may be blank. Retries once on 502/503 (storage blips).
+     * [note] may be blank. One upload a minute; retries once on 502/503/timeout (storage
+     * blips), never on 429, which only more requests would make worse.
      */
     suspend fun uploadFeedback(
         context: Context,
@@ -66,9 +82,12 @@ object LogHubClient {
     ): Result<UploadResult> = withContext(Dispatchers.IO) {
         runCatching {
             check(isConfigured) { "LogHub upload token not configured" }
+            val prefs = context.getSharedPreferences("muxa_diag", Context.MODE_PRIVATE)
+            val wait = cooldownSeconds(prefs.getLong(LAST_UPLOAD_KEY, 0L), System.currentTimeMillis())
+            if (wait > 0) throw LogHubCooldownException(wait)
             val logText = cappedLog()
             val device = deviceId(context)
-            val zipBytes = buildZip(
+            val zipBytes = buildZipWithinLimit(
                 logText = logText,
                 deviceId = device,
                 appVersion = appVersion,
@@ -77,24 +96,56 @@ object LogHubClient {
             var lastErr: Throwable? = null
             repeat(2) { attempt ->
                 try {
-                    return@runCatching postMultipart(
+                    val result = postMultipart(
                         zipBytes = zipBytes,
                         deviceId = device,
                         appVersion = appVersion,
                         note = note.trim(),
                         osVersion = Build.VERSION.RELEASE?.takeIf { it.isNotBlank() } ?: "unknown",
                     )
+                    prefs.edit().putLong(LAST_UPLOAD_KEY, System.currentTimeMillis()).apply()
+                    return@runCatching result
                 } catch (t: Throwable) {
                     lastErr = t
-                    val msg = t.message.orEmpty()
-                    val retryable = msg.contains("502") || msg.contains("503") ||
-                        msg.contains("storage put", ignoreCase = true)
-                    if (!retryable || attempt == 1) throw t
-                    delay(800)
+                    if ((t as? LogHubHttpException)?.code == 429) {
+                        prefs.edit().putLong(LAST_UPLOAD_KEY, System.currentTimeMillis()).apply()
+                    }
+                    if (!isRetryable(t) || attempt == 1) throw t
+                    delay(RETRY_DELAY_MS)
                 }
             }
             throw lastErr ?: error("upload failed")
         }
+    }
+
+    /** Seconds left before another upload; 0 if none, or if the clock moved backwards. */
+    internal fun cooldownSeconds(lastUploadAt: Long, now: Long): Int {
+        val left = lastUploadAt + UPLOAD_COOLDOWN_MS - now
+        return if (left <= 0 || left > UPLOAD_COOLDOWN_MS) 0 else ((left + 999) / 1000).toInt()
+    }
+
+    internal fun isRetryable(t: Throwable): Boolean = when (t) {
+        is SocketTimeoutException -> true
+        is LogHubHttpException -> t.code == 502 || t.code == 503 ||
+            t.message.orEmpty().contains("storage put", ignoreCase = true)
+        else -> false
+    }
+
+    /** [buildZip], dropping the oldest half of the log until the package fits [maxBytes]. */
+    internal fun buildZipWithinLimit(
+        logText: String,
+        deviceId: String,
+        appVersion: String,
+        note: String,
+        maxBytes: Int = MAX_ZIP_BYTES,
+    ): ByteArray {
+        var log = logText
+        var zip = buildZip(log, deviceId, appVersion, note)
+        while (zip.size > maxBytes && log.isNotEmpty()) {
+            log = log.takeLast(log.length / 2)
+            zip = buildZip(log, deviceId, appVersion, note)
+        }
+        return zip
     }
 
     /** The diagnostic log, trimmed from the front to [MAX_LOG_CHARS]. */
@@ -199,7 +250,7 @@ object LogHubClient {
         conn.disconnect()
 
         if (code !in 200..299) {
-            error("LogHub HTTP $code: ${respBody.take(400)}")
+            throw LogHubHttpException(code, respBody)
         }
         val json = JSONObject(respBody)
         return UploadResult(

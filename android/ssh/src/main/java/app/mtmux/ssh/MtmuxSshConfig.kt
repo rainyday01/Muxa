@@ -1,5 +1,6 @@
 package app.mtmux.ssh
 
+import net.schmizz.keepalive.KeepAliveProvider
 import net.schmizz.sshj.DefaultConfig
 import net.schmizz.sshj.common.Factory
 
@@ -19,6 +20,9 @@ object MtmuxSshConfig {
         SshCryptoBootstrap.ensure()
         val caps = SshCryptoBootstrap.capabilities()
         val config = DefaultConfig()
+        // keepalive@openssh.com gets a reply, so a dead link is noticed; the default
+        // heartbeat is send-only and never reveals one.
+        config.keepAliveProvider = KeepAliveProvider.KEEP_ALIVE
 
         // --- Key exchange ---
         var kex = config.keyExchangeFactories.toList()

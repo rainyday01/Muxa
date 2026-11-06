@@ -173,6 +173,16 @@ public final class TerminalBuffer {
         mActiveTranscriptRows += n;
     }
 
+    /**
+     * Replace the whole transcript with {@code oldestFirst}. tmux owns the pane's history;
+     * what reached the local transcript is partial (large bursts, redraws, reconnect gaps).
+     * The visible screen does not move.
+     */
+    public void replaceTranscriptLines(String[] oldestFirst) {
+        mActiveTranscriptRows = 0;
+        prependTranscriptLines(oldestFirst);
+    }
+
     private void fillPlainRow(TerminalRow row, String raw) {
         if (raw == null || raw.isEmpty()) return;
         int col = 0;

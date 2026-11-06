@@ -329,12 +329,23 @@ _mtmux_canonical_base() {
             socketPath: String?,
             body: (tmuxClient: String) -> String,
         ): String {
-            if (!socketPath.isNullOrBlank()) {
-                return "$SOCKET_HELPER\n${body(tmuxBin(socketPath))}\n"
+            val nameQ = shellQuote(sessionName)
+            // A remembered path goes stale when the tmux server restarts elsewhere
+            // (session list cache, /run/user vs /tmp); fall back to discovery like
+            // attachOrCreateCmd does, or these commands silently print nothing.
+            val locate = if (socketPath.isNullOrBlank()) {
+                "_sock=${'$'}(_mtmux_find_session $nameQ)"
+            } else {
+                """
+_sock=${shellQuote(socketPath)}
+if ! tmux -S "${'$'}_sock" has-session -t $nameQ 2>/dev/null; then
+  _sock=${'$'}(_mtmux_find_session $nameQ)
+fi
+""".trim()
             }
             return """
 $SOCKET_HELPER
-_sock=${'$'}(_mtmux_find_session ${shellQuote(sessionName)})
+$locate
 if [ -n "${'$'}_sock" ]; then
   ${body("tmux -S \"${'$'}_sock\"")}
 else
@@ -458,22 +469,63 @@ exec tmux new-session -A -s $nameQ
         fun shellQuote(s: String): String =
             "'" + s.replace("'", "'\"'\"'") + "'"
 
+        private const val PANE_META_MARK = "MUXA_PANE "
+
+        /** Pane state plus its scrolled-off lines (empty when not asked for or not applicable). */
+        data class PaneHistory(
+            val alternate: Boolean,
+            val historySize: Int,
+            /** Changes when the pane's history does; compare to skip a re-capture. */
+            val signature: String,
+            val lines: List<String>,
+        )
+
         /**
-         * Pane scroll meta: `alternate_on history_size pane_height`.
-         * Inline CLIs (AGy) keep history on the main pane; tmux-client 1049h is not the app's alt-screen.
+         * First line: `alternate_on history_size history_bytes pane_id`. Then, unless the pane
+         * is on its own alt screen, is empty or still matches [knownSignature], up to [maxLines]
+         * of history (`-E -1` stops above the visible screen).
+         * Inline CLIs (AGy, Claude…) keep history on the main pane; tmux-client 1049h is not
+         * the app's alt screen.
          */
-        fun captureHistoryCmd(sessionName: String, socketPath: String?): String {
+        fun paneHistoryCmd(
+            sessionName: String,
+            socketPath: String?,
+            maxLines: Int,
+            knownSignature: String?,
+        ): String {
             val q = shellQuote(sessionName)
+            val known = shellQuote(knownSignature.orEmpty())
             return withSessionSocket(sessionName, socketPath) { t ->
-                "$t capture-pane -p -S - -t $q 2>/dev/null || true"
+                """
+_m=${'$'}($t display-message -p -t $q '#{alternate_on} #{history_size} #{history_bytes} #{pane_id}' 2>/dev/null)
+printf '$PANE_META_MARK%s\n' "${'$'}_m"
+if [ "${'$'}_m" != $known ]; then
+  case "${'$'}_m" in
+    "0 0 "*|"") ;;
+    "0 "*) $t capture-pane -p -S -${maxLines.coerceAtLeast(1)} -E -1 -t $q 2>/dev/null || true ;;
+  esac
+fi
+""".trim()
             }
         }
 
-        fun paneScrollMetaCmd(sessionName: String, socketPath: String?): String {
-            val q = shellQuote(sessionName)
-            return withSessionSocket(sessionName, socketPath) { t ->
-                "$t display-message -p -t $q '#{alternate_on} #{history_size} #{pane_height}' 2>/dev/null || true"
-            }
+        /** Null when tmux answered nothing (no such session, SSH failure). */
+        fun parsePaneHistory(output: String): PaneHistory? {
+            // The marker skips anything a login profile printed first.
+            val rows = output.split('\n').map { it.trimEnd('\r') }
+                .dropWhile { !it.startsWith(PANE_META_MARK) }
+            val signature = rows.firstOrNull()?.removePrefix(PANE_META_MARK)?.trim().orEmpty()
+            val meta = signature.split(' ')
+            val historySize = meta.getOrNull(1)?.toIntOrNull()
+            if (meta.size < 3 || historySize == null) return null
+            // Output ends in a newline, which is not another (blank) history line.
+            val body = rows.drop(1).let { if (it.lastOrNull().isNullOrEmpty()) it.dropLast(1) else it }
+            return PaneHistory(
+                alternate = meta[0] == "1",
+                historySize = historySize,
+                signature = signature,
+                lines = body,
+            )
         }
 
         /**

@@ -58,6 +58,13 @@ private const val FONT_DEFAULT = 16
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
+private fun keepDurationLabel(minutes: Int): String = when {
+    minutes <= 0 -> stringResource(R.string.settings_bg_keep_off_short)
+    minutes % 60 == 0 -> stringResource(R.string.settings_bg_keep_hours, minutes / 60)
+    else -> stringResource(R.string.settings_bg_keep_minutes, minutes)
+}
+
+@Composable
 fun SettingsScreen(
     appearance: AppearanceMode,
     appLanguage: AppLanguage = AppLanguage.SYSTEM,
@@ -69,6 +76,7 @@ fun SettingsScreen(
     terminalTermType: String = UserPreferences.DEFAULT_TERM_TYPE,
     terminalBufferLines: Int = UserPreferences.DEFAULT_BUFFER_LINES,
     preventSleeping: Boolean = true,
+    backgroundKeepMinutes: Int = UserPreferences.DEFAULT_BACKGROUND_KEEP_MINUTES,
     appVersion: String,
     onAppearance: (AppearanceMode) -> Unit,
     onAppLanguage: (AppLanguage) -> Unit = {},
@@ -80,6 +88,7 @@ fun SettingsScreen(
     onTerminalTermType: (String) -> Unit = {},
     onTerminalBufferLines: (Int) -> Unit = {},
     onPreventSleeping: (Boolean) -> Unit = {},
+    onBackgroundKeepMinutes: (Int) -> Unit = {},
     onOpenSnippets: () -> Unit,
     onOpenKeyboards: () -> Unit = {},
     onOpenPrivacy: () -> Unit = {},
@@ -103,6 +112,8 @@ fun SettingsScreen(
     var showTermType by remember { mutableStateOf(false) }
     var showBuffer by remember { mutableStateOf(false) }
     var bufferDraft by remember { mutableStateOf(terminalBufferLines.toString()) }
+    var showBackgroundKeep by remember { mutableStateOf(false) }
+    var backgroundKeepDraft by remember { mutableStateOf("") }
     var showFeedback by remember { mutableStateOf(false) }
     var feedbackNote by remember { mutableStateOf("") }
     var feedbackSubmitting by remember { mutableStateOf(false) }
@@ -201,6 +212,22 @@ fun SettingsScreen(
                         showBuffer = true
                     },
                     testTag = "settings_buffer_size",
+                )
+                SubtitleRow(
+                    title = stringResource(R.string.settings_bg_keep),
+                    subtitle = if (backgroundKeepMinutes == 0) {
+                        stringResource(R.string.settings_bg_keep_off)
+                    } else {
+                        stringResource(R.string.settings_bg_keep_sub, keepDurationLabel(backgroundKeepMinutes))
+                    },
+                    onClick = {
+                        backgroundKeepDraft = backgroundKeepMinutes
+                            .takeIf { it !in UserPreferences.BACKGROUND_KEEP_PRESETS }
+                            ?.toString()
+                            .orEmpty()
+                        showBackgroundKeep = true
+                    },
+                    testTag = "settings_background_keep",
                 )
                 SwitchRow(
                     title = stringResource(R.string.settings_keep_awake),
@@ -343,6 +370,64 @@ fun SettingsScreen(
             },
             dismissButton = {
                 TextButton(onClick = { showBuffer = false }) { Text(stringResource(R.string.cancel)) }
+            },
+        )
+    }
+
+    if (showBackgroundKeep) {
+        AlertDialog(
+            onDismissRequest = { showBackgroundKeep = false },
+            title = { Text(stringResource(R.string.settings_bg_keep)) },
+            text = {
+                Column(Modifier.verticalScroll(rememberScrollState())) {
+                    UserPreferences.BACKGROUND_KEEP_PRESETS.forEach { minutes ->
+                        val choose = {
+                            onBackgroundKeepMinutes(minutes)
+                            showBackgroundKeep = false
+                        }
+                        Row(
+                            Modifier
+                                .fillMaxWidth()
+                                .selectable(selected = minutes == backgroundKeepMinutes, onClick = choose)
+                                .padding(vertical = 4.dp),
+                            verticalAlignment = Alignment.CenterVertically,
+                        ) {
+                            RadioButton(selected = minutes == backgroundKeepMinutes, onClick = choose)
+                            Text(keepDurationLabel(minutes), modifier = Modifier.padding(start = 8.dp))
+                        }
+                    }
+                    OutlinedTextField(
+                        value = backgroundKeepDraft,
+                        onValueChange = { backgroundKeepDraft = it.filter { c -> c.isDigit() }.take(4) },
+                        label = { Text(stringResource(R.string.settings_bg_keep_custom_label)) },
+                        singleLine = true,
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(top = 8.dp)
+                            .testTag("settings_background_keep_custom"),
+                    )
+                    Text(
+                        stringResource(R.string.settings_bg_keep_note),
+                        color = theme.colors.onSurfaceMuted,
+                        fontSize = 12.sp,
+                        modifier = Modifier.padding(top = 8.dp),
+                    )
+                }
+            },
+            confirmButton = {
+                TextButton(
+                    enabled = backgroundKeepDraft.toIntOrNull()?.let { it > 0 } == true,
+                    onClick = {
+                        onBackgroundKeepMinutes(
+                            backgroundKeepDraft.toInt()
+                                .coerceAtMost(UserPreferences.MAX_BACKGROUND_KEEP_MINUTES),
+                        )
+                        showBackgroundKeep = false
+                    },
+                ) { Text(stringResource(R.string.ok)) }
+            },
+            dismissButton = {
+                TextButton(onClick = { showBackgroundKeep = false }) { Text(stringResource(R.string.cancel)) }
             },
         )
     }

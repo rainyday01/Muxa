@@ -195,10 +195,10 @@ public final class TerminalSession extends TerminalOutput {
         notifyScreenUpdate();
     }
 
-    /** Insert history lines above the live screen so local finger-scroll has content. */
-    public void prependScrollback(String[] oldestFirst) {
-        if (mEmulator == null || oldestFirst == null || oldestFirst.length == 0) return;
-        mEmulator.prependScrollback(oldestFirst);
+    /** Replace the history above the live screen so local finger-scroll shows the pane's. */
+    public void replaceScrollback(String[] oldestFirst) {
+        if (mEmulator == null || oldestFirst == null) return;
+        mEmulator.replaceScrollback(oldestFirst);
         notifyScreenUpdate();
     }
 

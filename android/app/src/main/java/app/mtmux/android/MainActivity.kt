@@ -1,9 +1,12 @@
 package app.mtmux.android
 
+import android.Manifest
 import android.content.ClipData
 import android.content.ClipboardManager
 import android.content.Context
 import android.content.Intent
+import android.content.pm.PackageManager
+import android.os.Build
 import android.os.Bundle
 import android.view.WindowManager
 import android.view.inputmethod.InputMethodManager
@@ -11,6 +14,7 @@ import androidx.activity.ComponentActivity
 import androidx.activity.compose.BackHandler
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
+import androidx.core.content.ContextCompat
 import androidx.activity.compose.setContent
 import androidx.activity.SystemBarStyle
 import androidx.activity.enableEdgeToEdge
@@ -70,6 +74,8 @@ import app.mtmux.core.data.diag.DiagLog
 import app.mtmux.core.data.diag.DiagRedactor
 import app.mtmux.core.data.diag.GitHubIssue
 import app.mtmux.core.data.diag.LogHubClient
+import app.mtmux.core.data.diag.LogHubCooldownException
+import app.mtmux.core.data.diag.LogHubHttpException
 import app.mtmux.core.data.export.ConfigExport
 import app.mtmux.core.data.keyboard.BuiltinKeyboards
 import app.mtmux.core.data.keyboard.KeyboardActionResolver
@@ -204,6 +210,13 @@ private fun MtmuxRoot(app: MtmuxApp, activity: ComponentActivity) {
         initial = UserPreferences.DEFAULT_BUFFER_LINES,
     )
     val preventSleeping by c.prefs.preventSleeping.collectAsState(initial = true)
+    val backgroundKeepMinutes by c.prefs.backgroundKeepMinutes.collectAsState(
+        initial = UserPreferences.DEFAULT_BACKGROUND_KEEP_MINUTES,
+    )
+    // The hold works either way; this only decides whether its notification shows.
+    val requestNotifications = rememberLauncherForActivityResult(
+        ActivityResultContracts.RequestPermission(),
+    ) { granted -> DiagLog.i("keep", "notification permission granted=$granted") }
     val shortcutOrder by c.prefs.shortcutBarOrder.collectAsState(initial = emptyList())
     val composeEnabled by c.prefs.composeBoxEnabled.collectAsState(initial = false)
     val composeHistory by c.prefs.composeHistory.collectAsState(initial = emptyList())
@@ -1852,8 +1865,21 @@ fi
                         when (event) {
                             Lifecycle.Event.ON_PAUSE -> {
                                 sawPause = true
+                                val alive = termController.isLinkAlive()
+                                DiagLog.i(
+                                    "attach",
+                                    "ON_PAUSE session=${s.name} link=$alive keepMin=$backgroundKeepMinutes",
+                                )
+                                if (alive) {
+                                    BackgroundKeepAlive.enter(
+                                        ctx,
+                                        "${s.hostAlias ?: s.hostId} · ${s.name}",
+                                        backgroundKeepMinutes,
+                                    )
+                                }
                             }
                             Lifecycle.Event.ON_RESUME -> {
+                                BackgroundKeepAlive.exit(ctx)
                                 if (!sawPause) {
                                     // First enter after open — attach is owned by LaunchedEffect.
                                     DiagLog.i("attach", "ON_RESUME skip (initial enter) session=${s.name}")
@@ -1893,6 +1919,7 @@ fi
                                         return@launch
                                     }
                                     if (live) {
+                                        DiagLog.i("attach", "ON_RESUME link kept session=${s.name}")
                                         termController.forceRedraw()
                                         val sz = pendingSurfaceSize
                                         if (sz != null && attachStartedForGen == attachGen) {
@@ -2005,10 +2032,24 @@ fi
                         }
                     }
                     lifecycleOwner.lifecycle.addObserver(obs)
+                    BackgroundKeepAlive.onExpired = {
+                        scope.launch(Dispatchers.IO) {
+                            termController.releaseLinkInBackground()
+                            c.connections.invalidateEngine(s.hostId)
+                        }
+                    }
                     onDispose {
                         lifecycleOwner.lifecycle.removeObserver(obs)
+                        BackgroundKeepAlive.onExpired = null
+                        BackgroundKeepAlive.exit(ctx)
                         DiagLog.i("attach", "dispose terminal ${s.hostId}/${s.name}")
                         termController.close()
+                    }
+                }
+                // A link that died in the background has nothing left to hold.
+                LaunchedEffect(Unit) {
+                    termController.linkAlive.collect { alive ->
+                        if (!alive) BackgroundKeepAlive.exit(ctx)
                     }
                 }
                 // Size-first attach: wait for surface size WITHOUT re-keying on every resize.
@@ -2204,7 +2245,10 @@ fi
                     val hostId = s.hostId
                     while (true) {
                         if (attachReadyGen != attachGen) return@LaunchedEffect
-                        runCatching { termController.refreshLatencyMs(hostId) }
+                        // Nobody reads the title in the background; SSH keepalives watch the link.
+                        if (lifecycleOwner.lifecycle.currentState.isAtLeast(Lifecycle.State.RESUMED)) {
+                            runCatching { termController.refreshLatencyMs(hostId) }
+                        }
                         delay(10_000L)
                     }
                 }
@@ -2252,6 +2296,7 @@ fi
                     connecting = attachReadyGen != attachGen,
                     connectingMessage = termStatus,
                     onAltFingerScroll = { up -> termController.onAltFingerScroll(up) },
+                    isAltPaneInline = { termController.isAltPaneInline() },
                     onBack = { leaveTerminal("back") },
                     onKeyPress = { handleKeyboardKey(it) },
                     shortcutOrder = shortcutOrder,
@@ -2544,6 +2589,7 @@ fi
                             terminalTermType = terminalTermType,
                             terminalBufferLines = terminalBufferLines,
                             preventSleeping = preventSleeping,
+                            backgroundKeepMinutes = backgroundKeepMinutes,
                             appVersion = appVersionName,
                             onAppearance = { scope.launch { c.prefs.setAppearance(it) } },
                             onAppLanguage = { lang ->
@@ -2574,6 +2620,15 @@ fi
                             onPreventSleeping = { v ->
                                 scope.launch { c.prefs.setPreventSleeping(v) }
                             },
+                            onBackgroundKeepMinutes = { minutes ->
+                                scope.launch { c.prefs.setBackgroundKeepMinutes(minutes) }
+                                if (minutes > 0 && Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU &&
+                                    ContextCompat.checkSelfPermission(ctx, Manifest.permission.POST_NOTIFICATIONS) !=
+                                    PackageManager.PERMISSION_GRANTED
+                                ) {
+                                    requestNotifications.launch(Manifest.permission.POST_NOTIFICATIONS)
+                                }
+                            },
                             onOpenSnippets = { showSnippets = true },
                             onOpenKeyboards = { showKeyboards = true },
                             onOpenPrivacy = { showPrivacy = true },
@@ -2598,15 +2653,14 @@ fi
                                         toast(tr(UiR.string.toast_feedback_ok, ref), force = true)
                                     }.onFailure { err ->
                                         DiagLog.e("diag", "feedback upload fail", err)
-                                        val http = Regex("LogHub HTTP (\\d+)")
-                                            .find(err.message.orEmpty())
-                                            ?.groupValues
-                                            ?.getOrNull(1)
-                                            ?.toIntOrNull()
-                                        val msg = if (http == 401 || http == 403) {
-                                            tr(UiR.string.toast_feedback_auth)
-                                        } else {
-                                            tr(UiR.string.toast_feedback_fail)
+                                        val msg = when {
+                                            err is LogHubCooldownException ->
+                                                tr(UiR.string.toast_feedback_wait, err.waitSeconds)
+                                            err !is LogHubHttpException -> tr(UiR.string.toast_feedback_fail)
+                                            err.code == 401 || err.code == 403 -> tr(UiR.string.toast_feedback_auth)
+                                            err.code == 429 -> tr(UiR.string.toast_feedback_rate_limited)
+                                            err.code == 503 -> tr(UiR.string.toast_feedback_server_busy)
+                                            else -> tr(UiR.string.toast_feedback_fail)
                                         }
                                         toast(msg, force = true)
                                     }

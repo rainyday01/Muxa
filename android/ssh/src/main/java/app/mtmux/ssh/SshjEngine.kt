@@ -8,6 +8,7 @@ import java.util.concurrent.TimeUnit
 import java.util.concurrent.atomic.AtomicReference
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
+import net.schmizz.keepalive.KeepAliveRunner
 import net.schmizz.sshj.SSHClient
 import net.schmizz.sshj.common.IOUtils
 import net.schmizz.sshj.connection.channel.direct.Session
@@ -29,6 +30,12 @@ class SshjEngine(
     private fun s(id: Int, vararg args: Any): String = AppLocale.getString(appContext, id, *args)
 
     private val clients = ConcurrentHashMap<String, SSHClient>()
+
+    private companion object {
+        /** A silent link is declared dead after interval × missed = 60s. */
+        const val KEEPALIVE_INTERVAL_SEC = 20
+        const val KEEPALIVE_MAX_MISSED = 3
+    }
 
     /** True if we already hold a live authenticated client for [hostId]. */
     fun isConnected(hostId: String): Boolean {
@@ -116,7 +123,12 @@ class SshjEngine(
         }
         try {
             authenticate(client, params)
-            client.connection.keepAlive.keepAliveInterval = 30
+            // client.timeout is SO_TIMEOUT on the socket sshj's reader blocks on: a quiet
+            // link (or a frozen app waking up) died after 30s even though TCP was fine.
+            // It only guards the handshake above; keepalive replies watch the link now.
+            client.socket.soTimeout = 0
+            client.connection.keepAlive.keepAliveInterval = KEEPALIVE_INTERVAL_SEC
+            (client.connection.keepAlive as? KeepAliveRunner)?.maxAliveCount = KEEPALIVE_MAX_MISSED
             clients[params.hostId] = client
         } catch (e: Exception) {
             runCatching { client.disconnect() }

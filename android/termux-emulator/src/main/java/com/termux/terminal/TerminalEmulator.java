@@ -354,9 +354,9 @@ public final class TerminalEmulator {
         return mScreen;
     }
 
-    /** Seed scrollback above the current screen (tmux pane history). */
-    public void prependScrollback(String[] oldestFirst) {
-        if (mScreen != null) mScreen.prependTranscriptLines(oldestFirst);
+    /** Replace scrollback above the current screen (tmux pane history); empty clears it. */
+    public void replaceScrollback(String[] oldestFirst) {
+        if (mScreen != null) mScreen.replaceTranscriptLines(oldestFirst);
     }
 
     public boolean isAlternateBufferActive() {
