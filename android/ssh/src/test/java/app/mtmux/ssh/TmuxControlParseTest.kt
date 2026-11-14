@@ -46,6 +46,13 @@ class TmuxControlParseTest {
     }
 
     @Test
+    fun parseIgnoresShellErrorsOnStderr() {
+        val text = "zsh: no matches found: /tmp/tmux-1000/*\nwork: 1 windows (created x)\n"
+        val list = TmuxControl.parseListSessions("h1", text)
+        assertEquals(listOf("work"), list.map { it.name })
+    }
+
+    @Test
     fun attachOrCreateCmdIncludesSocketScan() {
         val cmd = TmuxControl.attachOrCreateCmd("claude", "/tmp/tmux-0/default")
         assertTrue(cmd.contains("attach-session"))

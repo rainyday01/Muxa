@@ -278,8 +278,16 @@ echo OK
         /**
          * Multiline shell helpers inlined into remote commands.
          * Keep real newlines (do NOT flatten to `;`) — function bodies break otherwise.
+         *
+         * SSH runs these through the login shell. Under zsh an empty `tmux-$uid`
+         * directory (left behind when a server exits) makes the socket glob a
+         * "no matches found" error that aborts `_mtmux_socks`. Every socket after
+         * it is skipped, and with it every session on that server. The first two
+         * lines put zsh into sh mode; bash and dash ignore them. iOS does the same.
          */
         val SOCKET_HELPER: String = """
+emulate sh 2>/dev/null || true
+setopt NULL_GLOB 2>/dev/null || true
 _mtmux_socks() {
   _uid=${'$'}(id -u)
   {
@@ -452,9 +460,10 @@ exec tmux new-session -A -s $nameQ
                             socketPath = p.getOrNull(3)?.takeIf { it.isNotBlank() },
                         )
                     } else {
-                        val name = line.substringBefore(':').trim()
-                        if (name.isEmpty()) return@forEach
-                        TmuxSession(hostId = hostId, name = name)
+                        // Only plain `tmux ls` rows. Exec falls back to stderr when
+                        // stdout is empty, so a shell error must not become a card.
+                        val m = LEGACY_LS_ROW.matchEntire(line) ?: return@forEach
+                        TmuxSession(hostId = hostId, name = m.groupValues[1])
                     }
                     val prev = byName[session.name]
                     if (prev == null) {
@@ -468,6 +477,8 @@ exec tmux new-session -A -s $nameQ
 
         fun shellQuote(s: String): String =
             "'" + s.replace("'", "'\"'\"'") + "'"
+
+        private val LEGACY_LS_ROW = Regex("""^([^:]+): \d+ windows?\b.*""")
 
         private const val PANE_META_MARK = "MUXA_PANE "
 

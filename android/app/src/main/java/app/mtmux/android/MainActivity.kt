@@ -250,6 +250,10 @@ private fun MtmuxRoot(app: MtmuxApp, activity: ComponentActivity) {
     var loading by remember { mutableStateOf(false) }
     var emptyNeedsInstall by remember { mutableStateOf(false) }
     var sessionsFromCache by remember { mutableStateOf(false) }
+    /** Cached cards are painted; the list may now re-list live on its own. */
+    var sessionCacheReady by remember { mutableStateOf(false) }
+    /** uptimeMillis of the last automatic list refresh (debounce). */
+    val lastAutoListAt = remember { longArrayOf(0L) }
     var terminalSession by remember { mutableStateOf<TmuxSession?>(null) }
     /** Bumps on each enter/leave so a slow attach cannot paint a previous session. */
     var attachGen by remember { mutableStateOf(0L) }
@@ -706,8 +710,9 @@ private fun MtmuxRoot(app: MtmuxApp, activity: ComponentActivity) {
         onlyHostIds: Set<String>? = null,
         quietFailures: Boolean = onlyHostIds == null,
     ) {
+        // Set before launching so a second trigger in the same frame sees it.
+        loading = true
         scope.launch {
-            loading = true
             val all = mutableListOf<TmuxSession>()
             var anyMissingTmux = false
             val previousByHost = sessions.groupBy { it.hostId }
@@ -866,6 +871,20 @@ private fun MtmuxRoot(app: MtmuxApp, activity: ComponentActivity) {
         }
     }
 
+    /**
+     * Re-list when the session list comes on screen, so sessions made elsewhere
+     * (a desktop `tmux new`) appear without a manual refresh. Quiet: a dead host
+     * keeps its last cards.
+     */
+    fun autoRefreshSessions(reason: String) {
+        if (!sessionCacheReady || hosts.isEmpty() || loading) return
+        val now = android.os.SystemClock.uptimeMillis()
+        if (now - lastAutoListAt[0] < 5_000L) return
+        lastAutoListAt[0] = now
+        DiagLog.i("sessions", "auto refresh ($reason)")
+        refreshSessions()
+    }
+
     // Cold start: paint long-lived local snapshot first (no SSH storm).
     // Only if cache is empty do we do a one-shot live refresh.
     LaunchedEffect(Unit) {
@@ -877,6 +896,7 @@ private fun MtmuxRoot(app: MtmuxApp, activity: ComponentActivity) {
                 refreshSessions()
             }
         }
+        sessionCacheReady = true
     }
 
     LaunchedEffect(openLast, hosts) {
@@ -2458,6 +2478,20 @@ fi
                     modifier = Modifier.padding(padding),
                 ) {
                     composable(Tab.Sessions.route) {
+                        // Live re-list on cold start (after the cached paint), back
+                        // from a terminal, tab switch, and app resume.
+                        val hostsKnown = hosts.isNotEmpty()
+                        LaunchedEffect(hostsKnown, sessionCacheReady) {
+                            autoRefreshSessions("open")
+                        }
+                        val listLifecycle = LocalLifecycleOwner.current
+                        DisposableEffect(listLifecycle) {
+                            val obs = LifecycleEventObserver { _, event ->
+                                if (event == Lifecycle.Event.ON_RESUME) autoRefreshSessions("resume")
+                            }
+                            listLifecycle.lifecycle.addObserver(obs)
+                            onDispose { listLifecycle.lifecycle.removeObserver(obs) }
+                        }
                         SessionsScreen(
                             sessions = sessions,
                             hosts = hosts,
