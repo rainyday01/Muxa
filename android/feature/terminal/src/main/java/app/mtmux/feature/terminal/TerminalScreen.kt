@@ -153,6 +153,11 @@ fun TerminalScreen(
     onPaste: (() -> Unit)? = null,
     onOpenKeyboardSettings: (() -> Unit)? = null,
     connecting: Boolean = false,
+    /**
+     * Attached, but the pane is still repainting after the attach resize. Shows the
+     * same veil as [connecting] without its IME-freeze rule.
+     */
+    settling: Boolean = false,
     /** Shown while [connecting] is true (e.g. install shell phase). */
     connectingMessage: String = "",
     onResize: ((cols: Int, rows: Int) -> Unit)? = null,
@@ -689,7 +694,7 @@ fun TerminalScreen(
                 )
             }
             // Show while connecting even after emulator exists (install shell used to go black).
-            if (connecting) {
+            if (connecting || settling) {
                 Box(
                     Modifier
                         .fillMaxSize()

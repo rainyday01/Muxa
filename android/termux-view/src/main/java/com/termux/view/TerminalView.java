@@ -1279,6 +1279,11 @@ public final class TerminalView extends View {
             public long rttEstimateMs() {
                 return mTermSession != null ? mTermSession.getRemoteRttEstimateMs() : 0L;
             }
+
+            @Override
+            public boolean paneReprintsOnResize() {
+                return mClient != null && mClient.isAltPaneInline();
+            }
         });
         mResizeCover.setListener((reason, heldMs) -> {
             if (mClient != null) mClient.logInfo("resize", "cover release " + reason + " held=" + heldMs + "ms");

@@ -37,6 +37,15 @@ final class ResizeCover implements Choreographer.FrameCallback {
 
         /** Smoothed keystroke→echo latency in ms; 0 if unknown. */
         long rttEstimateMs();
+
+        /**
+         * The pane is inline (tmux main screen). Agent TUIs that run inline, such as
+         * agy, answer SIGWINCH with a quick redraw, then ~400ms later clear the
+         * screen and scrollback and print the whole conversation again.
+         */
+        default boolean paneReprintsOnResize() {
+            return false;
+        }
     }
 
     interface Listener {
@@ -50,6 +59,13 @@ final class ResizeCover implements Choreographer.FrameCallback {
     private static final long DEFAULT_RTT_MS = 180L;
     /** Give up and show the live grid even if the remote keeps streaming. */
     private static final long MAX_HOLD_MS = 650L;
+    /**
+     * Inline pane: the reprint starts ~400ms after WINCH, after one or two partial
+     * redraws ~100ms apart (agy 1.5, measured on the host). A 70ms quiet gap released
+     * the sheet between them, so the user watched the whole conversation scroll by.
+     */
+    private static final long INLINE_QUIET_MS = 260L;
+    private static final long INLINE_MAX_HOLD_MS = 1800L;
     /** Sheet up but the grid never applied (no layout pass): drop it. */
     private static final long UNARMED_MAX_MS = 900L;
     private static final long FADE_MS = 90L;
@@ -78,6 +94,8 @@ final class ResizeCover implements Choreographer.FrameCallback {
     /** Uptime when the new grid (WINCH) was applied; 0 until then. */
     private long mArmedAt;
     private long mFadeStartAt;
+    private long mQuietMs = QUIET_MS;
+    private long mMaxHoldMs = MAX_HOLD_MS;
 
     ResizeCover(View host) {
         mHost = host;
@@ -130,6 +148,8 @@ final class ResizeCover implements Choreographer.FrameCallback {
         mStartedAt = SystemClock.uptimeMillis();
         mArmedAt = 0L;
         mFadeStartAt = 0L;
+        mQuietMs = QUIET_MS;
+        mMaxHoldMs = MAX_HOLD_MS;
         post();
         mHost.invalidate();
     }
@@ -138,6 +158,9 @@ final class ResizeCover implements Choreographer.FrameCallback {
     void arm() {
         if (!isActive() || mFadeStartAt > 0L) return;
         mArmedAt = SystemClock.uptimeMillis();
+        boolean inline = mClock != null && mClock.paneReprintsOnResize();
+        mQuietMs = inline ? INLINE_QUIET_MS : QUIET_MS;
+        mMaxHoldMs = inline ? INLINE_MAX_HOLD_MS : MAX_HOLD_MS;
         post();
     }
 
@@ -193,6 +216,7 @@ final class ResizeCover implements Choreographer.FrameCallback {
     private void beginFade(String reason, long now) {
         if (mFadeStartAt > 0L) return;
         mFadeStartAt = now;
+        if (mMaxHoldMs != MAX_HOLD_MS) reason = reason + " inline";
         if (mListener != null) mListener.onCoverReleased(reason, now - mStartedAt);
         post();
         mHost.invalidate();
@@ -225,12 +249,12 @@ final class ResizeCover implements Choreographer.FrameCallback {
         final long sinceArm = now - mArmedAt;
         final long lastOut = mClock != null ? mClock.lastRemoteOutputAt() : 0L;
         final boolean repainted = lastOut > mArmedAt;
-        if (repainted && now - lastOut >= QUIET_MS && sinceArm >= QUIET_MS) {
+        if (repainted && now - lastOut >= mQuietMs && sinceArm >= mQuietMs) {
             beginFade("quiet", now);
-        } else if (!repainted && sinceArm >= waitForFirstOutputMs() + QUIET_MS) {
+        } else if (!repainted && sinceArm >= waitForFirstOutputMs() + mQuietMs) {
             // Nothing came back: the remote frame did not change.
             beginFade("no_output", now);
-        } else if (sinceArm >= MAX_HOLD_MS) {
+        } else if (sinceArm >= mMaxHoldMs) {
             beginFade("max", now);
         } else {
             post();

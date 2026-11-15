@@ -34,6 +34,9 @@ import kotlinx.coroutines.withTimeoutOrNull
 /** Finger scroll calls closer together than this belong to one gesture. */
 private const val SCROLL_GESTURE_GAP_MS = 400L
 private const val RESUME_PROBE_TIMEOUT_MS = 5_000L
+/** agy's partial redraws after a resize land ~100ms apart; its reprint follows within ~400ms. */
+private const val ATTACH_SETTLE_QUIET_MS = 320L
+private const val ATTACH_SETTLE_MAX_MS = 2_200L
 
 /**
  * Binds remote SSH PTY bytes into a **Termux** [TerminalSession] (battle-tested VT).
@@ -143,6 +146,8 @@ class TerminalSessionController(
     /** Pane is known to be on its main screen; false until the first pull answers. */
     @Volatile private var tmuxPaneInline = false
     @Volatile private var paneHistorySignature: String? = null
+    /** hostId/session → pane was inline on the last pull; alt-screen panes skip the entry settle. */
+    private val paneInlineMemo = java.util.concurrent.ConcurrentHashMap<String, Boolean>()
     @Volatile private var lastPaneSyncMs = 0L
     private var lastAltScrollMs = 0L
     private val paneSyncRunning = java.util.concurrent.atomic.AtomicBoolean(false)
@@ -825,6 +830,38 @@ class TerminalSessionController(
         return true
     }
 
+    /**
+     * Wait until the freshly attached pane stops painting, so the terminal is shown
+     * in its final state.
+     *
+     * Attaching resizes the tmux window to the phone. An inline agent TUI (agy) then
+     * redraws, and ~400ms later clears the screen and scrollback and prints the whole
+     * conversation again; uncovered, that reads as the text scrolling from the first
+     * line to the newest on every entry. Panes last seen on the alternate screen
+     * (Claude Code, grok) page themselves and do not wait.
+     *
+     * @return true if the output went quiet, false on timeout or a closed channel.
+     */
+    suspend fun awaitAttachSettled(hostId: String, sessionName: String): Boolean {
+        if (paneInlineMemo["$hostId/$sessionName"] == false) return true
+        val epoch = channelEpoch.get()
+        val start = android.os.SystemClock.uptimeMillis()
+        while (true) {
+            if (!epochLive(epoch)) return false
+            val now = android.os.SystemClock.uptimeMillis()
+            val last = termuxSession?.getLastRemoteOutputAt() ?: 0L
+            if (last > 0L && now - last >= ATTACH_SETTLE_QUIET_MS) {
+                DiagLog.i("attach", "settled quiet session=$sessionName held=${now - start}ms")
+                return true
+            }
+            if (now - start >= ATTACH_SETTLE_MAX_MS) {
+                DiagLog.i("attach", "settle max session=$sessionName held=${now - start}ms")
+                return false
+            }
+            delay(40)
+        }
+    }
+
     /** tmux pane known to be on its main screen; see [TmuxControl.paneHistoryCmd]. */
     fun isAltPaneInline(): Boolean = tmuxPaneInline
 
@@ -889,6 +926,7 @@ class TerminalSessionController(
                     "tmux scroll meta alt=${pane.alternate} hist=${pane.historySize} lines=${pane.lines.size}",
                 )
                 tmuxPaneInline = !pane.alternate
+                paneInlineMemo["${attach.hostId}/${attach.sessionName}"] = !pane.alternate
                 // An alt-screen app's own redraws refill the transcript, so that case always clears.
                 if (!pane.alternate && pane.signature == paneHistorySignature) return@launch
                 // A pane with history that returned none: page it on the host instead.

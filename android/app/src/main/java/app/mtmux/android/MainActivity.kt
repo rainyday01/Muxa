@@ -267,6 +267,8 @@ private fun MtmuxRoot(app: MtmuxApp, activity: ComponentActivity) {
     var attachStartedForGen by remember { mutableStateOf(0L) }
     /** Set to attachGen only after PTY attach succeeds (UI overlay). */
     var attachReadyGen by remember { mutableStateOf(0L) }
+    /** Attach gen whose pane has stopped repainting; the connecting veil stays up until then. */
+    var attachSettledGen by remember { mutableStateOf(0L) }
     val termController = remember { TerminalSessionController(c.sshEngine, scope, ctx) }
     val transportLabel by termController.transportLabel.collectAsState()
     val termStatus by termController.status.collectAsState()
@@ -2207,6 +2209,12 @@ fi
                                 "session=${s.name}",
                         )
                         attachReadyGen = gen
+                        // Keep the veil over the resize repaint (agy reprints its whole
+                        // conversation), so the first frame shown is the newest one.
+                        launch {
+                            termController.awaitAttachSettled(host.id, s.name)
+                            attachSettledGen = gen
+                        }
                         scope.launch {
                             runCatching {
                                 val res = c.tmux.probeHostResources(host.id)
@@ -2314,6 +2322,7 @@ fi
                     schemeId = terminalSchemeId,
                     suggestions = suggestions,
                     connecting = attachReadyGen != attachGen,
+                    settling = attachReadyGen == attachGen && attachSettledGen != attachGen,
                     connectingMessage = termStatus,
                     onAltFingerScroll = { up -> termController.onAltFingerScroll(up) },
                     isAltPaneInline = { termController.isAltPaneInline() },
