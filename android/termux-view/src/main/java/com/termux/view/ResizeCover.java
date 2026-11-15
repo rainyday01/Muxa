@@ -60,12 +60,14 @@ final class ResizeCover implements Choreographer.FrameCallback {
     /** Give up and show the live grid even if the remote keeps streaming. */
     private static final long MAX_HOLD_MS = 650L;
     /**
-     * Inline pane: the reprint starts ~400ms after WINCH, after one or two partial
-     * redraws ~100ms apart (agy 1.5, measured on the host). A 70ms quiet gap released
-     * the sheet between them, so the user watched the whole conversation scroll by.
+     * Inline pane: agy redraws, clears, then pauses while it lays out the whole
+     * conversation (300-400ms for ~740 lines) before reprinting it (~400KB, ~0.6s).
+     * Shorter quiet gaps released the sheet inside that pause (0.3.22 field log).
+     * Keyboard changes no longer resize inline panes (TerminalView pans), so this
+     * only covers rotation, split screen and growing past the attach size.
      */
-    private static final long INLINE_QUIET_MS = 260L;
-    private static final long INLINE_MAX_HOLD_MS = 1800L;
+    private static final long INLINE_QUIET_MS = 550L;
+    private static final long INLINE_MAX_HOLD_MS = 3000L;
     /** Sheet up but the grid never applied (no layout pass): drop it. */
     private static final long UNARMED_MAX_MS = 900L;
     private static final long FADE_MS = 90L;

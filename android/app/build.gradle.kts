@@ -23,8 +23,8 @@ android {
         applicationId = "app.mtmux.android"
         minSdk = 26
         targetSdk = 36
-        versionCode = 132
-        versionName = "0.3.22"
+        versionCode = 133
+        versionName = "0.3.23"
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
         buildConfigField("String", "LOGHUB_UPLOAD_TOKEN", "\"$logHubUploadToken\"")
     }

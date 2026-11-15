@@ -647,6 +647,7 @@ public final class TerminalView extends View {
     public int[] getColumnAndRow(MotionEvent event, boolean relativeToScroll) {
         int column = (int) (event.getX() / mRenderer.mFontWidth);
         int row = (int) ((event.getY() - mRenderer.mFontLineSpacingAndAscent) / mRenderer.mFontLineSpacing);
+        row += panRows();
         if (relativeToScroll) {
             row += mTopRow;
         }
@@ -1266,6 +1267,10 @@ public final class TerminalView extends View {
     /** Apply rows once the reserved slot has produced a new view height. */
     private boolean mApplyOnNextSizeChange = false;
     private boolean mForceApplyOnce = false;
+    /** Last view height (rows) logged as a pan; -1 when not panned. */
+    private int mPanLoggedRows = -1;
+    /** Pan from the last frame with the cursor shown; -1 if none. */
+    private int mLastPan = -1;
     /** Last complete frame held over a grid resize until the remote repaints. */
     private final ResizeCover mResizeCover = new ResizeCover(this);
     {
@@ -1366,9 +1371,12 @@ public final class TerminalView extends View {
         if (mResizeCover.isActive() || mEmulator == null || mEmulator.mRows <= 4) return;
         Bitmap snap = capturePageSnapshot(w, h);
         if (snap == null) return;
-        int cursorRow = mEmulator.getCursorRow() - mTopRow;
-        if (cursorRow < 0 || cursorRow >= mEmulator.mRows) cursorRow = -1;
-        mResizeCover.start(snap, mEmulator.mRows, cursorRow,
+        // A panned frame shows only the rows that fit; the sheet is that many rows tall.
+        int pan = panRowsFor(h);
+        int shownRows = pan > 0 ? visibleRows(h) : mEmulator.mRows;
+        int cursorRow = mEmulator.getCursorRow() - mTopRow - pan;
+        if (cursorRow < 0 || cursorRow >= shownRows) cursorRow = -1;
+        mResizeCover.start(snap, shownRows, cursorRow,
             mRenderer.getFontLineSpacing(), mRenderer.mFontLineSpacingAndAscent);
     }
 
@@ -1384,6 +1392,8 @@ public final class TerminalView extends View {
         try {
             Bitmap bmp = Bitmap.createBitmap(w, h, Bitmap.Config.ARGB_8888);
             Canvas c = new Canvas(bmp);
+            int pan = panRowsFor(h);
+            if (pan > 0) c.translate(0f, -pan * (float) mRenderer.mFontLineSpacing);
             mRenderer.render(mEmulator, c, mTopRow, -1, -1, -1, -1);
             return bmp;
         } catch (Throwable t) {
@@ -1469,6 +1479,29 @@ public final class TerminalView extends View {
             return;
         }
 
+        if (mEmulator != null
+            && newColumns == mEmulator.mColumns
+            && newRows < mEmulator.mRows
+            && mClient != null
+            && mClient.isAltPaneInline()) {
+            // Inline pane (agy, a shell): keep the remote size and show the rows that
+            // fit. agy answers every SIGWINCH by clearing and reprinting its whole
+            // conversation (~400KB, >1s, with a pause before the reprint), which the
+            // user saw scroll by on each keyboard open/close. No WINCH, no reprint.
+            if (newRows != mPanLoggedRows) {
+                mPanLoggedRows = newRows;
+                if (mClient != null) {
+                    mClient.logInfo("resize", "pan keep " + mEmulator.mColumns + "x" + mEmulator.mRows
+                        + " show " + newRows + " rows");
+                }
+            }
+            mResizeCover.releaseNow("pan");
+            mPendingSizeAfterFreeze = false;
+            invalidate();
+            return;
+        }
+        mPanLoggedRows = -1;
+
         if (mEmulator == null || (newColumns != mEmulator.mColumns || newRows != mEmulator.mRows)) {
             if (newColumns == mLastAppliedCols && newRows == mLastAppliedRows) {
                 mResizeCover.releaseNow("same_grid");
@@ -1499,6 +1532,38 @@ public final class TerminalView extends View {
         mPendingSizeAfterFreeze = false;
     }
 
+    /** Rows of grid that fit a view of height h. */
+    private int visibleRows(int h) {
+        if (mRenderer == null) return 0;
+        return Math.max(4, (h - mRenderer.mFontLineSpacingAndAscent) / mRenderer.mFontLineSpacing);
+    }
+
+    /**
+     * Grid rows hidden above the view while an inline pane keeps its size over a
+     * shorter view (keyboard up). Shows the bottom (agy's input and newest lines)
+     * unless the cursor sits higher, as in a shell after {@code clear}; then the
+     * cursor row stays the last visible one.
+     */
+    int panRows() {
+        int pan = panRowsFor(getHeight());
+        mLastPan = pan > 0 ? pan : -1;
+        return pan;
+    }
+
+    /** {@link #panRows()} for a view of height h, without remembering it. */
+    private int panRowsFor(int h) {
+        if (mEmulator == null || mRenderer == null || mClient == null) return 0;
+        int vis = visibleRows(h);
+        int rows = mEmulator.mRows;
+        if (vis >= rows || !mClient.isAltPaneInline()) return 0;
+        int bottom = rows - vis;
+        // tmux hides the cursor while it paints cells across the screen; a frame
+        // caught mid-update must not move the view. Keep the last settled pan.
+        if (!mEmulator.isCursorEnabled() && mLastPan >= 0) return Math.min(mLastPan, bottom);
+        int cursor = mEmulator.getCursorRow();
+        return cursor >= bottom ? bottom : Math.max(0, cursor - vis + 1);
+    }
+
     /** cols×rows the grid would have at w×h, or null when it equals the current grid. */
     private int[] gridSizeFor(int w, int h) {
         if (mEmulator == null || mRenderer == null || w <= 0 || h <= 0) return null;
@@ -1524,7 +1589,13 @@ public final class TerminalView extends View {
                 mTextSelectionCursorController.getSelectors(sel);
             }
 
+            int pan = panRows();
+            if (pan > 0) {
+                canvas.save();
+                canvas.translate(0f, -pan * (float) mRenderer.mFontLineSpacing);
+            }
             mRenderer.render(mEmulator, canvas, mTopRow, sel[0], sel[1], sel[2], sel[3]);
+            if (pan > 0) canvas.restore();
 
             // render the text selection handles
             renderTextSelection();
@@ -1547,7 +1618,7 @@ public final class TerminalView extends View {
     }
 
     public int getCursorY(float y) {
-        return (int) (((y - 40) / mRenderer.mFontLineSpacing) + mTopRow);
+        return (int) (((y - 40) / mRenderer.mFontLineSpacing) + mTopRow + panRows());
     }
 
     public int getPointX(int cx) {
@@ -1558,7 +1629,7 @@ public final class TerminalView extends View {
     }
 
     public int getPointY(int cy) {
-        return Math.round((cy - mTopRow) * mRenderer.mFontLineSpacing);
+        return Math.round((cy - mTopRow - panRows()) * mRenderer.mFontLineSpacing);
     }
 
     public int getTopRow() {

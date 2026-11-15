@@ -34,9 +34,9 @@ import kotlinx.coroutines.withTimeoutOrNull
 /** Finger scroll calls closer together than this belong to one gesture. */
 private const val SCROLL_GESTURE_GAP_MS = 400L
 private const val RESUME_PROBE_TIMEOUT_MS = 5_000L
-/** agy's partial redraws after a resize land ~100ms apart; its reprint follows within ~400ms. */
-private const val ATTACH_SETTLE_QUIET_MS = 320L
-private const val ATTACH_SETTLE_MAX_MS = 2_200L
+/** agy pauses 300-400ms (longer with more history) between clearing and reprinting. */
+private const val ATTACH_SETTLE_QUIET_MS = 550L
+private const val ATTACH_SETTLE_MAX_MS = 3_000L
 
 /**
  * Binds remote SSH PTY bytes into a **Termux** [TerminalSession] (battle-tested VT).
@@ -884,7 +884,9 @@ class TerminalSessionController(
     private fun refreshTmuxPagingHint() {
         tmuxHistoryPaging = false
         tmuxCopyModeDepth = 0
-        tmuxPaneInline = false
+        // Seed from the last visit so a keyboard opened before the first pull already
+        // keeps an inline pane's size (TerminalView pans) instead of resizing it.
+        tmuxPaneInline = lastAttach?.let { paneInlineMemo["${it.hostId}/${it.sessionName}"] } == true
         paneHistorySignature = null
         val epoch = channelEpoch.get()
         scope.launch(Dispatchers.IO) {
