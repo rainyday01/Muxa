@@ -4,6 +4,7 @@ import app.mtmux.core.model.Host
 import app.mtmux.core.model.HostResourceText
 import app.mtmux.core.model.HostResources
 import app.mtmux.core.model.TmuxSession
+import java.io.IOException
 
 data class TmuxWindow(
     val session: String,
@@ -154,7 +155,12 @@ class TmuxControl(private val connections: ConnectionManager) {
         return r.getOrNull()?.isNotBlank() == true
     }
 
-    /** Full environment probe: tmux, mosh, OS, package manager, latency (AND-029/030). */
+    /**
+     * Full environment probe: tmux, mosh, OS, package manager, latency (AND-029/030).
+     *
+     * @throws IOException when the probe could not run (silent/dead link). That says
+     *   nothing about tmux, so callers must not record "tmux missing" from it.
+     */
     suspend fun probeEnvironment(hostId: String): EnvProbe {
         val script = """
             echo TMUX=$(command -v tmux || true)
@@ -170,12 +176,16 @@ class TmuxControl(private val connections: ConnectionManager) {
             $HOST_RESOURCE_SCRIPT
         """.trimIndent()
         val t0 = System.nanoTime()
-        val raw = connections.exec(hostId, script).getOrDefault("")
+        val raw = connections.exec(hostId, script).getOrElse { e ->
+            throw IOException("environment probe failed: ${e.message ?: e.javaClass.simpleName}", e)
+        }
         val latency = (System.nanoTime() - t0) / 1_000_000L
         val map = raw.lineSequence().mapNotNull { line ->
             val i = line.indexOf('=')
             if (i <= 0) null else line.substring(0, i) to line.substring(i + 1).trim()
         }.toMap()
+        // The script always prints UNAME=; without it the output is not the probe's.
+        if ("UNAME" !in map) throw IOException("environment probe returned no result")
         val pm = map["PM"]?.takeIf { it.isNotBlank() && it != "unknown" }
         val tmuxOk = !map["TMUX"].isNullOrBlank()
         val moshOk = false

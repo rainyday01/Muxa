@@ -6,8 +6,13 @@ import java.security.PublicKey
 import java.util.concurrent.ConcurrentHashMap
 import java.util.concurrent.TimeUnit
 import java.util.concurrent.atomic.AtomicReference
+import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.SupervisorJob
+import kotlinx.coroutines.async
+import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
+import kotlinx.coroutines.withTimeoutOrNull
 import net.schmizz.keepalive.KeepAliveRunner
 import net.schmizz.sshj.SSHClient
 import net.schmizz.sshj.common.IOUtils
@@ -35,7 +40,17 @@ class SshjEngine(
         /** A silent link is declared dead after interval × missed = 60s. */
         const val KEEPALIVE_INTERVAL_SEC = 20
         const val KEEPALIVE_MAX_MISSED = 3
+
+        /**
+         * Whole control-plane exec (open + read + exit). The socket has no read timeout
+         * (keepalive watches the link), so without this a silent link after the app was
+         * frozen in the background held list/probe/capture for minutes.
+         */
+        const val EXEC_TIMEOUT_MS = 20_000L
     }
+
+    /** Runs blocking exec reads so a timed-out caller can walk away from a stuck one. */
+    private val execScope = CoroutineScope(SupervisorJob() + Dispatchers.IO)
 
     /** True if we already hold a live authenticated client for [hostId]. */
     fun isConnected(hostId: String): Boolean {
@@ -234,16 +249,21 @@ class SshjEngine(
         }
     }
 
-    override suspend fun exec(hostId: String, command: String): Result<String> =
-        withContext(Dispatchers.IO) {
+    override suspend fun exec(hostId: String, command: String): Result<String> {
+        val client = try {
+            requireClient(hostId)
+        } catch (e: Exception) {
+            return Result.failure(e)
+        }
+        val open = AtomicReference<Session?>(null)
+        val job = execScope.async {
             runCatching {
-                val client = requireClient(hostId)
                 client.startSession().use { session ->
+                    open.set(session)
                     // No PTY for control-plane — faster, no term negotiation
                     val cmd = session.exec(command)
                     val out = IOUtils.readFully(cmd.inputStream).toString("UTF-8")
                     val err = IOUtils.readFully(cmd.errorStream).toString("UTF-8")
-                    // Cap wait: slow links should not hang 30s on list/probe
                     cmd.join(12, TimeUnit.SECONDS)
                     when {
                         out.isNotBlank() -> out
@@ -253,6 +273,18 @@ class SshjEngine(
                 }
             }
         }
+        try {
+            withTimeoutOrNull(EXEC_TIMEOUT_MS) { job.await() }?.let { return it }
+        } catch (e: kotlinx.coroutines.CancellationException) {
+            job.cancel()
+            throw e
+        }
+        // Silent link: give up now. Closing the channel off-thread lets the stuck read end;
+        // ConnectionManager drops the client on this failure and reconnects.
+        job.cancel()
+        execScope.launch { runCatching { open.get()?.close() } }
+        return Result.failure(IOException("SSH exec timed out after ${EXEC_TIMEOUT_MS / 1000}s"))
+    }
 
     suspend fun openShellSession(
         hostId: String,

@@ -125,6 +125,7 @@ import app.mtmux.ssh.SshConnectParams
 import app.mtmux.ssh.TmuxControl
 import app.mtmux.ssh.TmuxWindow
 import app.mtmux.ssh.applyEnvProbe
+import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
@@ -221,11 +222,6 @@ private fun MtmuxRoot(app: MtmuxApp, activity: ComponentActivity) {
     val composeEnabled by c.prefs.composeBoxEnabled.collectAsState(initial = false)
     val composeHistory by c.prefs.composeHistory.collectAsState(initial = emptyList())
     val hosts by c.hosts.observeHosts().collectAsState(initial = emptyList())
-
-    /** SSH environment probe: tmux and host resources. */
-    suspend fun probeEnvFull(host: Host): EnvProbe {
-        return c.tmux.probeEnvironment(host.id)
-    }
 
     fun envSummary(env: EnvProbe): String {
         val tmux = if (env.tmux) "✓" else "✗"
@@ -367,6 +363,21 @@ private fun MtmuxRoot(app: MtmuxApp, activity: ComponentActivity) {
             snackbar.showSnackbar(msg, duration = SnackbarDuration.Short)
         }
     }
+
+    /**
+     * SSH environment probe: tmux and host resources. null (with a toast) when the probe
+     * could not run, so a dead link is never recorded as "tmux missing".
+     */
+    suspend fun probeEnvFull(host: Host): EnvProbe? =
+        try {
+            c.tmux.probeEnvironment(host.id)
+        } catch (e: CancellationException) {
+            throw e
+        } catch (e: Exception) {
+            DiagLog.w("tmux", "env probe fail alias=${host.alias}: ${e.message}")
+            toast(tr(UiR.string.toast_reprobe_fail, e.message ?: e.javaClass.simpleName), force = true)
+            null
+        }
 
     fun openUrl(url: String) {
         runCatching {
@@ -743,13 +754,27 @@ private fun MtmuxRoot(app: MtmuxApp, activity: ComponentActivity) {
                         } != false
                         if (fullProbe || stale || h.tmuxInstalled == null) {
                             // Background refresh: packages only (UDP is slow; explicit 环境检查 does UDP)
-                            val env = c.tmux.probeEnvironment(h.id)
+                            val env = try {
+                                c.tmux.probeEnvironment(h.id)
+                            } catch (e: CancellationException) {
+                                throw e
+                            } catch (e: Exception) {
+                                // Probe could not run (silent link after background): not
+                                // "tmux missing". Keep this host's cards, record nothing.
+                                DiagLog.w("tmux", "env probe fail alias=${h.alias}: ${e.message} (keep cards)")
+                                synchronized(all) {
+                                    previousByHost[h.id]?.let { all += it }
+                                }
+                                return@launch
+                            }
                             c.hosts.upsert(h.applyEnvProbe(env))
                             if (!env.tmux) {
+                                DiagLog.w("tmux", "tmux missing alias=${h.alias}")
                                 anyMissingTmux = true
                                 return@launch
                             }
                         } else if (h.tmuxInstalled == false) {
+                            DiagLog.w("tmux", "tmux marked missing alias=${h.alias} (skip list)")
                             anyMissingTmux = true
                             return@launch
                         }
@@ -1542,7 +1567,7 @@ fi
                                 return@launch
                             }
                             toast(tr(UiR.string.toast_checking), force = true)
-                            val env = probeEnvFull(h)
+                            val env = probeEnvFull(h) ?: return@launch
                             installProbe = env
                             val updated = h.applyEnvProbe(env)
                             c.hosts.upsert(updated)
@@ -1583,11 +1608,7 @@ fi
                                 toast(tr(UiR.string.toast_install_reprobe_fail), force = true)
                                 return@launch
                             }
-                            val env = runCatching { probeEnvFull(h) }
-                                .getOrElse { e ->
-                                    toast(tr(UiR.string.toast_reprobe_fail, e.message ?: e.javaClass.simpleName), force = true)
-                                    return@launch
-                                }
+                            val env = probeEnvFull(h) ?: return@launch
                             c.hosts.upsert(h.applyEnvProbe(env))
                             installProbe = env
                             installHost = (hosts.find { it.id == h.id } ?: h).applyEnvProbe(env)
@@ -2557,7 +2578,7 @@ fi
                                     }
                                     if (!connectWithHostKeyUi(h)) return@launch
                                     toast(tr(UiR.string.toast_checking))
-                                    installProbe = probeEnvFull(h)
+                                    installProbe = probeEnvFull(h) ?: return@launch
                                     installHost = h
                                 }
                             },
@@ -2602,7 +2623,7 @@ fi
                                 scope.launch {
                                     if (!connectWithHostKeyUi(host)) return@launch
                                     toast(tr(UiR.string.toast_host_checking, host.alias))
-                                    val env = probeEnvFull(host)
+                                    val env = probeEnvFull(host) ?: return@launch
                                     c.hosts.upsert(host.applyEnvProbe(env))
                                     toast("${host.alias}: ${envSummary(env)}")
                                     if (!env.tmux) {
@@ -2615,7 +2636,7 @@ fi
                                 scope.launch {
                                     if (!connectWithHostKeyUi(host)) return@launch
                                     toast(tr(UiR.string.toast_checking_udp))
-                                    installProbe = probeEnvFull(host)
+                                    installProbe = probeEnvFull(host) ?: return@launch
                                     installHost = host
                                 }
                             },
